@@ -1,6 +1,6 @@
 {
-  "name": "Hello Proerty",
-  "short_name": "Property",
+  "name": "Caitou",
+  "short_name": "Caitou",
   "display": "standalone",
   "start_url": "./?utm_source=homescreen",
   "theme_color": "#002140",
