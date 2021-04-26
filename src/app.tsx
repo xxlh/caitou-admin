@@ -108,23 +108,28 @@ const codeMessage = {
  */
 const errorHandler = (error: ResponseError) => {
   const { response } = error;
-  if (response && response.status) {
-    const errorText = codeMessage[response.status] || response.statusText;
-    const { status, url } = response;
-
+  if (!response || !response.status) throw error.message;
+  
+  const errorText = codeMessage[response.status] || response.statusText;
+  const errorTitle = error.data.msg || errorText;
+  const { status } = response;
+  
+  if (status === 401 && window.location.pathname !== '/user/login') {
+    localStorage.removeItem('token');
+    history.push('/user/login');
     notification.error({
-      message: `请求错误 ${status}: ${url}`,
+      message: errorTitle,
       description: errorText,
     });
+  } else {
+    throw error;
   }
 
-  if (!response) {
-    notification.error({
-      description: '您的网络发生异常，无法连接服务器',
-      message: '网络异常',
-    });
-  }
-  throw error;
+  return error.data;
+
+ 
+
+  
 };
 
 // https://umijs.org/zh-CN/plugins/plugin-request
