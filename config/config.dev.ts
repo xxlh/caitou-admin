@@ -2,7 +2,12 @@
 import { defineConfig } from 'umi';
 
 export default defineConfig({
-  API_URL: 'http://api-dev.caitou.ieexx.com', // API地址
+  define: {
+    API_URL:
+      process.env.NODE_ENV == 'development'
+        ? 'http://api-dev.caitou.ieexx.com'
+        : 'https://api.caitou.ieexx.com',
+  },
   plugins: [
     // https://github.com/zthxxx/react-dev-inspector
     'react-dev-inspector/plugins/umi/react-inspector',
