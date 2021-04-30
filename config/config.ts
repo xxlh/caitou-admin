@@ -14,6 +14,9 @@ export default defineConfig({
   dva: {
     hmr: true,
   },
+  define: {
+    API_URL: 'https://api.caitou.ieexx.com',
+  },
   layout: {
     // https://umijs.org/zh-CN/plugins/plugin-layout
     locale: true,

@@ -3,10 +3,7 @@ import { defineConfig } from 'umi';
 
 export default defineConfig({
   define: {
-    API_URL:
-      process.env.NODE_ENV == 'development'
-        ? 'http://api-dev.caitou.ieexx.com'
-        : 'https://api.caitou.ieexx.com',
+    API_URL: 'http://api-dev.caitou.ieexx.com',
   },
   plugins: [
     // https://github.com/zthxxx/react-dev-inspector
