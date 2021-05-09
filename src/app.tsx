@@ -135,7 +135,7 @@ const errorHandler = (error: ResponseError) => {
 // https://umijs.org/zh-CN/plugins/plugin-request
 const token: string = localStorage.getItem('token') || '';
 export const request: RequestConfig = {
-  prefix: API_URL,  // Todo: 判断是否mock
+  prefix: API_URL,
   errorHandler, // 默认错误处理
   credentials: 'include', // 默认请求是否带上cookie
   headers: token

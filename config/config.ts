@@ -15,6 +15,7 @@ export default defineConfig({
     hmr: true,
   },
   define: {
+    'process.env.UMI_ENV': 'prod',
     API_URL: 'https://api.caitou.ieexx.com',
   },
   layout: {

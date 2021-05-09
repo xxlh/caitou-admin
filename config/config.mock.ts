@@ -3,8 +3,8 @@ import { defineConfig } from 'umi';
 
 export default defineConfig({
   define: {
-    'process.env.UMI_ENV': 'dev',
-    API_URL: 'http://api-dev.caitou.ieexx.com',
+    'process.env.UMI_ENV': 'mock',
+    API_URL: '',  // use Mock server
   },
   plugins: [
     // https://github.com/zthxxx/react-dev-inspector
