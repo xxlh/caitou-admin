@@ -1,14 +1,9 @@
 export default {
-  'menu.importdata': '月账单导入',
-  'menu.billlist': '业主信息查询',
-  'menu.noticetable': '信息公告',
-
-  'menu.userverify': '业主注册信息查询',
-  'menu.success': '成功页',
   'menu.welcome': '欢迎',
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',
   'menu.admin': '管理页',
+  'menu.admin.sub-page': '二级管理页',
   'menu.login': '登录',
   'menu.register': '注册',
   'menu.register.result': '注册结果',
@@ -28,7 +23,6 @@ export default {
   'menu.form.advanced-form': '高级表单',
   'menu.list': '列表页',
   'menu.list.table-list': '查询表格',
-  'menu.list.payto-table': '缴至查询',
   'menu.list.basic-list': '标准列表',
   'menu.list.card-list': '卡片列表',
   'menu.list.search-list': '搜索列表',
