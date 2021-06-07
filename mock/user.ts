@@ -152,6 +152,28 @@ export default {
     });
     access = 'guest';
   },
+  'POST /admin/auth/signin': (req: Request, res: Response) => {
+    access = 'admin';
+    res.send({ data: {
+        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9hcGkuY2FpdG91LmllZXh4LmNvbVwvYWRtaW5cL2F1dGhcL3NpZ25pbiIsImlhdCI6MTYyMzA3NzE4NCwiZXhwIjoxNjIzMDgwNzg0LCJuYmYiOjE2MjMwNzcxODQsImp0aSI6Ik9nSHUzSTJWMEJPSnNPdmQiLCJzdWIiOjMsInBydiI6Ijg2NjVhZTk3NzVjZjI2ZjZiOGU0OTZmODZmYTUzNmQ2OGRkNzE4MTgifQ.3jNU9aAarBqLfCWfq406LM_EhTjzS81cmld48ivfdbc",
+        "token_type": "Bearer",
+        "expires_in": 3600,
+        "expires_time": 1623080784,
+        "userinfo": {
+            "id": 3,
+            "name": "啊啊啊",
+            "username": "aaa",
+            "email": "aaa@b.com",
+            "phone": null,
+            "allow_plot_ids": "1",
+            "default_plot_id": 1,
+            "permission_ids": "1",
+            "last_login": null,
+            "created_at": "2020-02-06 18:49:14",
+            "updated_at": "2020-02-17 18:13:29"
+        }
+    }, success: true });
+  },
   'POST /api/login/outLogin': (req: Request, res: Response) => {
     access = '';
     res.send({ data: {}, success: true });

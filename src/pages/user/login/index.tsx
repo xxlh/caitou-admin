@@ -11,7 +11,7 @@ import React, { useState } from 'react';
 import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
 import { useIntl, Link, history, FormattedMessage, SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
-import { login } from '@/services/ant-design-pro/api';
+import { login } from '@/services/login';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 
 import styles from './index.less';
@@ -41,7 +41,7 @@ const goto = () => {
 
 const Login: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
-  const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
+  const [userLoginState, setUserLoginState] = useState<API.LoginStatus>({});
   const [type, setType] = useState<string>('account');
   const { initialState, setInitialState } = useModel('@@initialState');
 
@@ -61,21 +61,22 @@ const Login: React.FC = () => {
     setSubmitting(true);
     try {
       // 登录
-      const msg = await login({ ...values, type });
-      if (msg.status === 'ok') {
-        message.success('登录成功！');
-        await fetchUserInfo();
-        goto();
-        return;
-      }
-      // 如果失败去设置用户错误信息
-      setUserLoginState(msg);
+      const data = await login({ ...values, type });
+      let token = data.token ? data.token_type + ' ' + data.token : '';
+	    localStorage.setItem('token', token);
+      
+      message.success('登录成功！');
+      await fetchUserInfo();
+      goto();
     } catch (error) {
-      message.error('登录失败，请重试！');
+      // 如果失败去设置用户错误信息
+      let msg = error.data.msg || '登录失败，请重试！';
+      setUserLoginState({status: 'error', type: 'account', msg});
+      // message.error(msg);
     }
     setSubmitting(false);
   };
-  const { status, type: loginType } = userLoginState;
+  const { status, type: loginType, msg } = userLoginState;
 
   return (
     <div className={styles.container}>
@@ -137,7 +138,7 @@ const Login: React.FC = () => {
               <LoginMessage
                 content={intl.formatMessage({
                   id: 'pages.login.accountLogin.errorMessage',
-                  defaultMessage: '账户或密码错误（admin/ant.design)',
+                  defaultMessage: msg,
                 })}
               />
             )}
