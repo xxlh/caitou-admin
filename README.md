@@ -28,6 +28,11 @@ Start project with dev server to develop with backend API
 npm run dev
 ```
 
+Start project with production server to verify with backend API
+```bash
+npm run start:pre
+```
+
 ### Build project
 
 ```bash
