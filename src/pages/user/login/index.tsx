@@ -11,7 +11,7 @@ import React, { useState } from 'react';
 import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
 import { useIntl, Link, history, FormattedMessage, SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
-import { login } from '@/services/login';
+import { login } from '@/services/auth';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 
 import styles from './index.less';
@@ -47,14 +47,14 @@ const Login: React.FC = () => {
 
   const intl = useIntl();
 
-  const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-    if (userInfo) {
+  const fetchUserInfo = async (userInfo: API.CurrentUserinfo) => {
+    // const userInfo = await initialState?.fetchUserInfo?.();
+    // if (userInfo) {
       setInitialState({
         ...initialState,
         currentUser: userInfo,
       });
-    }
+    // }
   };
 
   const handleSubmit = async (values: API.LoginParams) => {
@@ -66,7 +66,7 @@ const Login: React.FC = () => {
 	    localStorage.setItem('token', token);
       
       message.success('登录成功！');
-      await fetchUserInfo();
+      await fetchUserInfo(data.userinfo);
       goto();
     } catch (error) {
       // 如果失败去设置用户错误信息

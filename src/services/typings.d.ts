@@ -18,4 +18,15 @@ declare namespace API {
     currentAuthority?: string;
   };
 
+  type CurrentUserinfo = {
+    id: number;
+    name?: string;
+    username?: string;
+    avatar?: string;
+    email?: string;
+    phone?: string;
+    permission_ids?: string;
+    unreadCount?: number;
+    last_login?: string;
+  };
 }
