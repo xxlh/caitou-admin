@@ -12,6 +12,8 @@ import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-desi
 import { useIntl, Link, history, FormattedMessage, SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
 import { login } from '@/services/auth';
+import request from 'umi-request';
+
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 
 import styles from './index.less';
@@ -50,10 +52,10 @@ const Login: React.FC = () => {
   const fetchUserInfo = async (userInfo: API.CurrentUserinfo) => {
     // const userInfo = await initialState?.fetchUserInfo?.();
     // if (userInfo) {
-      setInitialState({
-        ...initialState,
-        currentUser: userInfo,
-      });
+    setInitialState({
+      ...initialState,
+      currentUser: userInfo,
+    });
     // }
   };
 
@@ -62,16 +64,26 @@ const Login: React.FC = () => {
     try {
       // 登录
       const data = await login({ ...values, type });
-      let token = data.token ? data.token_type + ' ' + data.token : '';
-	    localStorage.setItem('token', token);
-      
+      const token = data.token ? `${data.token_type} ${data.token}` : '';
+      localStorage.setItem('token', token);
+      request.interceptors.request.use((url, options) => {
+        return {
+          options: {
+            ...options,
+            headers: {
+              Authorization: token,
+            },
+          },
+        };
+      });
+
       message.success('登录成功！');
       await fetchUserInfo(data.userinfo);
       goto();
-    } catch (error) {
+    } catch (error: any) {
       // 如果失败去设置用户错误信息
-      let msg = error.data.msg || '登录失败，请重试！';
-      setUserLoginState({status: 'error', type: 'account', msg});
+      const msg = error?.data?.msg || '登录失败，请重试！';
+      setUserLoginState({ status: 'error', type: 'account', msg });
       // message.error(msg);
     }
     setSubmitting(false);
