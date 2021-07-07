@@ -1,4 +1,4 @@
-﻿export default [
+export default [
   {
     path: '/user',
     layout: false,
@@ -47,6 +47,18 @@
     icon: 'table',
     path: '/user-list',
     component: './UserList',
+  },
+  {
+    name: '商品管理',
+    icon: 'goods',
+    routes: [
+      {
+        name: '商品列表',
+        icon: 'smile',
+        path: '/goods',
+        component: './GoodsList',
+      },
+    ],
   },
   {
     path: '/',
