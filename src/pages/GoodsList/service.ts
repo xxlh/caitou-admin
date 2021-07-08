@@ -4,7 +4,7 @@ import { request } from 'umi';
 import { TableListItem } from './data';
 
 /** 获取规则列表 GET /api/rule */
-export async function rule(
+export async function goods(
   params: {
     // query
     /** 当前的页码 */
@@ -42,10 +42,13 @@ export async function updateRule(options?: { [key: string]: any }) {
 }
 
 /** 新建规则 POST /api/rule */
-export async function addRule(options?: { [key: string]: any }) {
-  return request<TableListItem>('/api/rule', {
+export async function addGoods(params?: { [key: string]: any }) {
+  return request<TableListItem>('/admin/products', {
     method: 'POST',
-    ...(options || {}),
+    params: {
+      ...params,
+      description: params.description.toHTML()
+    },
   });
 }
 

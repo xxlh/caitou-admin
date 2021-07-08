@@ -50,11 +50,11 @@ export default [
   },
   {
     name: '商品管理',
-    icon: 'goods',
+    icon: 'ShoppingOutlined',
     routes: [
       {
         name: '商品列表',
-        icon: 'smile',
+        icon: 'SkinOutlined',
         path: '/goods',
         component: './GoodsList',
       },
