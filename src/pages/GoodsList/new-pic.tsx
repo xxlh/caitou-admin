@@ -1,6 +1,8 @@
 import { Upload, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
+import cos from '@/utils/cos'
+
 
 function getBase64(file:File) {
   return new Promise((resolve, reject) => {
@@ -16,6 +18,7 @@ class PicturesWall extends React.Component {
     previewVisible: false,
     previewImage: '',
     previewTitle: '',
+    url: '',
     fileList: [
       {
         uid: '-1',
@@ -31,6 +34,19 @@ class PicturesWall extends React.Component {
       },
     ],
   };
+
+  getUploadURL = async (params:any) => {
+    cos.getObjectUrl({
+      Bucket: 'caitou-1252187609',
+      Region: 'ap-guangzhou',
+      Method: 'PUT',
+      Key: params.filename,
+      Sign: true
+    }, (err, data) => {
+      if (err) return console.log(err);
+      this.setState({url: data.Url});
+    });
+  }
 
   handleCancel = () => this.setState({ previewVisible: false });
 
@@ -48,6 +64,12 @@ class PicturesWall extends React.Component {
 
   handleChange = ({ fileList }) => this.setState({ fileList });
 
+  beforeUpload = async (file:File) => {
+    console.log(file.name);
+    await this.getUploadURL({filename: file.name});
+    console.log(this.state.url);
+  }
+
   render() {
     const { previewVisible, previewImage, fileList, previewTitle } = this.state;
     const uploadButton = (
@@ -59,11 +81,14 @@ class PicturesWall extends React.Component {
     return (
       <>
         <Upload
-          action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+          action={this.state.url}
           listType="picture-card"
+          method="PUT"
+          headers={{"Content-Type": 'application/octet-stream'}}
           fileList={fileList}
           onPreview={this.handlePreview}
           onChange={this.handleChange}
+          beforeUpload={this.beforeUpload}
         >
           {fileList.length >= 8 ? null : uploadButton}
         </Upload>

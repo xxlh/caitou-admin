@@ -57,6 +57,7 @@
     "antd": "^4.14.0",
     "braft-editor": "^2.3.9",
     "classnames": "^2.2.6",
+    "cos-js-sdk-v5": "^1.2.15",
     "lodash": "^4.17.11",
     "moment": "^2.25.3",
     "omit.js": "^2.0.2",

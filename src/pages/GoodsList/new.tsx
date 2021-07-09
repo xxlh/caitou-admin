@@ -11,17 +11,11 @@ import { addGoods } from './service';
 import { TableListItem } from './data';
 import PicturesWall from './new-pic';
 // 引入编辑器组件
-import BraftEditor from 'braft-editor'
+import BraftEditor, { MediaType } from 'braft-editor'
 // 引入编辑器样式
 import 'braft-editor/dist/index.css'
-
-const waitTime = (time: number = 100) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, time);
-  });
-};
+import uploadFn from '@/utils/upload'
+import { useModel } from 'umi';
 
 /**
  * 添加节点
@@ -46,12 +40,31 @@ const waitTime = (time: number = 100) => {
 export default () => {
   const formRef = useRef();
   const [editorState, setEditorState] = useState<any>(BraftEditor.createEditorState(null));
+  const { initialState } = useModel('@@initialState');
+  const { currentUser } = initialState || {};
 //   const submitContent = async () => {
 //     // 在编辑器获得焦点时按下ctrl+s会执行此方法
 //     // 编辑器内容提交到服务端之前，可直接调用editorState.toHTML()来获取HTML格式的内容
 //     const htmlContent = editorState.toHTML()
 //     const result = await saveEditorContent(htmlContent)
 //     }
+    const cosUploadFn = (param:any) => {
+        uploadFn({
+            path: `${currentUser?.id}`, // Todo: +/分类id
+            hashFilename: true,
+            ...param,
+            success: (data:any) => {
+                param.success({
+                    url: `//${data?.Location}`,
+                    meta: {
+                        id: param.libraryId,
+                        title: param.file?.name,
+                        alt: param.file?.name,
+                    }
+                });
+            }
+        })
+    }
   return (
     <DrawerForm<TableListItem>
       title="添加商品"
@@ -102,6 +115,7 @@ export default () => {
                 value={editorState}
                 onChange={setEditorState}
                 // onSave={submitContent}
+                media={{ uploadFn: cosUploadFn }}
             />
         </ProForm.Item>
         {/* <div>{editorState.toHTML()}</div> */}
