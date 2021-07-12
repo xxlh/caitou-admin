@@ -1,6 +1,6 @@
 // @ts-ignore
 /* eslint-disable */
-import { request } from 'umi';
+import { request, useModel } from 'umi';
 import { TableListItem } from './data';
 
 /** 获取规则列表 GET /api/rule */
@@ -42,12 +42,13 @@ export async function updateRule(options?: { [key: string]: any }) {
 }
 
 /** 新建规则 POST /api/rule */
-export async function addGoods(params?: { [key: string]: any }) {
+export async function addGoods(data?: { [key: string]: any }) {
   return request<TableListItem>('/admin/products', {
     method: 'POST',
-    params: {
-      ...params,
-      description: params.description.toHTML()
+    data: {
+      ...data,
+      images: data?.images?.map((img:any) => img?.url),
+      description: data?.description?.toHTML()
     },
   });
 }
@@ -57,5 +58,14 @@ export async function removeRule(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/rule', {
     method: 'DELETE',
     ...(options || {}),
+  });
+}
+
+/** 拉取类别 */
+  // const { categories, fetchCategories } = useModel('categories');
+export async function getCategories(params?: { [key: string]: any }) {
+  return request<Record<string, any>>('/admin/categories', {
+    method: 'GET',
+    params,
   });
 }

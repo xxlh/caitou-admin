@@ -32,16 +32,30 @@ import { useModel } from 'umi';
       return true;
     } catch (error) {
       hide();
-      message.error('添加失败请重试！');
+      message.error(error?.data?.msg ? error?.data?.msg : '添加失败请重试！');
       return false;
     }
-  };
+};
+
+
 
 export default () => {
   const formRef = useRef();
-  const [editorState, setEditorState] = useState<any>(BraftEditor.createEditorState(null));
-  const { initialState } = useModel('@@initialState');
+  const [editorState, setEditorState] = useState(BraftEditor.createEditorState(null));
+  const { initialState, setInitialState } = useModel('@@initialState');
   const { currentUser } = initialState || {};
+  const { getCategories, setCategories } = useModel('categories');
+  const [firstCategories, setFirstCategories] = useState([]);
+  const [secondCategories, setSecondCategories] = useState([]);
+  
+    const onVisibleChange = async (visible:boolean) => {
+        if (!visible) return;
+        /* 查询类别 */
+        let categories = await getCategories();
+        setFirstCategories(categories.map((cat:any) => {
+            return {label: cat.name, value: cat.id};
+        }));
+    }
 //   const submitContent = async () => {
 //     // 在编辑器获得焦点时按下ctrl+s会执行此方法
 //     // 编辑器内容提交到服务端之前，可直接调用editorState.toHTML()来获取HTML格式的内容
@@ -79,6 +93,7 @@ export default () => {
         forceRender: true,
         destroyOnClose: true,
       }}
+      onVisibleChange={onVisibleChange}
       onFinish={handleAdd}
     >
       <ProForm.Group>
@@ -95,19 +110,16 @@ export default () => {
       <ProForm.Group>
         <ProFormDigit width="sm" name="price" label="商品价格" />
         <ProFormSelect
-          options={[
-            {
-              value: 'chapter',
-              label: '盖章后生效',
-            },
-          ]}
+          options={firstCategories}
           width="xs"
           name="useMode"
           label="商品分类"
         />
       </ProForm.Group>
       <ProForm.Group>
+        <ProForm.Item name="images">
           <PicturesWall />
+        </ProForm.Item>
       </ProForm.Group>
       <ProForm.Group>
         <ProForm.Item name="description">

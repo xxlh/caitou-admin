@@ -1,7 +1,8 @@
 import { Upload, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
-import cos from '@/utils/cos'
+import cos, { getObjectUrl } from '@/utils/cos'
+import { ProFormUploadButton } from '@ant-design/pro-form';
 
 
 function getBase64(file:File) {
@@ -19,33 +20,12 @@ class PicturesWall extends React.Component {
     previewImage: '',
     previewTitle: '',
     url: '',
-    fileList: [
-      {
-        uid: '-1',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-      {
-        uid: '-2',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-    ],
+    fileList: [],
   };
 
   getUploadURL = async (params:any) => {
-    cos.getObjectUrl({
-      Bucket: 'caitou-1252187609',
-      Region: 'ap-guangzhou',
-      Method: 'PUT',
-      Key: params.filename,
-      Sign: true
-    }, (err, data) => {
-      if (err) return console.log(err);
-      this.setState({url: data.Url});
-    });
+    let url = await getObjectUrl({Key: params.filename});
+    this.setState({url});
   }
 
   handleCancel = () => this.setState({ previewVisible: false });
@@ -62,12 +42,13 @@ class PicturesWall extends React.Component {
     });
   };
 
-  handleChange = ({ fileList }) => this.setState({ fileList });
+  handleChange = ({ file, fileList }) => {
+    if (file.status == 'done') file.url = file?.xhr?.responseURL;
+    this.setState({ fileList });
+  }
 
   beforeUpload = async (file:File) => {
-    console.log(file.name);
     await this.getUploadURL({filename: file.name});
-    console.log(this.state.url);
   }
 
   render() {
@@ -80,18 +61,24 @@ class PicturesWall extends React.Component {
     );
     return (
       <>
-        <Upload
+        <ProFormUploadButton
+          name="images"
+          label="Upload"
           action={this.state.url}
-          listType="picture-card"
-          method="PUT"
-          headers={{"Content-Type": 'application/octet-stream'}}
+          fieldProps={{
+            name: 'file',
+            listType: 'picture-card',
+            method: "PUT",
+            headers: {"Content-Type": 'application/octet-stream'},
+            onPreview: this.handlePreview,
+            beforeUpload: this.beforeUpload,
+          }}
           fileList={fileList}
-          onPreview={this.handlePreview}
+          max={8}
           onChange={this.handleChange}
-          beforeUpload={this.beforeUpload}
         >
           {fileList.length >= 8 ? null : uploadButton}
-        </Upload>
+        </ProFormUploadButton>
         <Modal
           visible={previewVisible}
           title={previewTitle}

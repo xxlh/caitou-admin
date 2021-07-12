@@ -2,11 +2,12 @@ import { SecretId, SecretKey } from '/config/deploy.config';
 
 import COS from 'cos-js-sdk-v5';
 import { request } from 'umi';
+import { SoundFilled } from '@ant-design/icons';
 
 const Bucket = 'caitou-1252187609';
 const Region = 'ap-guangzhou';     /* 存储桶所在地域，必须字段 */
 
-export default new COS({
+let cos = new COS({
     SecretId: 'AKID0pOilX1FBrGPGq9H8i01mFRM0NUJswjF',
     SecretKey: 'GFxOXQ1LNIxKQEm7BxTheKktkKdfQuBC',
 //   getAuthorization: function (options, callback) {
@@ -28,3 +29,20 @@ export default new COS({
 //       });
 //   }
 });
+
+export let getObjectUrl = (params: COS.GetObjectAclParams) => {
+    return new Promise((resolve, reject) => {
+        cos.getObjectUrl({
+            Bucket,
+            Region,
+            Method: 'PUT',
+            Sign: true,
+            ...params
+        }, (err, data) => {
+            if (err) return reject(err);
+            resolve(data.Url);
+        });
+    });
+}
+
+export default cos;
