@@ -9,7 +9,7 @@ import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import { goods, updateRule, removeRule } from './service';
 import type { TableListItem, TableListPagination } from './data';
-import NewGoods from './new';
+import AddGoods from './add';
 
 /**
  * 更新节点
@@ -168,7 +168,7 @@ const TableList: React.FC = () => {
           },
         }}
         toolBarRender={() => [
-          <NewGoods />,
+          <AddGoods />,
         ]}
         params={params}
         request={goods}

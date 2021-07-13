@@ -52,6 +52,12 @@ export async function addGoods(data?: { [key: string]: any }) {
     },
   });
 }
+export async function addGoodsSpec(id:number, data?: { [key: string]: any }) {
+  return request<TableListItem>(`/admin/products/${id}/spec`, {
+    method: 'POST',
+    data: data,
+  });
+}
 
 /** 删除规则 DELETE /api/rule */
 export async function removeRule(options?: { [key: string]: any }) {
