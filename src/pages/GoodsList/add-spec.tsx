@@ -24,7 +24,7 @@ type DataSourceType = {
     created_at?: string;
   };
   
-export default (props:{goodsId:number, goodsRef:any, addEmptyGoods?:any, setSkuData?:any, fieldProps?:object}) => {
+export default (props:{goodsId:number, goodsRef:any, addEmptyGoods?:any, skuData?:any, setSkuData?:any, specData?:DataSourceType[], fieldProps?:object}) => {
   const formRef = useRef();
   const [specData, setSpecData] = useState<DataSourceType[]>([]);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>(() =>
@@ -74,7 +74,7 @@ export default (props:{goodsId:number, goodsRef:any, addEmptyGoods?:any, setSkuD
         title="添加商品规格"
         formRef={formRef}
         trigger={
-          specData.length ? <Button>
+          specData.length||props?.skuData?.length ? <Button>
                 <EditOutlined /> 编辑商品规格
             </Button> : <Button>
                 <PlusOutlined /> 添加商品规格
@@ -90,12 +90,19 @@ export default (props:{goodsId:number, goodsRef:any, addEmptyGoods?:any, setSkuD
             try {
               await props.goodsRef?.current?.validateFields();
               if (!props.goodsId) await props.addEmptyGoods();
-              setVisible(true);
+              if (!specData?.length) {
+                let spec = props?.specData || [];
+                spec = spec.map(s => {s.rowKey=s.id||Math.random();return s;})
+                setSpecData(spec);
+                setEditableRowKeys(spec.map(s => s.rowKey));
+              }
+              if (!visible) setVisible(true);
             } catch (error) {
-              setVisible(false);
+              if (visible) setVisible(false);
             }
           } else {
-            setVisible(false);
+            setSpecData([]);
+            if (visible) setVisible(false);
           }
         }}
         onFinish={async (values) => {

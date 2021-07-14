@@ -5,36 +5,10 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import ProDescriptions from '@ant-design/pro-descriptions';
-import type { FormValueType } from './components/UpdateForm';
-import UpdateForm from './components/UpdateForm';
 import { goods, updateRule, removeRule } from './service';
 import type { TableListItem, TableListPagination } from './data';
 import AddGoods from './add';
 
-/**
- * 更新节点
- *
- * @param fields
- */
-
-const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('正在配置');
-
-  try {
-    await updateRule({
-      name: fields.name,
-      desc: fields.desc,
-      key: fields.key,
-    });
-    hide();
-    message.success('配置成功');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('配置失败请重试！');
-    return false;
-  }
-};
 /**
  * 删除节点
  *
@@ -60,10 +34,10 @@ const handleRemove = async (selectedRows: TableListItem[]) => {
 };
 
 const TableList: React.FC = () => {
-  const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const formRef = useRef<FormInstance>();
   const actionRef = useRef<ActionType>();
+  const editRef = useRef()
   const [currentRow, setCurrentRow] = useState<TableListItem>();
   const [selectedRowsState, setSelectedRows] = useState<TableListItem[]>([]);
   const params:any = {bb:1};
@@ -135,19 +109,28 @@ const TableList: React.FC = () => {
       render: (_, record) => [
         <a
           key="config"
-          onClick={() => {
-            handleUpdateModalVisible(true);
+          onClick={(e) => {
+            editRef.current.open(record?.id);
             setCurrentRow(record);
           }}
         >
-          配置
-        </a>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          订阅警报
+          编辑
         </a>,
       ],
     },
   ];
+
+  // const onAddGoodsVisibleChange = async (visible:boolean) => {
+  //   if (visible) {
+  //     /* 查询类别 */
+  //     let categories = await getCategories();
+  //     setFirstCategories(categories.map((cat:any) => {
+  //         return {label: cat.name, value: cat.id};
+  //     }));
+  //   } else {
+      
+  //   }
+  // }
 
   return (
     <PageContainer>
@@ -168,7 +151,7 @@ const TableList: React.FC = () => {
           },
         }}
         toolBarRender={() => [
-          <AddGoods />,
+          <AddGoods ref={editRef} />,
         ]}
         params={params}
         request={goods}
@@ -210,26 +193,6 @@ const TableList: React.FC = () => {
           <Button type="primary">批量审批</Button>
         </FooterToolbar>
       )}
-      <UpdateForm
-        onSubmit={async (value) => {
-          const success = await handleUpdate(value);
-
-          if (success) {
-            handleUpdateModalVisible(false);
-            setCurrentRow(undefined);
-
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
-        onCancel={() => {
-          handleUpdateModalVisible(false);
-          setCurrentRow(undefined);
-        }}
-        updateModalVisible={updateModalVisible}
-        values={currentRow || {}}
-      />
 
       <Drawer
         width={600}

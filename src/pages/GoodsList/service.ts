@@ -33,11 +33,23 @@ export async function goods(
   });
 }
 
+export async function getGoods(id:number) {
+  return request<TableListItem>(`/admin/products/${id}`, {
+    method: 'GET',
+  });
+}
+
 /** 新建规则 PUT /api/rule */
-export async function updateRule(options?: { [key: string]: any }) {
-  return request<TableListItem>('/api/rule', {
-    method: 'PUT',
-    ...(options || {}),
+export async function updateGoods(id:number, data?: { [key: string]: any }) {
+  return request<TableListItem>(`/admin/products/${id}`, {
+    method: 'PATCH',
+    data: data,
+  });
+}
+export async function updateSku(id:number, skuId:number, data?: { [key: string]: any }) {
+  return request<TableListItem>(`/admin/products/${id}/sku/${skuId}`, {
+    method: 'PATCH',
+    data: data,
   });
 }
 
