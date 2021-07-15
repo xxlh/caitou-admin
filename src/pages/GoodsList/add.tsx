@@ -8,8 +8,8 @@ import ProForm, {
   DrawerFormProps,
 } from '@ant-design/pro-form';
 import { PlusOutlined } from '@ant-design/icons';
-import { addGoods, getGoods, updateGoods, updateSku } from './service';
-import { TableListItem } from './data';
+import { addGoods, getGoods, getGoodsCategories, updateGoods, updateSku } from './service';
+import { GoodsItemType, SkuDataType, SpecDataType } from './data';
 import AddSpec from './add-spec';
 import PicturesWall from './add-pic';
 // 引入编辑器组件
@@ -19,17 +19,9 @@ import 'braft-editor/dist/index.css'
 import uploadFn from '@/utils/upload'
 import { useModel } from 'umi';
 import { EditableProTable, ProColumns } from '@ant-design/pro-table';
+import _ from 'lodash/collection';
 
-type SkuDataSourceType = {
-  id: React.Key;
-  name?: string;
-  image?: string;
-  price: number;
-  stock: number;
-  spec_ids: string;
-  own_spec: string;
-  created_at?: string;
-};
+
 
 
 export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}, ref:any) => {
@@ -39,22 +31,28 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
   const { initialState, setInitialState } = useModel('@@initialState');
   const { currentUser } = initialState || {};
   const [goodsId, setGoodsId] = useState(0);
-  const [skuData, setSkuData] = useState<SkuDataSourceType[]>([]);
+  const [skuData, setSkuData] = useState<SkuDataType[]>([]);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
-  const [specData, setSpecData] = useState<DataSourceType[]>([]);
-  const { getCategories, setCategories } = useModel('categories');
+  const [specData, setSpecData] = useState<SpecDataType[]>([]);
+  const { categoriesByid, getCategories } = useModel('categories');
   const [firstCategories, setFirstCategories] = useState([]);
   const [secondCategories, setSecondCategories] = useState([]);
+  const [categoriesDefault, setCategoriesDefault] = useState([]);
 
-  const initiate = async () => {
+  const initiateGoodsData = async () => {
     const id = goodsId || props.goodsId;
     if (!id) return;
     if (!goodsId) setGoodsId(props.goodsId || 0);
     try {
       let goodsData = await getGoods(id);
       formRef?.current?.setFieldsValue(goodsData?.product);
-      setSkuData(goodsData?.skus);
+      setSkuData(goodsData?.skus?.map(sku => {
+        if (typeof sku.own_spec == 'object') sku.own_spec = _.map(sku.own_spec, (v,k) => `${k}: ${v}`).join('\n');
+        return sku;
+      }));
       setSpecData(goodsData?.specs);
+      let categories = await getGoodsCategories(id);
+      setCategoriesDefault(categories.map((cat:any) => cat.id));
     } catch (error) {
       message.error(error?.data?.msg);
     }
@@ -62,12 +60,18 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
   
   const onVisibleChange = async (visible:boolean) => {
     if (visible) {
-      await initiate();
+      await initiateGoodsData();
       /* 查询类别 */
       let categories = await getCategories();
       setFirstCategories(categories.map((cat:any) => {
-          return {label: cat.name, value: cat.id};
+        return {label: cat.name, value: cat.id};
       }));
+      // 拉取所有二级分类项，提供给DefaultValue的id识别
+      let secondCat:any = [];
+      categories.map((cat:any) => {
+        cat?.children?.map((c:any) => secondCat.push({label: c.name, value: c.id}));
+      });
+      setSecondCategories(secondCat);
       setVisible(true);
     } else {
       setVisible(false);
@@ -76,10 +80,11 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
       setSpecData([]);
       setFirstCategories([]);
       setSecondCategories([]);
+      setCategoriesDefault([]);
     }
   }
 
-  const handleAdd = async (fields: TableListItem) => {
+  const handleAdd = async (fields: GoodsItemType) => {
     const hide = message.loading('正在添加');
 
     try {
@@ -138,7 +143,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
     },
   }), []);
 
-  const skuColumns: ProColumns<SkuDataSourceType>[] = [
+  const skuColumns: ProColumns<SkuDataType>[] = [
     {
       title: '规格组合',
       dataIndex: 'own_spec',
@@ -174,7 +179,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
 
 
   return (
-    <DrawerForm<TableListItem>
+    <DrawerForm<GoodsItemType>
       title={goodsId ? "编辑商品" : "添加商品"}
       formRef={formRef}
       trigger={
@@ -207,9 +212,25 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
         <ProFormSelect
           options={firstCategories}
           width="sm"
-          name="useMode"
           label="商品分类"
+          fieldProps={{
+            onChange(v, o) {
+              setSecondCategories(categoriesByid[v]?.children?.map((cat:any) => {
+                return {label: cat.name, value: cat.id};
+              }));
+            },
+          }}
         />
+        {(secondCategories.length>0 || formRef?.current?.getFieldValue('categories')?.length>0) &&
+        <ProFormSelect
+          options={secondCategories}
+          width="sm"
+          name="categories"
+          label="子分类"
+          mode="multiple"
+          fieldProps={{defaultValue:categoriesDefault}}
+        />
+        }
         {skuData.length==0 && <>
         <ProFormDigit width="xs" name="price" label="商品价格" />
         <ProFormDigit width="xs" name="stock" label="商品库存" />
@@ -221,7 +242,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
           initialValue={skuData}
           trigger="onValuesChange"
         >
-          <EditableProTable<SkuDataSourceType>
+          <EditableProTable<SkuDataType>
             rowKey="id"
             toolBarRender={false}
             columns={skuColumns}

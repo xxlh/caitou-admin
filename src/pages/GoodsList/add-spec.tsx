@@ -5,35 +5,19 @@ import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { EditableProTable, ProColumns } from '@ant-design/pro-table';
 import _ from 'lodash/collection';
 import { addGoods, addGoodsSpec } from './service';
+import { SpecDataType } from './data';
 
-
-const waitTime = (time: number = 100) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, time);
-  });
-};
-
-type DataSourceType = {
-    rowKey: React.Key;
-    id?: number;
-    key: string;
-    name: string;
-    image?: string;
-    created_at?: string;
-  };
   
-export default (props:{goodsId:number, goodsRef:any, addEmptyGoods?:any, skuData?:any, setSkuData?:any, specData?:DataSourceType[], fieldProps?:object}) => {
+export default (props:{goodsId:number, goodsRef:any, addEmptyGoods?:any, skuData?:any, setSkuData?:any, specData?:SpecDataType[], fieldProps?:object}) => {
   const formRef = useRef();
-  const [specData, setSpecData] = useState<DataSourceType[]>([]);
+  const [specData, setSpecData] = useState<SpecDataType[]>([]);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>(() =>
     specData.map((item) => item.rowKey),
   );
   const [visible, setVisible] = useState(false);
 //   const [keys, setKeys] = useState({});
 
-  const columns: ProColumns<DataSourceType>[] = [
+  const columns: ProColumns<SpecDataType>[] = [
     {
       title: '规格类别',
       dataIndex: 'key',
@@ -120,7 +104,7 @@ export default (props:{goodsId:number, goodsRef:any, addEmptyGoods?:any, skuData
         initialValue={specData}
         trigger="onValuesChange"
       >
-        <EditableProTable<DataSourceType>
+        <EditableProTable<SpecDataType>
           rowKey="rowKey"
           toolBarRender={false}
           columns={columns}

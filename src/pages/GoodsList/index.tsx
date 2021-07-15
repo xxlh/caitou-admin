@@ -6,7 +6,7 @@ import ProTable from '@ant-design/pro-table';
 import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import { goods, updateRule, removeRule } from './service';
-import type { TableListItem, TableListPagination } from './data';
+import type { GoodsItemType, TableListPagination } from './data';
 import AddGoods from './add';
 
 /**
@@ -15,7 +15,7 @@ import AddGoods from './add';
  * @param selectedRows
  */
 
-const handleRemove = async (selectedRows: TableListItem[]) => {
+const handleRemove = async (selectedRows: GoodsItemType[]) => {
   const hide = message.loading('正在删除');
   if (!selectedRows) return true;
 
@@ -33,17 +33,17 @@ const handleRemove = async (selectedRows: TableListItem[]) => {
   }
 };
 
-const TableList: React.FC = () => {
+const GoodsList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const formRef = useRef<FormInstance>();
   const actionRef = useRef<ActionType>();
   const editRef = useRef()
-  const [currentRow, setCurrentRow] = useState<TableListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<TableListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<GoodsItemType>();
+  const [selectedRowsState, setSelectedRows] = useState<GoodsItemType[]>([]);
   const params:any = {bb:1};
   /** 国际化配置 */
 
-  const columns: ProColumns<TableListItem>[] = [
+  const columns: ProColumns<GoodsItemType>[] = [
     {
       title: '商品名称',
       dataIndex: 'title',
@@ -134,7 +134,7 @@ const TableList: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<TableListItem, TableListPagination>
+      <ProTable<GoodsItemType, TableListPagination>
         // headerTitle="所有商品"
         actionRef={actionRef}
         formRef={formRef}
@@ -204,7 +204,7 @@ const TableList: React.FC = () => {
         closable={false}
       >
         {currentRow?.name && (
-          <ProDescriptions<TableListItem>
+          <ProDescriptions<GoodsItemType>
             column={2}
             title={currentRow?.name}
             request={async () => ({
@@ -213,7 +213,7 @@ const TableList: React.FC = () => {
             params={{
               id: currentRow?.name,
             }}
-            columns={columns as ProDescriptionsItemProps<TableListItem>[]}
+            columns={columns as ProDescriptionsItemProps<GoodsItemType>[]}
           />
         )}
       </Drawer>
@@ -221,4 +221,4 @@ const TableList: React.FC = () => {
   );
 };
 
-export default TableList;
+export default GoodsList;

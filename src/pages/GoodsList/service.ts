@@ -1,7 +1,7 @@
 // @ts-ignore
 /* eslint-disable */
 import { request, useModel } from 'umi';
-import { TableListItem } from './data';
+import { GoodsItem, TableListItem } from './data';
 
 /** 获取规则列表 GET /api/rule */
 export async function goods(
@@ -16,7 +16,7 @@ export async function goods(
   filter?: { [key: string]: any },
 ) {
   return request<{
-    data: TableListItem[];
+    data: GoodsItem[];
     /** 列表的内容总数 */
     total?: number;
   }>('/admin/products', {
@@ -34,14 +34,14 @@ export async function goods(
 }
 
 export async function getGoods(id:number) {
-  return request<TableListItem>(`/admin/products/${id}`, {
+  return request<{product:GoodsItem}>(`/admin/products/${id}`, {
     method: 'GET',
   });
 }
 
 /** 新建规则 PUT /api/rule */
 export async function updateGoods(id:number, data?: { [key: string]: any }) {
-  return request<TableListItem>(`/admin/products/${id}`, {
+  return request<GoodsItem>(`/admin/products/${id}`, {
     method: 'PATCH',
     data: data,
   });
@@ -55,7 +55,7 @@ export async function updateSku(id:number, skuId:number, data?: { [key: string]:
 
 /** 新建规则 POST /api/rule */
 export async function addGoods(data?: { [key: string]: any }) {
-  return request<TableListItem>('/admin/products', {
+  return request<GoodsItem>('/admin/products', {
     method: 'POST',
     data: {
       ...data,
@@ -80,10 +80,8 @@ export async function removeRule(options?: { [key: string]: any }) {
 }
 
 /** 拉取类别 */
-  // const { categories, fetchCategories } = useModel('categories');
-export async function getCategories(params?: { [key: string]: any }) {
-  return request<Record<string, any>>('/admin/categories', {
+export async function getGoodsCategories(id:number) {
+  return request<Record<string, any>>(`/admin/products/${id}/categories`, {
     method: 'GET',
-    params,
   });
 }
