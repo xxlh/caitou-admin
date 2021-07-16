@@ -1,7 +1,7 @@
 import { Upload, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
-import cos, { getObjectUrl } from '@/utils/cos'
+import cos, { getFileUrl, getUploadUrl } from '@/utils/cos'
 import { ProFormUploadButton } from '@ant-design/pro-form';
 
 
@@ -24,7 +24,7 @@ class PicturesWall extends React.Component {
   };
 
   getUploadURL = async (params:any) => {
-    let url = await getObjectUrl({Key: params.filename});
+    let url = await getUploadUrl(params.filename);
     this.setState({url});
   }
 
@@ -42,8 +42,12 @@ class PicturesWall extends React.Component {
     });
   };
 
-  handleChange = ({ file, fileList }) => {
-    if (file.status == 'done') file.url = file?.xhr?.responseURL;
+  handleChange = async ({ file, fileList }) => {
+    if (file.status == 'done') {
+      // file.url = file?.xhr?.responseURL;
+      file.url = await getFileUrl(file.name);
+    }
+    
     this.setState({ fileList });
   }
 
@@ -63,7 +67,7 @@ class PicturesWall extends React.Component {
       <>
         <ProFormUploadButton
           name="images"
-          label="Upload"
+          label="商品图片"
           action={this.state.url}
           fieldProps={{
             name: 'file',

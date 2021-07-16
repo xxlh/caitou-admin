@@ -35,7 +35,6 @@ export let getObjectUrl = (params: COS.GetObjectAclParams) => {
         cos.getObjectUrl({
             Bucket,
             Region,
-            Method: 'PUT',
             Sign: true,
             ...params
         }, (err, data) => {
@@ -43,6 +42,14 @@ export let getObjectUrl = (params: COS.GetObjectAclParams) => {
             resolve(data.Url);
         });
     });
+}
+
+export let getUploadUrl = async (filename: string) => {
+    return await getObjectUrl({Key: filename, Method: 'PUT'});
+}
+
+export let getFileUrl = async (filename: string) => {
+    return await getObjectUrl({Key: filename});
 }
 
 export default cos;

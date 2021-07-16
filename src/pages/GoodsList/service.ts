@@ -43,7 +43,7 @@ export async function getGoods(id:number) {
 export async function updateGoods(id:number, data?: { [key: string]: any }) {
   return request<GoodsItem>(`/admin/products/${id}`, {
     method: 'PATCH',
-    data: data,
+    data,
   });
 }
 export async function updateSku(id:number, skuId:number, data?: { [key: string]: any }) {
@@ -57,11 +57,7 @@ export async function updateSku(id:number, skuId:number, data?: { [key: string]:
 export async function addGoods(data?: { [key: string]: any }) {
   return request<GoodsItem>('/admin/products', {
     method: 'POST',
-    data: {
-      ...data,
-      images: data?.images?.map((img:any) => img?.url),
-      description: data?.description?.toHTML()
-    },
+    data,
   });
 }
 export async function addGoodsSpec(id:number, data?: { [key: string]: any }) {

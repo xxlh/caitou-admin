@@ -35,44 +35,57 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
   const [specData, setSpecData] = useState<SpecDataType[]>([]);
   const { categoriesByid, getCategories } = useModel('categories');
+  const [firstCategoryId, setFirstCategoryId] = useState([]);
   const [firstCategories, setFirstCategories] = useState([]);
   const [secondCategories, setSecondCategories] = useState([]);
   const [categoriesDefault, setCategoriesDefault] = useState([]);
 
-  const initiateGoodsData = async () => {
-    const id = goodsId || props.goodsId;
-    if (!id) return;
-    if (!goodsId) setGoodsId(props.goodsId || 0);
-    try {
-      let goodsData = await getGoods(id);
-      formRef?.current?.setFieldsValue(goodsData?.product);
-      setSkuData(goodsData?.skus?.map(sku => {
-        if (typeof sku.own_spec == 'object') sku.own_spec = _.map(sku.own_spec, (v,k) => `${k}: ${v}`).join('\n');
-        return sku;
-      }));
-      setSpecData(goodsData?.specs);
-      let categories = await getGoodsCategories(id);
-      setCategoriesDefault(categories.map((cat:any) => cat.id));
-    } catch (error) {
-      message.error(error?.data?.msg);
-    }
-  }
-  
   const onVisibleChange = async (visible:boolean) => {
     if (visible) {
-      await initiateGoodsData();
-      /* 查询类别 */
-      let categories = await getCategories();
-      setFirstCategories(categories.map((cat:any) => {
-        return {label: cat.name, value: cat.id};
-      }));
-      // 拉取所有二级分类项，提供给DefaultValue的id识别
-      let secondCat:any = [];
-      categories.map((cat:any) => {
-        cat?.children?.map((c:any) => secondCat.push({label: c.name, value: c.id}));
-      });
-      setSecondCategories(secondCat);
+      const hide = message.loading('正在添加');
+      try {
+        /* 查询商品数据 */
+        let goodsCategories;
+        const id = goodsId || props.goodsId;
+        if (id) {
+          if (!goodsId) setGoodsId(props.goodsId || 0);
+          let goodsData = await getGoods(id);
+          formRef?.current?.setFieldsValue(goodsData?.product);
+          setSkuData(goodsData?.skus?.map(sku => {
+            if (typeof sku.own_spec == 'object') sku.own_spec = _.map(sku.own_spec, (v,k) => `${k}: ${v}`).join('\n');
+            return sku;
+          }));
+          setSpecData(goodsData?.specs);
+          goodsCategories = await getGoodsCategories(id);
+          setCategoriesDefault(goodsCategories?.map((cat:any) => cat.id));
+          console.log(goodsData?.product?.description);
+          
+          setEditorState(BraftEditor.createEditorState(goodsData?.product?.description));
+        }
+        /* 查询类别 */
+        let categories = await getCategories();
+        setFirstCategories(categories.map((cat:any) => {
+          return {label: cat.name, value: cat.id};
+        }));
+        // 拉取所有二级分类项，提供给DefaultValue的id识别
+        let allCatChildren:any = [];
+        categories.map((cat:any) => {
+          cat?.children?.map((c:any) => allCatChildren.push({label: c.name, value: c.id}));
+        });
+        setSecondCategories(allCatChildren);
+        // 选中一级分类
+        let firstCatId = goodsCategories?.[0]?.parent_id || goodsCategories?.[0]?.id;
+        if (id && firstCatId) {
+          setFirstCategoryId(firstCatId);
+          setSecondCategories(_.keyBy(categories, 'id')[firstCatId]?.children?.map((cat:any) => {
+            return {label: cat.name, value: cat.id};
+          }));
+        }
+      } catch (error) {
+        message.error(error?.data?.msg);
+      }
       setVisible(true);
+      hide();
     } else {
       setVisible(false);
       setGoodsId(0);
@@ -81,6 +94,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
       setFirstCategories([]);
       setSecondCategories([]);
       setCategoriesDefault([]);
+      setEditorState(BraftEditor.createEditorState(null));
     }
   }
 
@@ -88,6 +102,9 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
     const hide = message.loading('正在添加');
 
     try {
+      fields.images = fields.images?.map((img:any) => img?.url);
+      console.log(fields.description);
+      fields.description = fields.description?.toHTML();
       if (goodsId) await updateGoods(goodsId, { ...fields });
       else await addGoods({ ...fields });
       hide();
@@ -214,7 +231,9 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
           width="sm"
           label="商品分类"
           fieldProps={{
+            value: firstCategoryId,
             onChange(v, o) {
+              setFirstCategoryId(v);
               setSecondCategories(categoriesByid[v]?.children?.map((cat:any) => {
                 return {label: cat.name, value: cat.id};
               }));
@@ -226,14 +245,14 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
           options={secondCategories}
           width="sm"
           name="categories"
-          label="子分类"
+          label="子类别"
           mode="multiple"
           fieldProps={{defaultValue:categoriesDefault}}
         />
         }
         {skuData.length==0 && <>
-        <ProFormDigit width="xs" name="price" label="商品价格" />
-        <ProFormDigit width="xs" name="stock" label="商品库存" />
+        <ProFormDigit width="xs" name="price" label="商品价格" required={true} rules={[{ required: true, message: '请输入价格！' }]} />
+        <ProFormDigit width="xs" name="stock" label="商品库存" required={true} rules={[{ required: true, message: '请输入库存！' }]} />
         </>}
         <AddSpec goodsId={goodsId} goodsRef={formRef} addEmptyGoods={addEmptyGoods} skuData={skuData} setSkuData={setSkuData} specData={specData} />
         {skuData.length>0 &&
@@ -280,7 +299,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
                 media={{ uploadFn: cosUploadFn }}
             />
         </ProForm.Item>
-        {/* <div>{editorState.toHTML()}</div> */}
+        <div>{editorState.toHTML()}</div>
       </ProForm.Group>
     </DrawerForm>
   );
