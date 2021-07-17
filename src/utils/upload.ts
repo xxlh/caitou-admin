@@ -1,7 +1,8 @@
+import { RcFile } from "antd/lib/upload";
 import cos from "./cos";
 
 type UploadPramas = {
-    file: File,
+    file: File | RcFile | Blob,
     filename: string,
     hashFilename: boolean,
     path: string,

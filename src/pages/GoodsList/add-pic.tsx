@@ -1,8 +1,8 @@
-import { Upload, Modal } from 'antd';
+import { Modal } from 'antd';
+import { ProFormUploadButton } from '@ant-design/pro-form';
 import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
-import cos, { getFileUrl, getUploadUrl } from '@/utils/cos'
-import { ProFormUploadButton } from '@ant-design/pro-form';
+import cosUpload from '@/utils/upload'
 
 
 function getBase64(file:File) {
@@ -15,18 +15,16 @@ function getBase64(file:File) {
 }
 
 class PicturesWall extends React.Component {
+  // const { initialState } = useModel('@@initialState');
+  // const { currentUser } = initialState || {};
   state = {
     previewVisible: false,
     previewImage: '',
     previewTitle: '',
     url: '',
-    fileList: [],
+    fileList: this.props.fileList || [],
   };
 
-  getUploadURL = async (params:any) => {
-    let url = await getUploadUrl(params.filename);
-    this.setState({url});
-  }
 
   handleCancel = () => this.setState({ previewVisible: false });
 
@@ -43,16 +41,12 @@ class PicturesWall extends React.Component {
   };
 
   handleChange = async ({ file, fileList }) => {
-    if (file.status == 'done') {
-      // file.url = file?.xhr?.responseURL;
-      file.url = await getFileUrl(file.name);
-    }
-    
     this.setState({ fileList });
   }
 
-  beforeUpload = async (file:File) => {
-    await this.getUploadURL({filename: file.name});
+
+  componentWillReceiveProps() {
+    this.setState({fileList: this.props.fileList});
   }
 
   render() {
@@ -68,14 +62,27 @@ class PicturesWall extends React.Component {
         <ProFormUploadButton
           name="images"
           label="商品图片"
-          action={this.state.url}
           fieldProps={{
             name: 'file',
             listType: 'picture-card',
             method: "PUT",
             headers: {"Content-Type": 'application/octet-stream'},
             onPreview: this.handlePreview,
-            beforeUpload: this.beforeUpload,
+            customRequest ({
+              action,
+              file,
+              headers,
+              onError,
+              onProgress,
+              onSuccess,
+              withCredentials,
+            }) {
+              cosUpload({
+                  // path: `${currentUser?.id}`, // Todo: +/分类id
+                  file,
+                  success: onSuccess,
+              })
+            }
           }}
           fileList={fileList}
           max={8}

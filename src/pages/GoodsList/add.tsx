@@ -27,10 +27,11 @@ import _ from 'lodash/collection';
 export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}, ref:any) => {
   const formRef = useRef();
   const [visible, setVisible] = useState<boolean>(false);
-  const [editorState, setEditorState] = useState(BraftEditor.createEditorState(null));
-  const { initialState, setInitialState } = useModel('@@initialState');
+  const { initialState } = useModel('@@initialState');
   const { currentUser } = initialState || {};
+  const [editorState, setEditorState] = useState(BraftEditor.createEditorState(null));
   const [goodsId, setGoodsId] = useState(0);
+  const [goodsData, setGoodsData] = useState<GoodsItemType>({});
   const [skuData, setSkuData] = useState<SkuDataType[]>([]);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
   const [specData, setSpecData] = useState<SpecDataType[]>([]);
@@ -49,18 +50,17 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
         const id = goodsId || props.goodsId;
         if (id) {
           if (!goodsId) setGoodsId(props.goodsId || 0);
-          let goodsData = await getGoods(id);
-          formRef?.current?.setFieldsValue(goodsData?.product);
-          setSkuData(goodsData?.skus?.map(sku => {
+          let goods = await getGoods(id);
+          goods.product.description = BraftEditor.createEditorState(goods?.product?.description);
+          formRef?.current?.setFieldsValue(goods?.product);
+          setGoodsData(goods.product);
+          setSkuData(goods?.skus?.map(sku => {
             if (typeof sku.own_spec == 'object') sku.own_spec = _.map(sku.own_spec, (v,k) => `${k}: ${v}`).join('\n');
             return sku;
           }));
-          setSpecData(goodsData?.specs);
+          setSpecData(goods?.specs);
           goodsCategories = await getGoodsCategories(id);
           setCategoriesDefault(goodsCategories?.map((cat:any) => cat.id));
-          console.log(goodsData?.product?.description);
-          
-          setEditorState(BraftEditor.createEditorState(goodsData?.product?.description));
         }
         /* 查询类别 */
         let categories = await getCategories();
@@ -89,6 +89,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
     } else {
       setVisible(false);
       setGoodsId(0);
+      setGoodsData({});
       setSkuData([]);
       setSpecData([]);
       setFirstCategories([]);
@@ -98,12 +99,11 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
     }
   }
 
-  const handleAdd = async (fields: GoodsItemType) => {
+  const submit = async (fields: GoodsItemType) => {
     const hide = message.loading('正在添加');
 
     try {
-      fields.images = fields.images?.map((img:any) => img?.url);
-      console.log(fields.description);
+      if (typeof fields?.images == 'object') fields.images = fields?.images?.map((img:any) => img?.url||('http://'+img?.response?.Location));
       fields.description = fields.description?.toHTML();
       if (goodsId) await updateGoods(goodsId, { ...fields });
       else await addGoods({ ...fields });
@@ -147,8 +147,8 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
   }
 
   const addEmptyGoods = async () => {
-    let goodsData = formRef?.current?.getFieldsValue();
-    let goods = await addGoods({draft: true, title: goodsData?.title||' ', price: goodsData?.price||0, stock: goodsData?.stock||0});
+    let formData = formRef?.current?.getFieldsValue();
+    let goods = await addGoods({draft: true, title: formData?.title||' ', price: formData?.price||0, stock: formData?.stock||0});
     if (goods?.code && goods?.code != 200) throw new Error("Failed to add goods!");
     setGoodsId(goods?.id);
   }
@@ -211,7 +211,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
       }}
       visible={visible}
       onVisibleChange={onVisibleChange}
-      onFinish={handleAdd}
+      onFinish={submit}
       {...props.fieldProps}
     >
       <ProForm.Group>
@@ -287,7 +287,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
       </ProForm.Group>
       <ProForm.Group>
         <ProForm.Item name="images">
-          <PicturesWall />
+          <PicturesWall fileList={(goodsData.images||[]).map((url:string, k:number) => ({id:k, url:url}))} />
         </ProForm.Item>
       </ProForm.Group>
       <ProForm.Group>
