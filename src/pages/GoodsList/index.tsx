@@ -8,6 +8,9 @@ import ProDescriptions from '@ant-design/pro-descriptions';
 import { goods, updateRule, removeRule } from './service';
 import type { GoodsItemType, TableListPagination } from './data';
 import AddGoods from './add';
+import { useModel } from '@/.umi/plugin-model/useModel';
+import { useEffect } from 'react';
+import _ from 'lodash/collection';
 
 /**
  * 删除节点
@@ -40,7 +43,9 @@ const GoodsList: React.FC = () => {
   const editRef = useRef()
   const [currentRow, setCurrentRow] = useState<GoodsItemType>();
   const [selectedRowsState, setSelectedRows] = useState<GoodsItemType[]>([]);
-  const params:any = {bb:1};
+  const params:any = {};
+  const { categoriesByid, getCategories } = useModel('categories');
+  const [firstCategories, setFirstCategories] = useState({'':'全部分类'});
   /** 国际化配置 */
 
   const columns: ProColumns<GoodsItemType>[] = [
@@ -86,6 +91,15 @@ const GoodsList: React.FC = () => {
       renderText: (val: string) => `${val}`,
     },
     {
+      title: '分类',
+      dataIndex: 'category',
+      hideInTable: true,
+      hideInForm: true,
+      filters: true,
+      // onFilter: true,
+      valueEnum: firstCategories,
+    },
+    {
       title: '状态',
       dataIndex: 'on_sale',
       hideInForm: true,
@@ -120,17 +134,16 @@ const GoodsList: React.FC = () => {
     },
   ];
 
-  // const onAddGoodsVisibleChange = async (visible:boolean) => {
-  //   if (visible) {
-  //     /* 查询类别 */
-  //     let categories = await getCategories();
-  //     setFirstCategories(categories.map((cat:any) => {
-  //         return {label: cat.name, value: cat.id};
-  //     }));
-  //   } else {
-      
-  //   }
-  // }
+  useEffect(() => {
+    (async () => {
+      let categories = await getCategories();
+      setFirstCategories({
+        ...firstCategories,
+        ..._.keyBy(_.map(categories, c => ({text:c.name, id:c.id})), 'id'),
+      });
+    })()
+  }, [])
+
 
   return (
     <PageContainer>

@@ -24,9 +24,10 @@ export async function goods(
     params: {
       page: params.current,
       per_page: params.pageSize,
-      order: sort ? Object.keys(sort)[0] + (Object.values(sort)[0]=='ascend'?'_asc':'_desc') : null,
+      order: sort&&sort!={} ? Object.keys(sort)[0] + (Object.values(sort)[0]=='ascend'?'_asc':'_desc') : null,
       title: params.title,
       on_sale: params.on_sale || filter.on_sale?.join(','),
+      category_ids: params.category,
       search: params.search,
       // ...params,
     },
