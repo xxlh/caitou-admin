@@ -69,10 +69,10 @@ export async function addGoodsSpec(id:number, data?: { [key: string]: any }) {
 }
 
 /** 删除规则 DELETE /api/rule */
-export async function removeRule(options?: { [key: string]: any }) {
-  return request<Record<string, any>>('/api/rule', {
+export async function removeGoods(params?: { [ids: string]: any }) {
+  return request<Record<string, any>>('/admin/products', {
     method: 'DELETE',
-    ...(options || {}),
+    params: params,
   });
 }
 

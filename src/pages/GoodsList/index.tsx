@@ -5,7 +5,7 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import ProDescriptions from '@ant-design/pro-descriptions';
-import { goods, updateRule, removeRule } from './service';
+import { goods, removeGoods } from './service';
 import type { GoodsItemType, TableListPagination } from './data';
 import AddGoods from './add';
 import { useModel } from '@/.umi/plugin-model/useModel';
@@ -23,8 +23,8 @@ const handleRemove = async (selectedRows: GoodsItemType[]) => {
   if (!selectedRows) return true;
 
   try {
-    await removeRule({
-      key: selectedRows.map((row) => row.key),
+    await removeGoods({
+      ids: selectedRows.map((row) => row.id).join(','),
     });
     hide();
     message.success('删除成功，即将刷新');
@@ -151,7 +151,7 @@ const GoodsList: React.FC = () => {
         // headerTitle="所有商品"
         actionRef={actionRef}
         formRef={formRef}
-        rowKey="key"
+        rowKey="id"
         search={{
           labelWidth: 120,
         }}
@@ -187,10 +187,7 @@ const GoodsList: React.FC = () => {
               >
                 {selectedRowsState.length}
               </a>{' '}
-              项 &nbsp;&nbsp;
-              <span>
-                服务调用次数总计 {selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)} 万
-              </span>
+              项
             </div>
           }
         >
@@ -203,7 +200,7 @@ const GoodsList: React.FC = () => {
           >
             批量删除
           </Button>
-          <Button type="primary">批量审批</Button>
+          {/* <Button type="primary">批量上架</Button> */}
         </FooterToolbar>
       )}
 
