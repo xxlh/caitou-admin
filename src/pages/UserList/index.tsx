@@ -1,7 +1,6 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, message, Drawer } from 'antd';
 import React, { useState, useRef } from 'react';
-import { useIntl, FormattedMessage } from 'umi';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
@@ -11,14 +10,15 @@ import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import { userList, addUser, updateUser, removeUser } from '@/services/userList';
-
 /**
  * 添加节点
  *
  * @param fields
  */
+
 const handleAdd = async (fields: API.UserListItem) => {
   const hide = message.loading('正在添加');
+
   try {
     await addUser({ ...fields });
     hide();
@@ -30,14 +30,15 @@ const handleAdd = async (fields: API.UserListItem) => {
     return false;
   }
 };
-
 /**
  * 更新节点
  *
  * @param fields
  */
+
 const handleUpdate = async (fields: FormValueType) => {
   const hide = message.loading('正在配置');
+
   try {
     await updateUser({
       name: fields.name,
@@ -45,7 +46,6 @@ const handleUpdate = async (fields: FormValueType) => {
       key: fields.id,
     });
     hide();
-
     message.success('配置成功');
     return true;
   } catch (error) {
@@ -54,15 +54,16 @@ const handleUpdate = async (fields: FormValueType) => {
     return false;
   }
 };
-
 /**
  * 删除节点
  *
  * @param selectedRows
  */
+
 const handleRemove = async (selectedRows: API.UserListItem[]) => {
   const hide = message.loading('正在删除');
   if (!selectedRows) return true;
+
   try {
     await removeUser({
       key: selectedRows.map((row) => row.id),
@@ -81,25 +82,17 @@ const TableList: React.FC = () => {
   /** 新建窗口的弹窗 */
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   /** 分布更新窗口的弹窗 */
+
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
-
   const [showDetail, setShowDetail] = useState<boolean>(false);
-
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.UserListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.UserListItem[]>([]);
-
   /** 国际化配置 */
-  const intl = useIntl();
 
   const columns: ProColumns<API.UserListItem>[] = [
     {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.updateForm.ruleName.nameLabel"
-          defaultMessage="规则名称"
-        />
-      ),
+      title: '规则名称',
       dataIndex: 'last_login',
       tip: '规则名称是唯一的 key',
       render: (dom, entity) => {
@@ -116,7 +109,7 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
+      title: '操作',
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
@@ -127,22 +120,18 @@ const TableList: React.FC = () => {
             setCurrentRow(record);
           }}
         >
-          <FormattedMessage id="pages.searchTable.config" defaultMessage="配置" />
+          配置
         </a>,
         <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          <FormattedMessage id="pages.searchTable.subscribeAlert" defaultMessage="订阅警报" />
+          订阅警报
         </a>,
       ],
     },
   ];
-
   return (
     <PageContainer>
       <ProTable<API.UserListItem, API.PageParams>
-        headerTitle={intl.formatMessage({
-          id: 'pages.searchTable.title',
-          defaultMessage: '查询表格',
-        })}
+        headerTitle={'查询表格'}
         actionRef={actionRef}
         rowKey="id"
         search={{
@@ -156,7 +145,7 @@ const TableList: React.FC = () => {
               handleModalVisible(true);
             }}
           >
-            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="新建" />
+            <PlusOutlined /> 新建
           </Button>,
         ]}
         request={userList}
@@ -171,17 +160,17 @@ const TableList: React.FC = () => {
         <FooterToolbar
           extra={
             <div>
-              <FormattedMessage id="pages.searchTable.chosen" defaultMessage="已选择" />{' '}
-              <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
-              <FormattedMessage id="pages.searchTable.item" defaultMessage="项" />
-              &nbsp;&nbsp;
+              已选择{' '}
+              <a
+                style={{
+                  fontWeight: 600,
+                }}
+              >
+                {selectedRowsState.length}
+              </a>{' '}
+              项 &nbsp;&nbsp;
               <span>
-                <FormattedMessage
-                  id="pages.searchTable.totalServiceCalls"
-                  defaultMessage="服务调用次数总计"
-                />{' '}
-                {selectedRowsState.reduce((pre, item) => pre + item.id!, 0)}{' '}
-                <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万" />
+                服务调用次数总计 {selectedRowsState.reduce((pre, item) => pre + item.id!, 0)} 万
               </span>
             </div>
           }
@@ -193,25 +182,22 @@ const TableList: React.FC = () => {
               actionRef.current?.reloadAndRest?.();
             }}
           >
-            <FormattedMessage id="pages.searchTable.batchDeletion" defaultMessage="批量删除" />
+            批量删除
           </Button>
-          <Button type="primary">
-            <FormattedMessage id="pages.searchTable.batchApproval" defaultMessage="批量审批" />
-          </Button>
+          <Button type="primary">批量审批</Button>
         </FooterToolbar>
       )}
       <ModalForm
-        title={intl.formatMessage({
-          id: 'pages.searchTable.createForm.newRule',
-          defaultMessage: '新建规则',
-        })}
+        title={'新建规则'}
         width="400px"
         visible={createModalVisible}
         onVisibleChange={handleModalVisible}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.UserListItem);
+
           if (success) {
             handleModalVisible(false);
+
             if (actionRef.current) {
               actionRef.current.reload();
             }
@@ -222,12 +208,7 @@ const TableList: React.FC = () => {
           rules={[
             {
               required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.ruleName"
-                  defaultMessage="规则名称为必填项"
-                />
-              ),
+              message: '规则名称为必填项',
             },
           ]}
           width="md"
@@ -238,9 +219,11 @@ const TableList: React.FC = () => {
       <UpdateForm
         onSubmit={async (value) => {
           const success = await handleUpdate(value);
+
           if (success) {
             handleUpdateModalVisible(false);
             setCurrentRow(undefined);
+
             if (actionRef.current) {
               actionRef.current.reload();
             }

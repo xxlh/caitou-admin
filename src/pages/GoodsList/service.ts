@@ -1,7 +1,7 @@
 // @ts-ignore
 /* eslint-disable */
-import { request, useModel } from 'umi';
-import { GoodsItem, TableListItem } from './data';
+import { request } from 'umi';
+import { GoodsItemType } from './data';
 
 /** 获取规则列表 GET /api/rule */
 export async function goods(
@@ -16,7 +16,7 @@ export async function goods(
   filter?: { [key: string]: any },
 ) {
   return request<{
-    data: GoodsItem[];
+    data: GoodsItemType[];
     /** 列表的内容总数 */
     total?: number;
   }>('/admin/products', {
@@ -24,7 +24,7 @@ export async function goods(
     params: {
       page: params.current,
       per_page: params.pageSize,
-      order: sort&&sort!={} ? Object.keys(sort)[0] + (Object.values(sort)[0]=='ascend'?'_asc':'_desc') : null,
+      order: Object.keys(sort).length ? Object.keys(sort)[0] + (Object.values(sort)[0]=='ascend'?'_asc':'_desc') : null,
       title: params.title,
       on_sale: params.on_sale || filter.on_sale?.join(','),
       category_ids: params.category,
@@ -35,14 +35,14 @@ export async function goods(
 }
 
 export async function getGoods(id:number) {
-  return request<{product:GoodsItem}>(`/admin/products/${id}`, {
+  return request<{product:GoodsItemType}>(`/admin/products/${id}`, {
     method: 'GET',
   });
 }
 
 /** 新建规则 PUT /api/rule */
 export async function updateGoods(id:number, data?: { [key: string]: any }) {
-  return request<GoodsItem>(`/admin/products/${id}`, {
+  return request<GoodsItemType>(`/admin/products/${id}`, {
     method: 'PATCH',
     data,
   });
@@ -56,7 +56,7 @@ export async function updateSku(id:number, skuId:number, data?: { [key: string]:
 
 /** 新建规则 POST /api/rule */
 export async function addGoods(data?: { [key: string]: any }) {
-  return request<GoodsItem>('/admin/products', {
+  return request<GoodsItemType>('/admin/products', {
     method: 'POST',
     data,
   });

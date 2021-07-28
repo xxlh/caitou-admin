@@ -88,16 +88,16 @@ function getRule(req: Request, res: Response, u: string) {
     dataSource = dataSource.filter((data) => data.name.includes(params.name || ''));
   }
 
-  let pageSize = 10;
+  let pageSizeResult = 10;
   if (params.pageSize) {
-    pageSize = parseInt(`${params.pageSize}`, 10);
+    pageSizeResult = parseInt(`${params.pageSize}`, 10);
   }
 
   const result = {
     data: dataSource,
     total: tableListDataSource.length,
     success: true,
-    pageSize,
+    pageSize: pageSizeResult,
     current: parseInt(`${params.currentPage}`, 10) || 1,
   };
 
