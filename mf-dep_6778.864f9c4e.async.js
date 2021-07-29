@@ -1,0 +1,1 @@
+(self.webpackChunkcaitou_admin=self.webpackChunkcaitou_admin||[]).push([["mf-dep_6778"],{76778:function(a,_,e){"use strict";e.r(_);var n=e(63962);_.default=n.Z},63962:function(a,_,e){"use strict";e.d(_,{Z:function(){return n}});function n(u,s){if(!(u instanceof s))throw new TypeError("Cannot call a class as a function")}}}]);

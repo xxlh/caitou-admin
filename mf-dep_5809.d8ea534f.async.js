@@ -1,0 +1,1 @@
+(self.webpackChunkcaitou_admin=self.webpackChunkcaitou_admin||[]).push([["mf-dep_5809"],{15809:function(s,n,e){"use strict";e.r(n),e.d(n,{UseAPIProvider:function(){return u.dQ},UseRequestProvider:function(){return u.jQ},useAsync:function(){return u.r5},useLoadMore:function(){return u.BR},usePaginated:function(){return u.mU}});var u=e(31977);n.default=u.ZP}}]);
