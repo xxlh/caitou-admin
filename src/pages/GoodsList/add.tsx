@@ -22,9 +22,7 @@ import { EditableProTable, ProColumns } from '@ant-design/pro-table';
 import _ from 'lodash/collection';
 
 
-
-
-export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}, ref:any) => {
+export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps, onComplete?:()=>{}}, ref:any) => {
   const formRef = useRef();
   const [visible, setVisible] = useState<boolean>(false);
   const { initialState } = useModel('@@initialState');
@@ -103,12 +101,13 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps}
     const hide = message.loading('正在添加');
 
     try {
-      if (typeof fields?.images == 'object') fields.images = fields?.images?.map((img:any) => img?.url||('http://'+img?.response?.Location));
+      if (typeof fields?.images == 'object') fields.images = fields?.images?.map((img:any) => typeof img=='string' ? img : (img?.url||(img?.response?.Location?'http://'+img?.response?.Location:null)));
       fields.description = fields.description?.toHTML();
       if (goodsId) await updateGoods(goodsId, { ...fields });
       else await addGoods({ ...fields });
       hide();
       message.success('添加成功');
+      props?.onComplete();
       return true;
     } catch (error) {
       hide();

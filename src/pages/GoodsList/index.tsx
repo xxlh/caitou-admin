@@ -8,7 +8,7 @@ import ProDescriptions from '@ant-design/pro-descriptions';
 import { goods, removeGoods } from './service';
 import type { GoodsItemType, TableListPagination } from './data';
 import AddGoods from './add';
-import { useModel } from '@/.umi/plugin-model/useModel';
+import { useModel } from 'umi';
 import { useEffect } from 'react';
 import _ from 'lodash/collection';
 
@@ -164,7 +164,9 @@ const GoodsList: React.FC = () => {
           },
         }}
         toolBarRender={() => [
-          <AddGoods ref={editRef} />,
+          <AddGoods ref={editRef} onComplete={() => {
+            actionRef.current?.reload();
+          }} />,
         ]}
         params={params}
         request={goods}

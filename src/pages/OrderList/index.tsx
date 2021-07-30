@@ -7,7 +7,7 @@ import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import { getOrders, removeGoods } from './service';
 import type { OrderItemType, TableListPagination } from './data';
-import { useModel } from '@/.umi/plugin-model/useModel';
+import { useModel } from 'umi';
 import { useEffect } from 'react';
 import _ from 'lodash/collection';
 
@@ -43,7 +43,7 @@ const OrderList: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<OrderItemType>();
   const [selectedRowsState, setSelectedRows] = useState<OrderItemType[]>([]);
   const params:any = {};
-  const { categoriesByid, getCategories } = useModel('categories');
+  const { getCategories } = useModel('categories');
   const [firstCategories, setFirstCategories] = useState({'':'全部分类'});
   /** 国际化配置 */
 

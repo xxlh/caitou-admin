@@ -45,8 +45,9 @@ class PicturesWall extends React.Component {
   }
 
 
-  componentWillReceiveProps() {
-    this.setState({fileList: this.props.fileList});
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.fileList == this.props.fileList) return;  // 当增删图的时候value prop会变化，误触此函数
+    this.setState({fileList: nextProps.fileList});
   }
 
   render() {
