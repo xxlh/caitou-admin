@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { Button, message } from 'antd';
+import { Button, message, FormInstance } from 'antd';
 import ProForm, {
   DrawerForm,
   ProFormText,
@@ -23,7 +23,7 @@ import _ from 'lodash/collection';
 
 
 export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps, onComplete?:()=>{}}, ref:any) => {
-  const formRef = useRef();
+  const formRef = useRef<FormInstance>();
   const [visible, setVisible] = useState<boolean>(false);
   const { initialState } = useModel('@@initialState');
   const { currentUser } = initialState || {};
@@ -50,6 +50,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
           if (!goodsId) setGoodsId(props.goodsId || 0);
           let goods = await getGoods(id);
           goods.product.description = BraftEditor.createEditorState(goods?.product?.description);
+          if (goods?.skus?.[0]) goods.product.stock = goods?.skus?.[0].stock;
           formRef?.current?.setFieldsValue(goods?.product);
           setGoodsData(goods.product);
           setSkuData(goods?.skus?.map(sku => {
@@ -290,7 +291,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
         </ProForm.Item>
       </ProForm.Group>
       <ProForm.Group>
-        <ProForm.Item name="description">
+        <ProForm.Item name="description" label="商品介绍">
             <BraftEditor
                 value={editorState}
                 onChange={setEditorState}
