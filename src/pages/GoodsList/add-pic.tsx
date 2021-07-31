@@ -44,11 +44,11 @@ class PicturesWall extends React.Component {
     this.setState({ fileList });
   }
 
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.fileList == this.props.fileList) return;  // 当增删图的时候value prop会变化，误触此函数
-    this.setState({fileList: nextProps.fileList});
-  }
+  /* Replace with component key prop: https://blog.csdn.net/nnxxyy1111/article/details/80832525 */
+  // componentWillReceiveProps(nextProps) {
+  //   if (nextProps.fileList == this.props.fileList) return;  // 当增删图的时候value prop会变化，误触此函数
+  //   this.setState({fileList: nextProps.fileList});
+  // }
 
   render() {
     const { previewVisible, previewImage, fileList, previewTitle } = this.state;
@@ -62,7 +62,6 @@ class PicturesWall extends React.Component {
       <>
         <ProFormUploadButton
           name="images"
-          label="商品图片"
           fieldProps={{
             name: 'file',
             listType: 'picture-card',

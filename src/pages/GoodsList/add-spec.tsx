@@ -58,7 +58,7 @@ export default (props:{goodsId:number, goodsRef:any, addEmptyGoods?:any, skuData
         title="添加商品规格"
         formRef={formRef}
         trigger={
-          specData.length||props?.skuData?.length ? <Button>
+          specData.length ? <Button>
                 <EditOutlined /> 编辑商品规格
             </Button> : <Button>
                 <PlusOutlined /> 添加商品规格

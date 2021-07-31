@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { Button, message, FormInstance } from 'antd';
+import { Button, message, FormInstance, Divider } from 'antd';
 import ProForm, {
   DrawerForm,
   ProFormText,
@@ -250,12 +250,15 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
           fieldProps={{defaultValue:categoriesDefault}}
         />
         }
-        {skuData.length==0 && <>
+        {specData.length==0 && <>
         <ProFormDigit width="xs" name="price" label="商品价格" required={true} rules={[{ required: true, message: '请输入价格！' }]} />
         <ProFormDigit width="xs" name="stock" label="商品库存" required={true} rules={[{ required: true, message: '请输入库存！' }]} />
         </>}
+      </ProForm.Group>
+      <Divider plain orientation="left">商品规格</Divider>
+      <ProForm.Group>
         <AddSpec goodsId={goodsId} goodsRef={formRef} addEmptyGoods={addEmptyGoods} skuData={skuData} setSkuData={setSkuData} specData={specData} />
-        {skuData.length>0 &&
+        {specData.length>0 &&
         <ProForm.Item
           name="sku"
           initialValue={skuData}
@@ -285,13 +288,15 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
           />
         </ProForm.Item>}
       </ProForm.Group>
+      <Divider plain orientation="left">商品图片</Divider>
       <ProForm.Group>
         <ProForm.Item name="images">
-          <PicturesWall fileList={(goodsData.images||[]).map((url:string, k:number) => ({id:k, url:url}))} />
+          <PicturesWall key={goodsData?.id} fileList={(goodsData.images||[]).map((url:string, k:number) => ({id:k, url:url}))} />
         </ProForm.Item>
       </ProForm.Group>
+      <Divider plain orientation="left">商品介绍</Divider>
       <ProForm.Group>
-        <ProForm.Item name="description" label="商品介绍">
+        <ProForm.Item name="description">
             <BraftEditor
                 value={editorState}
                 onChange={setEditorState}
