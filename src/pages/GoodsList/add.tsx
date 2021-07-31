@@ -108,7 +108,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
       else await addGoods({ ...fields });
       hide();
       message.success('添加成功');
-      props?.onComplete();
+      props?.onComplete?.();
       return true;
     } catch (error) {
       hide();
