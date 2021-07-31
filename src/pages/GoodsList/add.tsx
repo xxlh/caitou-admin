@@ -257,7 +257,19 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
       </ProForm.Group>
       <Divider plain orientation="left">商品规格</Divider>
       <ProForm.Group>
-        <AddSpec goodsId={goodsId} goodsRef={formRef} addEmptyGoods={addEmptyGoods} skuData={skuData} setSkuData={setSkuData} specData={specData} />
+        <AddSpec goodsId={goodsId} skuData={skuData} specData={specData}
+          onOpen={async () => {
+            await formRef?.current?.validateFields();
+            if (!goodsId) await addEmptyGoods();
+          }}
+          onComplete={data => {
+            setSkuData(data.skus?.map(sku => {
+              if (typeof sku.own_spec == 'object') sku.own_spec = _.map(sku.own_spec, (v,k) => `${k}: ${v}`).join('\n');
+              return sku;
+            }));
+            setSpecData(data.specs);
+          }}
+          />
         {specData.length>0 &&
         <ProForm.Item
           name="sku"

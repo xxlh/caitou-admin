@@ -1,7 +1,7 @@
 // @ts-ignore
 /* eslint-disable */
 import { request } from 'umi';
-import { GoodsItemType } from './data';
+import { GoodsItemType, SkuDataType, SpecDataType } from './data';
 
 /** 获取规则列表 GET /api/rule */
 export async function goods(
@@ -35,7 +35,7 @@ export async function goods(
 }
 
 export async function getGoods(id:number) {
-  return request<{product:GoodsItemType}>(`/admin/products/${id}`, {
+  return request<{product:GoodsItemType, skus:SkuDataType[], specs:SpecDataType[], reviews:any}>(`/admin/products/${id}`, {
     method: 'GET',
   });
 }

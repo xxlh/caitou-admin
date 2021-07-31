@@ -5,10 +5,10 @@ import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { EditableProTable, ProColumns } from '@ant-design/pro-table';
 import _ from 'lodash/collection';
 import { addGoods, addGoodsSpec } from './service';
-import { SpecDataType } from './data';
+import { SkuDataType, SpecDataType } from './data';
 
   
-export default (props:{goodsId:number, goodsRef:any, addEmptyGoods?:any, skuData?:any, setSkuData?:any, specData?:SpecDataType[], fieldProps?:object}) => {
+export default (props:{goodsId:number, skuData?:any, specData?:SpecDataType[], onOpen?:()=>Promise<any>, onComplete?:(data:{specs:SpecDataType[],skus:SkuDataType[]})=>void, fieldProps?:object}) => {
   const formRef = useRef();
   const [specData, setSpecData] = useState<SpecDataType[]>([]);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>(() =>
@@ -58,7 +58,7 @@ export default (props:{goodsId:number, goodsRef:any, addEmptyGoods?:any, skuData
         title="添加商品规格"
         formRef={formRef}
         trigger={
-          specData.length ? <Button>
+          specData.length||props?.specData?.length ? <Button>
                 <EditOutlined /> 编辑商品规格
             </Button> : <Button>
                 <PlusOutlined /> 添加商品规格
@@ -72,8 +72,7 @@ export default (props:{goodsId:number, goodsRef:any, addEmptyGoods?:any, skuData
         onVisibleChange={async show => {
           if (show) {
             try {
-              await props.goodsRef?.current?.validateFields();
-              if (!props.goodsId) await props.addEmptyGoods();
+              await props?.onOpen?.();
               if (!specData?.length) {
                 let spec = props?.specData || [];
                 spec = spec.map(s => {s.rowKey=s.id||Math.random();return s;})
@@ -93,7 +92,7 @@ export default (props:{goodsId:number, goodsRef:any, addEmptyGoods?:any, skuData
             let spec = _.groupBy(_.reject(values.spec, s => !s.key||!s.name), 'key');
             let data = await addGoodsSpec(props.goodsId, spec);
             setSpecData(data.specs);
-            props.setSkuData(data.skus);
+            props?.onComplete?.(data);
             message.success('添加成功！继续设置价格库存～');
             return true;
         }}
