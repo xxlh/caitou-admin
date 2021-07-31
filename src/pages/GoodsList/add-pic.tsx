@@ -3,6 +3,7 @@ import { ProFormUploadButton } from '@ant-design/pro-form';
 import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
 import cosUpload from '@/utils/upload'
+import connectModel from '@/utils/connect';
 
 
 function getBase64(file:File) {
@@ -14,6 +15,7 @@ function getBase64(file:File) {
   });
 }
 
+@connectModel('initialState', '@@initialState')
 class PicturesWall extends React.Component {
   // const { initialState } = useModel('@@initialState');
   // const { currentUser } = initialState || {};
@@ -38,6 +40,8 @@ class PicturesWall extends React.Component {
       previewVisible: true,
       previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
     });
+    console.log(this.props.initialState);
+    
   };
 
   handleChange = async ({ file, fileList }) => {
@@ -52,6 +56,7 @@ class PicturesWall extends React.Component {
 
   render() {
     const { previewVisible, previewImage, fileList, previewTitle } = this.state;
+    const { initialState } = this.props;
     const uploadButton = (
       <div>
         <PlusOutlined />
@@ -78,7 +83,7 @@ class PicturesWall extends React.Component {
               withCredentials,
             }) {
               cosUpload({
-                  // path: `${currentUser?.id}`, // Todo: +/分类id
+                  path: `products/member-${initialState?.currentUser?.id}`,
                   file,
                   success: onSuccess,
               })

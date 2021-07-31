@@ -130,7 +130,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
   }
   const cosUploadFn = (param:any) => {
       uploadFn({
-          path: `${currentUser?.id}`, // Todo: +/分类id
+          path: `products/member-${currentUser?.id}`, // Todo: +/分类id
           hashFilename: true,
           ...param,
           success: (data:any) => {
@@ -266,7 +266,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
             setSkuData(data.skus?.map(sku => {
               if (typeof sku.own_spec == 'object') sku.own_spec = _.map(sku.own_spec, (v,k) => `${k}: ${v}`).join('\n');
               return sku;
-            }));
+            }));  // 需要通过Editable FormRef.current.setFieldsValue（不生效）
             setSpecData(data.specs);
           }}
           />
@@ -316,7 +316,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
                 media={{ uploadFn: cosUploadFn }}
             />
         </ProForm.Item>
-        <div>{editorState.toHTML()}</div>
+        {/* <div>{editorState.toHTML()}</div> */}
       </ProForm.Group>
     </DrawerForm>
   );
