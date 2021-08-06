@@ -300,7 +300,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
           />
         </ProForm.Item>}
       </ProForm.Group>
-      <Divider plain orientation="left">商品图片</Divider>
+      <Divider plain orientation="left">商品图片 (建议600x600)</Divider>
       <ProForm.Group>
         <ProForm.Item name="images">
           <PicturesWall key={goodsData?.id} fileList={(goodsData.images||[]).map((url:string, k:number) => ({id:k, url:url}))} />

@@ -94,6 +94,22 @@ const OrderList: React.FC = () => {
         canceled: '订单取消',
         completed: '订单完成',
       },
+      renderText: (val: string, record) => {
+        switch (record.status) {
+          case 'undelivered':
+            if (record.type == 'intra-city') val = '备货中';
+            break;
+          case 'unreceived':
+            if (record.type == 'verification') val = '已发核销码';
+            if (record.type == 'intra-city') val = '骑手取单';
+            break;
+          case 'unreviewed':
+            if (record.type == 'virtual') val = '已支付';
+            if (record.type == 'verification') val = '已核验';
+            break;
+        }
+        return val;
+      },
     },
     {
       title: '操作',
@@ -103,11 +119,11 @@ const OrderList: React.FC = () => {
         <a
           key="config"
           onClick={(e) => {
-            editRef.current.open(record?.id);
+            // Todo
             setCurrentRow(record);
           }}
         >
-          编辑
+          发货
         </a>,
       ],
     },

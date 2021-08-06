@@ -1,6 +1,7 @@
 export type OrderItemType = {
   id: number;
   no: string;
+  type: string;
   user_id: number;
   user_nickname: string;
   address: array;

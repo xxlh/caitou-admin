@@ -10,6 +10,8 @@ export type GoodsItemType = {
   review_count: number;
   price: string;
   generic_spec: array;
+  type: string;
+  verify_generator: string;
   status: string;
   created_at: Date;
   updated_at: Date;
