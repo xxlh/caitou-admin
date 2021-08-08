@@ -6,6 +6,7 @@ import { EditableProTable, ProColumns } from '@ant-design/pro-table';
 import _ from 'lodash/collection';
 import { addGoods, addGoodsSpec } from './service';
 import { SkuDataType, SpecDataType } from './data';
+import { useModel } from 'umi';
 
   
 export default (props:{goodsId:number, skuData?:any, specData?:SpecDataType[], onOpen?:()=>Promise<any>, onComplete?:(data:{specs:SpecDataType[],skus:SkuDataType[]})=>void, fieldProps?:object}) => {
@@ -15,28 +16,13 @@ export default (props:{goodsId:number, skuData?:any, specData?:SpecDataType[], o
     specData.map((item) => item.rowKey),
   );
   const [visible, setVisible] = useState(false);
-//   const [keys, setKeys] = useState({});
+  const { getFields } = useModel('fields');
+  const [fields, setFields] = useState(false);
 
   const columns: ProColumns<SpecDataType>[] = [
     {
       title: '规格类别',
       dataIndex: 'key',
-    //   key: 'key',
-    //   valueType: 'select',
-    //   fieldProps: {
-    //     showSearch: true,
-    //     onSearch: (value:string) => {
-    //         console.log(value);
-    //         let k = _.map(formRef?.current?.getFieldsFormatValue()?.spec, 'key');
-    //         console.log(k);
-    //         setKeys({
-    //             ...k,
-    //             value,
-    //         });
-            
-    //     }
-    //   },
-    //   valueEnum: keys,
     },
     {
       title: '规格名称',
@@ -46,6 +32,15 @@ export default (props:{goodsId:number, skuData?:any, specData?:SpecDataType[], o
       title: '缩略图',
       dataIndex: 'image',
       valueType: 'avatar',
+    },
+    {
+      title: '要求提交',
+      dataIndex: 'request_field_ids',
+      valueType: 'select',
+      fieldProps: {
+        options: fields,
+        mode: 'multiple',
+      }
     },
     {
       title: '操作',
@@ -78,6 +73,8 @@ export default (props:{goodsId:number, skuData?:any, specData?:SpecDataType[], o
                 spec = spec.map(s => {s.rowKey=s.id||Math.random();return s;})
                 setSpecData(spec);
                 setEditableRowKeys(spec.map(s => s.rowKey));
+                let fields = await getFields();
+                setFields(fields.map(f => ({label: f.name, value: f.id})))
               }
               if (!visible) setVisible(true);
             } catch (error) {
