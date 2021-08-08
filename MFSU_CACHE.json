@@ -85,7 +85,10 @@
     "antd/es/auto-complete/style": "4.16.9",
     "cos-js-sdk-v5": "1.2.15",
     "antd/es/divider": "4.16.9",
-    "antd/es/divider/style": "4.16.9"
+    "antd/es/divider/style": "4.16.9",
+    "lodash/array": "4.17.21",
+    "antd/es/switch": "4.16.9",
+    "antd/es/switch/style": "4.16.9"
   },
   "config": {
     "theme": {
