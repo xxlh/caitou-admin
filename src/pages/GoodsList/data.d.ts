@@ -9,9 +9,12 @@ export type GoodsItemType = {
   sold_count: number;
   review_count: number;
   price: string;
+  freight: string;
+  stock: number;
   generic_spec: array;
   type: string;
   verify_generator: string;
+  multi_checkout: string;
   status: string;
   created_at: Date;
   updated_at: Date;

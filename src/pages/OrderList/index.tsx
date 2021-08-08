@@ -66,6 +66,12 @@ const OrderList: React.FC = () => {
       },
     },
     {
+      title: '商品',
+      dataIndex: 'ship_data.express_company',
+      hideInSearch: true,
+      hideInForm: true,
+    },
+    {
       title: '购买用户',
       dataIndex: 'user_nickname',
       hideInSearch: true,
@@ -110,6 +116,12 @@ const OrderList: React.FC = () => {
         }
         return val;
       },
+    },
+    {
+      title: '备注',
+      dataIndex: 'note',
+      hideInSearch: true,
+      hideInForm: true,
     },
     {
       title: '操作',

@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { Button, message, FormInstance, Divider } from 'antd';
+import { Button, message, FormInstance, Divider, Switch } from 'antd';
 import ProForm, {
   DrawerForm,
   ProFormText,
@@ -20,6 +20,7 @@ import uploadFn from '@/utils/upload'
 import { useModel } from 'umi';
 import { EditableProTable, ProColumns } from '@ant-design/pro-table';
 import _ from 'lodash/collection';
+import _a from 'lodash/array';
 
 
 export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps, onComplete?:()=>{}}, ref:any) => {
@@ -34,10 +35,13 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
   const [specData, setSpecData] = useState<SpecDataType[]>([]);
   const { categoriesByid, getCategories } = useModel('categories');
+  const [goodsType, setGoodsType] = useState('physical');
   const [firstCategoryId, setFirstCategoryId] = useState([]);
   const [firstCategories, setFirstCategories] = useState([]);
   const [secondCategories, setSecondCategories] = useState([]);
   const [categoriesDefault, setCategoriesDefault] = useState([]);
+  const [specKeys, setSpecKeys] = useState([]);
+  const [enableMultiCheckout, setEnableMultiCheckout] = useState(false);
 
   const onVisibleChange = async (visible:boolean) => {
     if (visible) {
@@ -58,8 +62,10 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
             return sku;
           }));
           setSpecData(goods?.specs);
+          setSpecKeys(_a.union(goods?.specs?.map?.(spec => spec.key)));
           goodsCategories = await getGoodsCategories(id);
           setCategoriesDefault(goodsCategories?.map((cat:any) => cat.id));
+          setEnableMultiCheckout(!!goods.product.multi_checkout);
         }
         /* 查询类别 */
         let categories = await getCategories();
@@ -224,6 +230,24 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
           required={true}
           rules={[{ required: true, message: '请输入商品标题！' }]}
         />
+        <ProFormSelect
+          name="type"
+          width="xs"
+          label="类型"
+          valueEnum={{
+            physical: '实物商品',
+            virtual: '虚拟商品',
+            verification: '核销码',
+            'intra-city': '同城配送',
+          }}
+          initialValue="physical"
+          fieldProps={{
+            value: goodsType,
+            onChange(v, o) {
+              setGoodsType(v);
+            },
+          }}
+        />
       </ProForm.Group>
       <ProForm.Group>
         <ProFormSelect
@@ -247,13 +271,23 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
           name="categories"
           label="子类别"
           mode="multiple"
-          fieldProps={{defaultValue:categoriesDefault}}
+          initialValue={categoriesDefault}
         />
         }
         {specData.length==0 && <>
         <ProFormDigit width="xs" name="price" label="商品价格" required={true} rules={[{ required: true, message: '请输入价格！' }]} />
         <ProFormDigit width="xs" name="stock" label="商品库存" required={true} rules={[{ required: true, message: '请输入库存！' }]} />
         </>}
+        <ProFormDigit width="xs" name="freight" label="商品运费" initialValue={0} />
+        {goodsType=='verification' && <ProFormSelect
+          name="verify_generator"
+          width="xs"
+          label="核销码"
+          valueEnum={{
+            hash_code: '二维码',
+          }}
+          initialValue="hash_code"
+        />}
       </ProForm.Group>
       <Divider plain orientation="left">商品规格</Divider>
       <ProForm.Group>
@@ -270,7 +304,14 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
             setSpecData(data.specs);
           }}
           />
-        {specData.length>0 &&
+        {specData.length>0 && <>
+        是否允许多选下单：<Switch checked={enableMultiCheckout} onChange={checked => setEnableMultiCheckout(checked)} />
+        {enableMultiCheckout && <ProFormSelect
+          name="multi_checkout"
+          options={specKeys}
+          width="sm"
+          placeholder="可多选下单"
+        />}
         <ProForm.Item
           name="sku"
           initialValue={skuData}
@@ -298,7 +339,8 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
               },
             }}
           />
-        </ProForm.Item>}
+        </ProForm.Item>
+        </>}
       </ProForm.Group>
       <Divider plain orientation="left">商品图片 (建议600x600)</Divider>
       <ProForm.Group>
