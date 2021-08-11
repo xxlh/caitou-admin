@@ -1,1 +1,0 @@
-(self.webpackChunkcaitou_admin=self.webpackChunkcaitou_admin||[]).push([["mf-dep_753"],{10753:function(l,d,n){"use strict";n.r(d);var f=n(55586),a=n.n(f),u={};for(var t in f)t!=="default"&&(u[t]=function(i){return f[i]}.bind(0,t));n.d(d,u),d.default=a()}}]);

@@ -1,1 +1,0 @@
-(self.webpackChunkcaitou_admin=self.webpackChunkcaitou_admin||[]).push([[9024],{9024:function(_){_.exports={menu:"menu___1L63y",right:"right___3L8KG",action:"action___LP4_P",search:"search___2W0sJ",account:"account___6HXOq",avatar:"avatar___2cOWV",dark:"dark___1NwCY"}}}]);

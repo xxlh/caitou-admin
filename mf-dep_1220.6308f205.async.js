@@ -1,1 +1,0 @@
-(self.webpackChunkcaitou_admin=self.webpackChunkcaitou_admin||[]).push([["mf-dep_1220"],{51220:function(r,e,_){"use strict";_.r(e);var n=_(36752);e.default=n.Z},36752:function(r,e,_){"use strict";_.d(e,{Z:function(){return n}});function n(u,t,i){return t in u?Object.defineProperty(u,t,{value:i,enumerable:!0,configurable:!0,writable:!0}):u[t]=i,u}}}]);

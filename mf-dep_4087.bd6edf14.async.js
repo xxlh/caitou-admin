@@ -1,1 +1,0 @@
-(self.webpackChunkcaitou_admin=self.webpackChunkcaitou_admin||[]).push([["mf-dep_4087"],{80342:function(e,u,t){"use strict";t.r(u),t.d(u,{Onion:function(){return n.wN},RequestError:function(){return n.Lu},ResponseError:function(){return n.VL},extend:function(){return n.l7},fetch:function(){return n.he}});var n=t(78854);u.default=n.ZP},21735:function(){}}]);
