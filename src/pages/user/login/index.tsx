@@ -130,7 +130,7 @@ const Login: React.FC = () => {
             </Tabs>
 
             {status === 'error' && loginType === 'account' && (
-              <LoginMessage content={'登陆错误！'} />
+              <LoginMessage content={msg || '登陆错误！'} />
             )}
             {type === 'account' && (
               <>

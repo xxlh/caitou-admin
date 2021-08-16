@@ -58,5 +58,5 @@ export default defineConfig({
       projectName: 'swagger',
     },
   ],
-  mfsu: {production:{}},
+  mfsu: {},
 });

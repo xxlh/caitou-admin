@@ -3,7 +3,7 @@ export type GoodsItemType = {
   title: string;
   description?: string;
   image: string;
-  images: array;
+  images: Array;
   on_sale: number;
   rating: number;
   sold_count: number;
@@ -11,7 +11,7 @@ export type GoodsItemType = {
   price: string;
   freight: string;
   stock: number;
-  generic_spec: array;
+  generic_spec: Array;
   type: string;
   verify_generator: string;
   multi_checkout: string;
@@ -39,3 +39,18 @@ export type SpecDataType = {
   image?: string;
   created_at?: string;
 };
+
+export type WechatTemplate = {
+  id: number;
+  no: number;
+  affect_types: Array;
+  title: string;
+  description?: string;
+  data: Array<{
+    name: string;
+    key: string;
+    type: string;
+    max: number;
+    value?: string;
+  }>
+}

@@ -21,6 +21,7 @@ import { useModel } from 'umi';
 import { EditableProTable, ProColumns } from '@ant-design/pro-table';
 import _ from 'lodash/collection';
 import _a from 'lodash/array';
+import AddNotify from './add-notify';
 
 
 export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps, onComplete?:()=>{}}, ref:any) => {
@@ -30,7 +31,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
   const { currentUser } = initialState || {};
   const [editorState, setEditorState] = useState(BraftEditor.createEditorState(null));
   const [goodsId, setGoodsId] = useState(0);
-  const [goodsData, setGoodsData] = useState<GoodsItemType>({});
+  const [goodsData, setGoodsData] = useState<GoodsItemType|{}>({});
   const [skuData, setSkuData] = useState<SkuDataType[]>([]);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
   const [specData, setSpecData] = useState<SpecDataType[]>([]);
@@ -57,6 +58,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
           if (goods?.skus?.[0]) goods.product.stock = goods?.skus?.[0].stock;
           formRef?.current?.setFieldsValue(goods?.product);
           setGoodsData(goods.product);
+          setGoodsType(goods.product.type);
           setSkuData(goods?.skus?.map(sku => {
             if (typeof sku.own_spec == 'object') sku.own_spec = _.map(sku.own_spec, (v,k) => `${k}: ${v}`).join('\n');
             return sku;
@@ -106,10 +108,12 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
 
   const submit = async (fields: GoodsItemType) => {
     const hide = message.loading('正在添加');
+    // console.log(fields);return;
+    
 
     try {
       if (typeof fields?.images == 'object') fields.images = fields?.images?.map((img:any) => typeof img=='string' ? img : (img?.url||(img?.response?.Location?'http://'+img?.response?.Location:null)));
-      fields.description = fields.description?.toHTML();
+      fields.description = fields.description?.toHTML?.();
       if (goodsId) await updateGoods(goodsId, { ...fields });
       else await addGoods({ ...fields });
       hide();
@@ -237,6 +241,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
           valueEnum={{
             physical: '实物商品',
             virtual: '虚拟商品',
+            travel: '旅游线路',
             verification: '核销码',
             'intra-city': '同城配送',
           }}
@@ -346,6 +351,12 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
       <ProForm.Group>
         <ProForm.Item name="images">
           <PicturesWall key={goodsData?.id} fileList={(goodsData.images||[]).map((url:string, k:number) => ({id:k, url:url}))} />
+        </ProForm.Item>
+      </ProForm.Group>
+      <Divider plain orientation="left">消息推送</Divider>
+      <ProForm.Group>
+        <ProForm.Item name="notify">
+          <AddNotify key={goodsType} goodsType={goodsType} />
         </ProForm.Item>
       </ProForm.Group>
       <Divider plain orientation="left">商品介绍</Divider>

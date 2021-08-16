@@ -17,7 +17,7 @@ export default (props:{goodsId:number, skuData?:any, specData?:SpecDataType[], o
   );
   const [visible, setVisible] = useState(false);
   const { getFields } = useModel('fields');
-  const [fields, setFields] = useState(false);
+  const [fields, setFields] = useState([]);
 
   const columns: ProColumns<SpecDataType>[] = [
     {
