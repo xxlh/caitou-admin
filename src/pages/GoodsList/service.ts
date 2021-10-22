@@ -1,7 +1,7 @@
 // @ts-ignore
 /* eslint-disable */
 import { request } from 'umi';
-import { GoodsItemType, SkuDataType, SpecDataType } from './data';
+import { DailypriceItemType, GoodsItemType, SkuDataType, SpecDataType } from './data';
 
 /** 获取规则列表 GET /api/rule */
 export async function goods(
@@ -80,5 +80,23 @@ export async function removeGoods(params?: { [ids: string]: any }) {
 export async function getGoodsCategories(id:number) {
   return request<Record<string, any>>(`/admin/products/${id}/categories`, {
     method: 'GET',
+  });
+}
+
+/* 团期 */
+export async function getDailyprice(id:number) {
+  return request<Record<string, DailypriceItemType[]>>(`/admin/products/${id}/dailyprice`, {
+    method: 'GET',
+  });
+}
+export async function setDailyprice(id:number, data?: Record<string, DailypriceItemType[]>) {
+  return request(`/admin/products/${id}/dailyprice`, {
+    method: 'PUT',
+    data: data,
+  });
+}
+export async function removeDailyprice(id:number) {
+  return request<Record<string, DailypriceItemType[]>>(`/admin/products/${id}/dailyprice`, {
+    method: 'DELETE',
   });
 }

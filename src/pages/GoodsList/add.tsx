@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { Button, message, FormInstance, Divider, Switch } from 'antd';
+import { Button, message, FormInstance, Divider, Switch, Tooltip } from 'antd';
 import ProForm, {
   DrawerForm,
   ProFormText,
@@ -7,7 +7,7 @@ import ProForm, {
   ProFormDigit,
   DrawerFormProps,
 } from '@ant-design/pro-form';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { addGoods, getGoods, getGoodsCategories, updateGoods, updateSku } from './service';
 import { GoodsItemType, SkuDataType, SpecDataType } from './data';
 import AddSpec from './add-spec';
@@ -22,6 +22,7 @@ import { EditableProTable, ProColumns } from '@ant-design/pro-table';
 import _ from 'lodash/collection';
 import _a from 'lodash/array';
 import AddNotify from './add-notify';
+import AddDailyprice from './add-dailyprice';
 
 
 export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps, onComplete?:()=>{}}, ref:any) => {
@@ -43,6 +44,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
   const [categoriesDefault, setCategoriesDefault] = useState([]);
   const [specKeys, setSpecKeys] = useState([]);
   const [enableMultiCheckout, setEnableMultiCheckout] = useState(false);
+  const [enableDailyprice, setEnableDailyprice] = useState(false);
 
   const onVisibleChange = async (visible:boolean) => {
     if (visible) {
@@ -60,6 +62,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
           setGoodsData(goods.product);
           setGoodsType(goods.product.type);
           setSkuData(goods?.skus?.map(sku => {
+            if (sku.daily_price) setEnableDailyprice(true);
             if (typeof sku.own_spec == 'object') sku.own_spec = _.map(sku.own_spec, (v,k) => `${k}: ${v}`).join('\n');
             return sku;
           }));
@@ -181,12 +184,12 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
       dataIndex: 'name',
     },
     {
-      title: '价格',
+      title: enableDailyprice ? <Tooltip title="已启用团期，价格以团期日历为准！">默认价格 <QuestionCircleOutlined /></Tooltip> : '价格',
       dataIndex: 'price',
       valueType: 'money',
     },
     {
-      title: '库存',
+      title: enableDailyprice ? <Tooltip title="已启用团期，库存以团期日历为准！">默认库存 <QuestionCircleOutlined /></Tooltip> : '库存',
       dataIndex: 'stock',
       valueType: 'digit',
     },
@@ -346,6 +349,15 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
           />
         </ProForm.Item>
         </>}
+      </ProForm.Group>
+      <Divider plain orientation="left">团期价格</Divider>
+      <ProForm.Group>
+        <AddDailyprice goodsId={goodsId} skuData={skuData}
+          onOpen={async () => {
+            await formRef?.current?.validateFields();
+            if (!goodsId) await addEmptyGoods();
+          }}
+        />
       </ProForm.Group>
       <Divider plain orientation="left">商品图片 (建议600x600)</Divider>
       <ProForm.Group>

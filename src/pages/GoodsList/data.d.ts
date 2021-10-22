@@ -21,14 +21,22 @@ export type GoodsItemType = {
 };
 
 export type SkuDataType = {
-  id: React.Key;
+  id: number;
   name?: string;
   image?: string;
   price: string;
   stock: number;
+  daily_price: Array
   spec_ids: string;
-  own_spec: string;
+  own_spec: Array;
   created_at?: string;
+};
+
+export type DailypriceItemType = {
+  price: string;
+  stock: number;
+  sku_id: number;
+  sku_name?: string;
 };
 
 export type SpecDataType = {
@@ -41,11 +49,13 @@ export type SpecDataType = {
 };
 
 export type WechatTemplate = {
+  key: string;
   id: number;
   no: number;
   affect_types: Array;
   title: string;
   description?: string;
+  page?: string;
   data: Array<{
     name: string;
     key: string;

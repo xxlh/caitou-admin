@@ -7,15 +7,6 @@ const { TabPane } = Tabs;
 const { Text } = Typography;
 
 
-type DataItem = {
-    name: string;
-    state: string;
-};
-
-function callback(key) {
-  console.log(key);
-}
-
 const AddNotify = (props:{goodsType:string}) => {
     const { getTemplates } = useModel('notifyTemplates');
     const [templates, setTemplates] = useState<WechatTemplate[]>([]);
@@ -28,7 +19,7 @@ const AddNotify = (props:{goodsType:string}) => {
     }, []);
 
     return (<>
-        <Tabs defaultActiveKey="1" onChange={callback}>
+        <Tabs defaultActiveKey="1">
             {templates.map(template => 
             <TabPane tab={template.title} key={template.id}>
                 <Text type="secondary">{template.description}</Text>
@@ -42,7 +33,7 @@ const AddNotify = (props:{goodsType:string}) => {
                         valueType: 'group',
                         columns: template.data.map(data => ({
                             title: data.name,
-                            dataIndex: ['notifications', template.id, data.key],
+                            dataIndex: ['notifications', template.key, data.key],
                             valueType: data.type,
                             width: data.name=='温馨提醒' ? "lg" : "sm",
                             fieldProps: {

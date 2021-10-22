@@ -9,7 +9,7 @@ import { SkuDataType, SpecDataType } from './data';
 import { useModel } from 'umi';
 
   
-export default (props:{goodsId:number, skuData?:any, specData?:SpecDataType[], onOpen?:()=>Promise<any>, onComplete?:(data:{specs:SpecDataType[],skus:SkuDataType[]})=>void, fieldProps?:object}) => {
+export default (props:{goodsId:number, skuData?:SkuDataType, specData?:SpecDataType[], onOpen?:()=>Promise<any>, onComplete?:(data:{specs:SpecDataType[],skus:SkuDataType[]})=>void, fieldProps?:object}) => {
   const formRef = useRef();
   const [specData, setSpecData] = useState<SpecDataType[]>([]);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>(() =>
@@ -53,7 +53,7 @@ export default (props:{goodsId:number, skuData?:any, specData?:SpecDataType[], o
         title="添加商品规格"
         formRef={formRef}
         trigger={
-          specData.length||props?.specData?.length ? <Button>
+          specData.length||props?.specData?.length ? <Button type="primary">
                 <EditOutlined /> 编辑商品规格
             </Button> : <Button>
                 <PlusOutlined /> 添加商品规格
