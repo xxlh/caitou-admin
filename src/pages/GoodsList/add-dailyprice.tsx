@@ -57,6 +57,7 @@ export default (props:{goodsId:number, skuData:SkuDataType[], onOpen?:()=>Promis
     if (!values.daterange || !values.daterange[0] || !values.daterange[1]) {message.error('需要起止时间'); return false;}
     if (!weekdaysValue || !weekdaysValue.length) {message.error('需要限定时间'); return false}
 
+    let dailyprice = {...dailypriceData};
     let weekdays = new Set(weekdaysValue);
     let dailypriceItem = values.dailypriceItem.map(sku => ({
       sku_id: sku.id,
@@ -67,17 +68,17 @@ export default (props:{goodsId:number, skuData:SkuDataType[], onOpen?:()=>Promis
     let curDate = moment(values.daterange[0]);
     while (curDate <= moment(values.daterange[1])) {
       if (weekdays.has('daily')) {
-        dailypriceData[curDate.format('YYYY-MM-DD')] = dailypriceItem;
+        dailyprice[curDate.format('YYYY-MM-DD')] = dailypriceItem;
       } else if (weekdays.has('clean')) {
-        delete dailypriceData[curDate.format('YYYY-MM-DD')];
+        delete dailyprice[curDate.format('YYYY-MM-DD')];
       } else {
-        if (weekdays.has(curDate.day())) dailypriceData[curDate.format('YYYY-MM-DD')] = dailypriceItem;
+        if (weekdays.has(curDate.day())) dailyprice[curDate.format('YYYY-MM-DD')] = dailypriceItem;
       }
       curDate.add(1, 'days');
     }
 
-    setForceRefreshCalendar(Math.random()) // Todo: 为什么加这行就自动刷新日历
-    setDailypriceData(dailypriceData);
+    // setForceRefreshCalendar(Math.random()) // Todo: 为什么加这行就自动刷新日历 -> 数组state需要改变地址才会重新渲染 {..dailypriceData}
+    setDailypriceData(dailyprice);
     message.success('已刷新日历价格！');
     return true;
   }

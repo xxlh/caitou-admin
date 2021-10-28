@@ -100,3 +100,10 @@ export async function removeDailyprice(id:number) {
     method: 'DELETE',
   });
 }
+
+/* 二维码 */
+export async function getQRcode(uri:string) {
+  return request<Record<string, any>>(`/admin/wechat/qrcode?uri=${uri}`, {
+    method: 'GET',
+  });
+}
