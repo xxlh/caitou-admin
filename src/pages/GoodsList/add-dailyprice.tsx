@@ -28,7 +28,7 @@ export default (props:{goodsId:number, skuData:SkuDataType[], onOpen?:()=>Promis
       
     return (
       <ul className="events" key={forceRefreshCalendar}>
-        {dailypriceData[dateString].map(item => (
+        {Object.values(dailypriceData[dateString]).map(item => (
         <li key={item.sku_id}><Badge status="default" text={`¥${item.price} (${item.sku_name}')`} /></li>
         ))}
       </ul>
@@ -85,6 +85,7 @@ export default (props:{goodsId:number, skuData:SkuDataType[], onOpen?:()=>Promis
 
   const submit = async () => {
     await setDailyprice(props.goodsId, dailypriceData||{});
+    setEnableDailyprice(Object.values(dailypriceData).length > 0);
     props?.onComplete?.(dailypriceData||{});
     message.success('配置完成！价格将以价格日历为准～');
     return true;
@@ -92,6 +93,7 @@ export default (props:{goodsId:number, skuData:SkuDataType[], onOpen?:()=>Promis
 
   const purge = async () => {
     await removeDailyprice(props.goodsId);
+    setEnableDailyprice(false);
     setDailypriceData({});
     message.success('已清空团期！价格将以规格配置为准～');
     return true;
@@ -112,7 +114,7 @@ export default (props:{goodsId:number, skuData:SkuDataType[], onOpen?:()=>Promis
       formRef={formRef}
       key={props.goodsId}
       trigger={
-        enableDailyprice || JSON.stringify(dailypriceData) != '{}' ? <Button type="primary">
+        enableDailyprice ? <Button type="primary">
               <EditOutlined /> 配置团期价格
           </Button> : <Button>
               <PlusOutlined /> 启用团期价格
@@ -128,10 +130,11 @@ export default (props:{goodsId:number, skuData:SkuDataType[], onOpen?:()=>Promis
           try {
             await props?.onOpen?.();
             if (!dailypriceData || JSON.stringify(dailypriceData) == '{}') {
-              let dailypriceData = await getDailyprice(props.goodsId);
-              setDailypriceData(dailypriceData);
+              let dailyprice = await getDailyprice(props.goodsId);
+              setEnableDailyprice(dailyprice.enable);
+              setDailypriceData(dailyprice.all);
             }
-            setEditableRowKeys(props.skuData.map(sku => sku.id))
+            setEditableRowKeys(props.skuData.map(sku => sku.id));
             if (!visible) setVisible(true);
           } catch (error) {
             if (visible) setVisible(false);

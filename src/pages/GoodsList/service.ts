@@ -85,7 +85,7 @@ export async function getGoodsCategories(id:number) {
 
 /* 团期 */
 export async function getDailyprice(id:number) {
-  return request<Record<string, DailypriceItemType[]>>(`/admin/products/${id}/dailyprice`, {
+  return request<{enable:boolean, all:Record<string, DailypriceItemType[]>, data:Record<string, DailypriceItemType[]>}>(`/admin/products/${id}/dailyprice`, {
     method: 'GET',
   });
 }
