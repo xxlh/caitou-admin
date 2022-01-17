@@ -32,7 +32,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
   const { currentUser } = initialState || {};
   const [editorState, setEditorState] = useState(BraftEditor.createEditorState(null));
   const [goodsId, setGoodsId] = useState(0);
-  const [goodsData, setGoodsData] = useState<GoodsItemType|{}>({});
+  const [goodsData, setGoodsData] = useState<GoodsItemType>({});
   const [skuData, setSkuData] = useState<SkuDataType[]>([]);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
   const [specData, setSpecData] = useState<SpecDataType[]>([]);
@@ -97,6 +97,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
       setVisible(true);
       hide();
     } else {
+      // Todo: 应该在外层调用的时候设置key="goodsId"，来为不同商品创建不同组件
       setVisible(false);
       setGoodsId(0);
       setGoodsData({});
@@ -106,6 +107,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
       setSecondCategories([]);
       setCategoriesDefault([]);
       setEditorState(BraftEditor.createEditorState(null));
+      setEnableDailyprice(false);
     }
   }
 
@@ -357,6 +359,9 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
             await formRef?.current?.validateFields();
             if (!goodsId) await addEmptyGoods();
           }}
+          onComplete={dailypriceData => {
+            setEnableDailyprice(Object.values(dailypriceData).length > 0);
+          }}
         />
       </ProForm.Group>
       <Divider plain orientation="left">商品图片 (建议600x600)</Divider>
@@ -367,8 +372,18 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
       </ProForm.Group>
       <Divider plain orientation="left">消息推送</Divider>
       <ProForm.Group>
-        <ProForm.Item name="notify">
-          <AddNotify key={goodsType} goodsType={goodsType} />
+        <ProForm.Item name="notify"> {/* 不理解为什么+name会导致子组件加载2次 */}
+          <AddNotify key={goodsType} goodsType={goodsType} enableDailyprice={enableDailyprice}>
+            <AddDailyprice buttonText={<Button>配置团期后生效</Button>} goodsId={goodsId} skuData={skuData}
+              onOpen={async () => {
+                await formRef?.current?.validateFields();
+                if (!goodsId) await addEmptyGoods();
+              }}
+              onComplete={dailypriceData => {
+                setEnableDailyprice(Object.values(dailypriceData).length > 0);
+              }}
+            />
+          </AddNotify>
         </ProForm.Item>
       </ProForm.Group>
       <Divider plain orientation="left">商品介绍</Divider>

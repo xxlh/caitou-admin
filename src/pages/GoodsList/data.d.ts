@@ -47,20 +47,3 @@ export type SpecDataType = {
   image?: string;
   created_at?: string;
 };
-
-export type WechatTemplate = {
-  key: string;
-  id: number;
-  no: number;
-  affect_types: Array;
-  title: string;
-  description?: string;
-  page?: string;
-  data: Array<{
-    name: string;
-    key: string;
-    type: string;
-    max: number;
-    value?: string;
-  }>
-}

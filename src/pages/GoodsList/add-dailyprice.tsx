@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, ReactNode } from 'react';
 import { Button, message, Calendar, Badge, Popconfirm } from 'antd';
 import ProForm, {DrawerForm, ModalForm, ProFormDateRangePicker, ProFormSelect} from '@ant-design/pro-form';
 import { EditableProTable, ProColumns } from '@ant-design/pro-table';
@@ -10,7 +10,7 @@ import moment, { Moment } from 'moment';
 import './goods.css'
 
   
-export default (props:{goodsId:number, skuData:SkuDataType[], onOpen?:()=>Promise<any>, onComplete?:(data:Record<string, DailypriceItemType[]>)=>void, fieldProps?:object}) => {
+export default (props:{goodsId:number, skuData:SkuDataType[], onOpen?:()=>Promise<any>, onComplete?:(data:Record<string, DailypriceItemType[]>)=>void, fieldProps?:object, buttonText?:JSX.Element}) => {
   const formRef = useRef();
   const [dailypriceData, setDailypriceData] = useState<Record<string, DailypriceItemType[]>>({});
   const [enableDailyprice, setEnableDailyprice] = useState(false);
@@ -114,11 +114,11 @@ export default (props:{goodsId:number, skuData:SkuDataType[], onOpen?:()=>Promis
       formRef={formRef}
       key={props.goodsId}
       trigger={
-        enableDailyprice ? <Button type="primary">
+        props.buttonText || (enableDailyprice ? <Button type="primary">
               <EditOutlined /> 配置团期价格
           </Button> : <Button>
               <PlusOutlined /> 启用团期价格
-          </Button>
+          </Button>)
       }
       drawerProps={{
           forceRender: true,
