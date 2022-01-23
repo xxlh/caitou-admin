@@ -6,15 +6,16 @@ import {
   UserOutlined,
   WeiboCircleOutlined,
 } from '@ant-design/icons';
-import { Alert, Space, message, Tabs } from 'antd';
-import React, { useState } from 'react';
+import { Alert, Space, message, Tabs, Button, Popover } from 'antd';
+import React, { useEffect, useState } from 'react';
 import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
 import { Link, history, useModel } from 'umi';
 import Footer from '@/components/Footer';
-import { login } from '@/services/auth';
+import { login, loginWework } from '@/services/auth';
 import request from 'umi-request';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 import styles from './index.less';
+import Script from 'react-load-script';
 
 const LoginMessage: React.FC<{
   content: string;
@@ -46,6 +47,7 @@ const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<API.LoginStatus>({});
   const [type, setType] = useState<string>('account');
   const { initialState, setInitialState } = useModel('@@initialState');
+  const [weworkLoading, setWeworkLoading] = useState(false);
 
   const fetchUserInfo = async (userInfo: API.CurrentUserinfo) => {
     // const userInfo = await initialState?.fetchUserInfo?.();
@@ -53,24 +55,29 @@ const Login: React.FC = () => {
     setInitialState({ ...initialState, currentUser: userInfo }); // }
   };
 
+  const saveToken = (data:API.LoginResults) => {
+    const token = data.token ? `${data.token_type} ${data.token}` : '';
+    if (!token) throw new Error("Get token failed!");
+    localStorage.setItem('token', token);
+    request.interceptors.request.use((url, options) => {
+      return {
+        options: {
+          ...options,
+          headers: {
+            Authorization: token,
+          },
+        },
+      };
+    });
+  }
+
   const handleSubmit = async (values: API.LoginParams) => {
     setSubmitting(true);
 
     try {
       // 登录
       const data = await login({ ...values, type });
-      const token = data.token ? `${data.token_type} ${data.token}` : '';
-      localStorage.setItem('token', token);
-      request.interceptors.request.use((url, options) => {
-        return {
-          options: {
-            ...options,
-            headers: {
-              Authorization: token,
-            },
-          },
-        };
-      });
+      saveToken(data);
       message.success('登录成功！');
       await fetchUserInfo(data.userinfo);
       goto();
@@ -86,6 +93,54 @@ const Login: React.FC = () => {
 
     setSubmitting(false);
   };
+
+  const toWeworkAuth = () => {
+    // if (NoInWeworkBrowser) return false;
+    setWeworkLoading(true);
+    location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + WEWORK_CORPID + '&redirect_uri=' + encodeURIComponent(location.href) + '&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'
+  }
+
+  const generateWeworkQRcode = () => {
+    const wwLogin = new WwLogin({
+      "id": "wework-qrcode",
+      "appid": WEWORK_CORPID,
+      "agentid": WEWORK_AGENTID,
+      "redirect_uri": encodeURIComponent(location.href),
+      "state": "",
+      "href": "",
+      "lang": "zh",
+    });
+    console.log(wwLogin);
+  }
+
+  useEffect(() => {
+    (async () => {
+      // 企业微信授权回调验证
+      const { code } = history.location.query as {code: string}
+      if (code) {
+        try {
+          // 登录
+          let data = await loginWework({code});
+          saveToken(data);
+          message.success('登录成功！');
+          await fetchUserInfo(data.userinfo);
+          goto();
+        } catch (error: any) {
+          // 如果失败去设置用户错误信息
+          const msg = error?.data?.msg || '授权失败，请重试！';
+          setUserLoginState({
+            status: 'error',
+            type: 'account',
+            msg,
+          }); // message.error(msg);
+          // 清除code参数
+          let queryWithoutCode = {...history.location.query}
+          delete queryWithoutCode.code;
+          history.replace(history.location.pathname + '?' + Object.entries(queryWithoutCode).map(q => q.join('=')).join('&'));
+        }
+      }
+    })()
+  }, [])
 
   const { status, type: loginType, msg } = userLoginState;
   return (
@@ -240,12 +295,28 @@ const Login: React.FC = () => {
               </a>
             </div>
           </ProForm>
-          <Space className={styles.other}>
+          
+          <Space style={{marginTop:'20px', verticalAlign:'middle'}}>
+            其他登录方式 :
+            {!navigator.userAgent.includes('Mobile') && !navigator.userAgent.includes('wxwork') && !navigator.userAgent.includes('MicroMessenger') ?
+              <Popover content={<div id="wework-qrcode">loading...</div>} onVisibleChange={generateWeworkQRcode}>
+                <Script
+                  url="http://wwcdn.weixin.qq.com/node/wework/wwopen/js/wwLogin-1.2.5.js"
+                  // onLoad={generateWeworkQRcode}
+                />
+                <Button icon={<img style={{width:28}} src={'/icons/wework.png'}/>} style={{width:200, height:40}}>企业微信登录</Button>
+              </Popover>
+            :
+              <Button icon={<img style={{width:28}} src={'/icons/wework.png'}/>} style={{width:200, height:40}}
+              loading={weworkLoading} onClick={toWeworkAuth}>企业微信登录</Button>
+            }
+          </Space>
+          {/* <Space className={styles.other}>
             其他登录方式 :
             <AlipayCircleOutlined className={styles.icon} />
             <TaobaoCircleOutlined className={styles.icon} />
             <WeiboCircleOutlined className={styles.icon} />
-          </Space>
+          </Space> */}
         </div>
       </div>
       <Footer />

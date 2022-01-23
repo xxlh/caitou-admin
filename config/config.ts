@@ -14,6 +14,8 @@ export default defineConfig({
   define: {
     'process.env.UMI_ENV': 'prod',
     API_URL: 'https://api.caitou.ieexx.com',
+    WEWORK_CORPID: 'wwab032cc648e1816d',
+    WEWORK_AGENTID: '1000009',
   },
   layout: {
     // https://umijs.org/zh-CN/plugins/plugin-layout
