@@ -97,7 +97,7 @@ const Login: React.FC = () => {
   const toWeworkAuth = () => {
     // if (NoInWeworkBrowser) return false;
     setWeworkLoading(true);
-    location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + WEWORK_CORPID + '&redirect_uri=' + encodeURIComponent(location.href) + '&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'
+    location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + WEWORK_CORPID + '&redirect_uri=' + encodeURIComponent(location.href) + '&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect';
   }
 
   const generateWeworkQRcode = () => {

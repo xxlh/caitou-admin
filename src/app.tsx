@@ -114,9 +114,9 @@ const errorHandler = (error: ResponseError) => {
   const errorTitle = error.data.msg || errorText;
   const { status } = response;
   
-  if (status === 401 && window.location.pathname !== '/user/login') {
+  if (status === 401 && window.location.pathname !== loginPath) {
     localStorage.removeItem('token');
-    history.push('/user/login');
+    history.push(loginPath);
     notification.error({
       message: errorTitle,
       description: errorText,
@@ -132,8 +132,13 @@ const errorHandler = (error: ResponseError) => {
   
 };
 
-// https://umijs.org/zh-CN/plugins/plugin-request
 const token: string = localStorage.getItem('token') || '';
+// 企业微信自动登录
+if (!token && window.location.pathname !== loginPath && (navigator.userAgent.includes('wxwork') || navigator.userAgent.includes('MicroMessenger'))) {
+  const redirect_uri = encodeURIComponent(location.origin + loginPath + '?redirect=' + location.pathname);
+  location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + WEWORK_CORPID + '&redirect_uri=' + redirect_uri + '&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect';
+}
+// https://umijs.org/zh-CN/plugins/plugin-request
 export const request: RequestConfig = {
   prefix: API_URL,
   errorHandler, // 默认错误处理
