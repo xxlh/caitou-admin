@@ -19,11 +19,8 @@ export default [
   },
   { name: '订单管理', icon: 'ShoppingCartOutlined', path: '/order', component: './OrderList' },
   { name: '查询用户表格', icon: 'table', path: '/user-list', component: './UserList' },
-  {
-    name: '商品管理',
-    icon: 'ShoppingOutlined',
-    routes: [{ name: '商品列表', icon: 'SkinOutlined', path: '/goods', component: './GoodsList' }],
-  },
+  { name: '商品管理', icon: 'SkinOutlined', path: '/goods', component: './GoodsList' },
+  { name: '区域管理', icon: 'SkinOutlined', path: '/area', component: './AreaEdit' },
   { path: '/', redirect: '/welcome' },
   { component: './404' },
 ];
