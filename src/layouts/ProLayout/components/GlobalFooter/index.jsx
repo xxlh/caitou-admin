@@ -34,7 +34,7 @@ const GlobalFooter = {
           ) || links}
         </div>
         {copyright && (
-          <div class="ant-pro-global-footer-copyright">{copyright}</div>
+         <div class="ant-pro-global-footer-copyright">Copyright © 2022 新鲜旅生活 | appmn.cn</div>
         )}
       </footer>
     )

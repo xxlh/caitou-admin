@@ -398,6 +398,71 @@ export const asyncRouterMap = [
             ]
           },
           {
+            path: '/market/assistance',
+            component: RouteView,
+            redirect: '/market/assistance/index',
+            meta: { title: '助力券', keepAlive: false, permission: ['/market/assistance'] },
+            children: [
+              {
+                path: '/market/assistance/index',
+                component: () => import(/* webpackChunkName: "market" */ '@/views/market/assistance/Index'),
+                meta: { title: '助力券列表', keepAlive: false, permission: ['/market/assistance/index'] },
+                // 访问其他页面时激活该菜单(router-link-active)
+                activePath: ['/market/assistance/create', '/market/assistance/update']
+              },
+              {
+                path: '/market/assistance/create',
+                component: () => import(/* webpackChunkName: "market" */ '@/views/market/assistance/Create'),
+                meta: { title: '创建助力券', keepAlive: false, permission: ['/market/assistance/create'] },
+                hidden: true
+              },
+              {
+                path: '/market/assistance/update',
+                component: () => import(/* webpackChunkName: "market" */ '@/views/market/assistance/Update'),
+                meta: { title: '编辑助力券', keepAlive: false, permission: ['/market/assistance/update'] },
+                hidden: true
+              },
+              {
+                path: '/market/assistance/receive/index',
+                component: () => import(/* webpackChunkName: "market" */ '@/views/market/assistance/Receive'),
+                meta: { title: '领券记录', keepAlive: false, permission: ['/market/assistance/receive/index'] }
+              }
+            ]
+          },
+          
+          {
+            path: '/market/seckill',
+            component: RouteView,
+            redirect: '/market/seckill/index',
+            meta: { title: '秒杀', keepAlive: false, permission: ['/market/seckill'] },
+            children: [
+              {
+                path: '/market/seckill/index',
+                component: () => import(/* webpackChunkName: "market" */ '@/views/market/seckill/Index'),
+                meta: { title: '秒杀', keepAlive: false, permission: ['/market/seckill/index'] },
+                // 访问其他页面时激活该菜单(router-link-active)
+                activePath: ['/market/seckill/create', '/market/seckill/update']
+              },
+              {
+                path: '/market/seckill/create',
+                component: () => import(/* webpackChunkName: "market" */ '@/views/market/seckill/Create'),
+                meta: { title: '创建秒杀', keepAlive: false, permission: ['/market/seckill/create'] },
+                hidden: true
+              },
+              {
+                path: '/market/seckill/update',
+                component: () => import(/* webpackChunkName: "market" */ '@/views/market/seckill/Update'),
+                meta: { title: '编辑秒杀', keepAlive: false, permission: ['/market/seckill/update'] },
+                hidden: true
+              },
+              {
+                path: '/market/assistance/receive/index',
+                component: () => import(/* webpackChunkName: "market" */ '@/views/market/assistance/Receive'),
+                meta: { title: '秒杀记录', keepAlive: false, permission: ['/market/assistance/receive/index'] }
+              }
+            ]
+          },
+          {
             path: '/market/full-free',
             component: () => import(/* webpackChunkName: "market" */ '@/views/market/FullFree'),
             meta: { title: '满额包邮', keepAlive: false, permission: ['/market/full-free'] }

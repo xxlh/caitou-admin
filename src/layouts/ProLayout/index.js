@@ -7,6 +7,6 @@ import SettingDrawer from './components/SettingDrawer'
 import DocumentTitle from './components/DocumentTitle'
 import { updateTheme } from './utils/dynamicTheme'
 
-export { GlobalFooter, PageHeaderWrapper, SiderMenuWrapper, BlockLayout, SettingDrawer, DocumentTitle, BasicLayoutProps, updateTheme }
+export {GlobalFooter,PageHeaderWrapper, SiderMenuWrapper, BlockLayout, SettingDrawer, DocumentTitle, BasicLayoutProps, updateTheme }//@JP
 
 export default BasicLayout

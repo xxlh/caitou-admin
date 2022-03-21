@@ -5,5 +5,4 @@ window.publicConfig = {
   // 例如: https://www.你的域名.com/index.php?s=/store
   // BASE_API: '../index.php?s=/store'
   BASE_API: 'https://www.appmn.cn/sinaxmshop2.0/public/index.php?s=/store'
-  // BASE_API: 'http://yoshop2-feel.cn/index.php?s=/store'
 }
