@@ -4,12 +4,12 @@ import { axios } from '@/utils/request'
  * api接口列表
  */
 const api = {
-  list: '/market.coupon/list',
-  detail: '/market.coupon/detail',
-  receive: '/market.coupon/receive',
-  add: '/market.coupon/add',
-  edit: '/market.coupon/edit',
-  delete: '/market.coupon/delete'
+  list: '/market.seckill/list',
+  detail: '/market.seckill/detail',
+  receive: '/market.seckill/receive',
+  add: '/market.seckill/add',
+  edit: '/market.seckill/edit',
+  delete: '/market.seckill/delete'
 }
 
 /**

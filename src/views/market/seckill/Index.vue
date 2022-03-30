@@ -6,7 +6,7 @@
       <a-row>
         <a-col :span="6">
           <a-button
-            v-if="$auth('/market/coupon/create')"
+            v-if="$auth('/market/seckill/create')"
             type="primary"
             icon="plus"
             @click="handleAdd"
@@ -24,43 +24,29 @@
     </div>
     <s-table
       ref="table"
-      rowKey="coupon_id"
+      rowKey="seckill_id"
       :loading="isLoading"
       :columns="columns"
       :data="loadData"
       :pageSize="15"
     >
-      <!--秒杀类型 -->
-      <template slot="coupon_type" slot-scope="text">
-        <a-tag>{{ CouponTypeEnum[text].name }}</a-tag>
+  
+      <!-- 商品价格 -->
+      <template slot="goods_price_min" slot-scope="item">
+        <span class="c-p mlr-2">{{ item.goods_price_min }}</span>
+        <span>元</span>
       </template>
-      <!-- 最低消费金额 -->
-      <template slot="min_price" slot-scope="text">
-        <p class="c-p">{{ text }}</p>
-      </template>
-      <!-- 优惠方式 -->
-      <template slot="discount" slot-scope="item">
-        <template v-if="item.coupon_type == 10">
-          <span>立减</span>
-          <span class="c-p mlr-2">{{ item.reduce_price }}</span>
-          <span>元</span>
-        </template>
-        <template v-if="item.coupon_type == 20">
-          <span>打</span>
-          <span class="c-p mlr-2">{{ item.discount }}</span>
-          <span>折</span>
-        </template>
-      </template>
-      <!-- 有效期 -->
+      
       <template slot="duetime" slot-scope="item">
-        <template v-if="item.expire_type == 10">
-          <span>领取</span>
-          <span class="c-p mlr-2">{{ item.expire_day }}</span>
-          <span>天内有效</span>
-        </template>
-        <template v-if="item.expire_type == 20">
+         <template>
           <span>{{ item.start_time }} ~ {{ item.end_time }}</span>
         </template>
+      </template>
+      
+      <!-- 优惠方式 -->
+      <template slot="seckil_price" slot-scope="item">
+          <span class="c-p mlr-2">{{ item.seckil_price }}</span>
+          <span>元</span>
       </template>
       <!-- 状态 -->
       <template slot="status" slot-scope="text">
@@ -68,7 +54,7 @@
       </template>
       <!-- 操作 -->
       <span class="actions" slot="action" slot-scope="item">
-        <a v-if="$auth('/market/coupon/update')" @click="handleEdit(item)">编辑</a>
+        <a v-if="$auth('/market/seckill/update')" @click="handleEdit(item)">编辑</a>
         <a v-action:delete @click="handleDelete(item)">删除</a>
       </span>
     </s-table>
@@ -76,9 +62,9 @@
 </template>
 
 <script>
-import * as Api from '@/api/market/assistance'
+import * as Api from '@/api/market/seckill'
 import { STable } from '@/components'
-import { ApplyRangeEnum, CouponTypeEnum, ExpireTypeEnum } from '@/common/enum/coupon'
+import { ApplyRangeEnum, SeckillTypeEnum, ExpireTypeEnum } from '@/common/enum/seckill'
 
 export default {
   name: 'Index',
@@ -91,7 +77,7 @@ export default {
       queryParam: {},
       // 枚举类
       ApplyRangeEnum,
-      CouponTypeEnum,
+      SeckillTypeEnum,
       ExpireTypeEnum,
       // 正在加载
       isLoading: false,
@@ -99,37 +85,23 @@ export default {
       columns: [
         {
           title: '秒杀ID',
-          dataIndex: 'coupon_id'
+          dataIndex: 'seckill_id'
         },
         {
-          title: '秒杀名称',
-          dataIndex: 'name'
+          title: '商品名称',
+          dataIndex: 'goods_name'
         },
         {
-          title: '秒杀类型',
-          dataIndex: 'coupon_type',
-          scopedSlots: { customRender: 'coupon_type' }
+          title: '秒杀时间范围',
+          scopedSlots: { customRender: 'duetime' }
         },
         {
-          title: '最低消费金额 (元)',
-          dataIndex: 'min_price',
-          scopedSlots: { customRender: 'min_price' }
+          title: '商品价格',
+          scopedSlots: { customRender: 'goods_price_min' }
         },
         {
-          title: '秒杀方式',
-          scopedSlots: { customRender: 'discount' }
-        },
-        // {
-        //   title: '有效期',
-        //   scopedSlots: { customRender: 'duetime' }
-        // },
-        // {
-        //   title: '发放总数量',
-        //   dataIndex: 'total_num'
-        // },
-        {
-          title: '已发放/领取数量',
-          dataIndex: 'receive_num'
+          title: '秒杀价格',
+          scopedSlots: { customRender: 'seckil_price' }
         },
         {
           title: '状态',
@@ -171,7 +143,7 @@ export default {
 
     // 编辑记录
     handleEdit (item) {
-      this.$router.push({ path: './update', query: { couponId: item.coupon_id } })
+      this.$router.push({ path: './update', query: { seckillId: item.seckill_id } })
     },
 
     /**
@@ -183,7 +155,7 @@ export default {
         title: '您确定要删除该记录吗?',
         content: '删除后不可恢复',
         onOk () {
-          return Api.deleted({ couponId: item.coupon_id })
+          return Api.deleted({ seckillId: item.seckill_id })
             .then((result) => {
               app.$message.success(result.message, 1.5)
               app.handleRefresh()

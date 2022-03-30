@@ -13,7 +13,7 @@
     <div class="table-operator">
       <a-row class="row-item-search">
         <a-form class="search-form" :form="searchForm" layout="inline" @submit="handleSearch">
-          <a-form-item label="商品名称">
+          <a-form-item label="商品名称@2222">
             <a-input v-decorator="['goodsName']" placeholder="请输入商品名称" />
           </a-form-item>
           <a-form-item label="商品分类">
