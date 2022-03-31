@@ -96,7 +96,7 @@ export default {
       form: this.$form.createForm(this),
       // 默认日期范围
       defaultDate: [moment(), moment()],
-      // 优惠券ID
+      // 秒杀ID
       seckillId: null,
       // 当前记录
       record: {},
@@ -105,7 +105,7 @@ export default {
     }
   },
   async created () {
-    // 记录优惠券ID
+    // 记录秒杀ID
     this.seckillId = this.$route.query.seckillId
     // 获取当前记录
     await this.getDetail()

@@ -354,11 +354,6 @@ export const asyncRouterMap = [
                 component: () => import(/* webpackChunkName: "market" */ '@/views/market/seckill/Update'),
                 meta: { title: '编辑秒杀', keepAlive: false, permission: ['/market/seckill/update'] },
                 hidden: true
-              },
-              {
-                path: '/market/assistance/receive/index',
-                component: () => import(/* webpackChunkName: "market" */ '@/views/market/assistance/Receive'),
-                meta: { title: '秒杀记录', keepAlive: false, permission: ['/market/assistance/receive/index'] }
               }
             ]
           },

@@ -1,7 +1,7 @@
 <template>
   <a-card :bordered="false">
     <div class="card-title">{{ $route.meta.title }}</div>
-    <a-alert message="注：秒杀券只能抵扣商品金额，最多优惠到0.02元，不能抵扣运费" banner />
+   <!-- <a-alert message="注：秒杀只能抵扣商品金额" banner /> -->
     <div class="table-operator">
       <a-row>
         <a-col :span="6">
@@ -16,7 +16,7 @@
           <a-input-search
             style="max-width: 300px; min-width: 150px;float: right;"
             v-model="queryParam.search"
-            placeholder="请输入限时秒杀名称"
+            placeholder="请输入限时秒杀商品名称"
             @search="onSearch"
           />
         </a-col>
