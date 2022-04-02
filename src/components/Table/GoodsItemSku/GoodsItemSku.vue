@@ -1,12 +1,14 @@
+<!-- 选中后的商品列表 -->
 <template>
   <div class="goods-info clearfix">
     <!-- 商品图片 -->
     <div class="in-left">
-      <img :src="data.image" :alt="data.imageAlt" />@2226
+      <img :src="data.image" :alt="data.imageAlt" />
     </div>
     <div class="in-right">
       <!-- 商品名称 -->
       <p class="title twoline-hide">{{ data.title }}</p>
+      
       <!-- 副标题 -->
       <p
         v-if="isEmpty(data.goodsProps)"
@@ -19,7 +21,16 @@
           <span>{{ props.value.name }}</span>
         </div>
       </div>
+      
     </div>
+    
+   <!-- <div class="goods-props clearfix" v-for="(props2, idx2) in data.skuList" :key="idx2">
+      
+      <div class="goods-props-item"  v-for="(props, idx) in props2.goods_props" :key="idx">
+        <span>{{ props.value.name }}</span>
+      </div>
+    </div> -->
+    
   </div>
 </template>
 
@@ -29,7 +40,7 @@ import { isEmpty } from '@/utils/util'
 
 // Table内容元素: 商品信息
 export default {
-  name: 'GoodsItem',
+  name: 'GoodsItemSku',
   props: {
     // 商品信息
     data: PropTypes.object.def({
@@ -37,7 +48,9 @@ export default {
       imageAlt: '',
       title: '',
       subtitle: '',
-      goodsProps: []
+      goodsProps: [],
+      spec_type:'',
+      skuList:[]
     }),
     // 副标题颜色
     subTitleColor: PropTypes.bool.def(false)

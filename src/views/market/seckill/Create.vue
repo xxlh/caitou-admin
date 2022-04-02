@@ -6,14 +6,14 @@
         
         <a-form-item label="秒杀范围" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-form-item>
-            <SelectGoods
+            <SelectGoodsSku
               :defaultList="containGoodsList"
               v-decorator="['apply_range_config.applyGoodsIds', { initialValue: [], rules: [{ required: true, message: '请选择指定的商品' }] }]"
             />
           </a-form-item>
         </a-form-item>
         
-        <a-form-item
+        <!-- <a-form-item
           label="秒杀价格"
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
@@ -24,7 +24,7 @@
             v-decorator="['seckil_price', { rules: [{ required: true, message: '请输入秒杀价格' }] }]"
           />
           <span class="ml-5">元</span>
-        </a-form-item>
+        </a-form-item> -->
      
         <a-form-item label="到期类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
         
@@ -66,12 +66,12 @@
 <script>
 import moment from 'moment'
 import * as Api from '@/api/market/seckill'
-import { InputNumberGroup, SelectGoods } from '@/components'
+import { InputNumberGroup, SelectGoodsSku } from '@/components'
 import { ApplyRangeEnum, SeckillTypeEnum, ExpireTypeEnum } from '@/common/enum/seckill'
 
 export default {
   components: {
-    SelectGoods,
+    SelectGoodsSku,
     InputNumberGroup
   },
   data () {
