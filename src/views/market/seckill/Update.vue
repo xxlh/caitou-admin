@@ -10,7 +10,7 @@
         </a-form-item>
         
         
-        <a-form-item
+        <!-- <a-form-item
           label="秒杀价格"
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
@@ -22,7 +22,7 @@
           />
           <span class="ml-5">元</span>
         </a-form-item>
-        
+        -->
         
       
         <a-form-item label="到期类型" :labelCol="labelCol" :wrapperCol="wrapperCol">

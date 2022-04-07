@@ -44,7 +44,7 @@
                    <!-- <a-input-number>渲染不出来数字 -->
                   <a-input
                   placeholder="请输入金额"
-                  v-decorator="[ `seckilSku_price.'${props.id}'`, {validateTrigger: [ 'blur'], rules: [{ required: true, message: '请输入秒杀价格' }] }]"  @change="(e) => {e.target.value = e.target.value.replace(/[^1-9.]/g,'')}"/>
+                  v-decorator="[ `seckilSku_price.skuid_${props.id}`, {validateTrigger: [ 'blur'], rules: [{ required: true, message: '请输入秒杀价格' }] }]"  @change="(e) => {e.target.value = e.target.value.replace(/[^1-9.]/g,'')}"/>
                   
                 </a-form-item>
                
@@ -61,8 +61,9 @@
         <a v-action:delete @click="handleDeleteItem(index)">删除</a>
       </span>
     </a-table>
-    <GoodsModal
-      ref="GoodsModal"
+    <!-- 商品范围选择页列表-->
+    <GoodsModalRadio
+      ref="GoodsModalRadio"
       :multiple="multiple"
       :maxNum="maxNum"
       :defaultList="selectedItems"
@@ -74,7 +75,7 @@
 <script>
 import PropTypes from 'ant-design-vue/es/_util/vue-types'
 import cloneDeep from 'lodash.clonedeep'
-import { GoodsModal } from '@/components/Modal'
+import { GoodsModalRadio } from '@/components/Modal'
 import { GoodsItemSku } from '@/components/Table'
 
 const columns = [
@@ -106,7 +107,7 @@ const columns = [
 export default {
   name: 'SelectGoodsSku',
   components: {
-    GoodsModal,
+    GoodsModalRadio,
     GoodsItemSku
   },
   model: {
@@ -164,7 +165,7 @@ export default {
 
     // 打开商品选择器
     handleSelectGoods () {
-      this.$refs.GoodsModal.handle()
+      this.$refs.GoodsModalRadio.handle()
     },
 
     // 商品库modal确认回调
