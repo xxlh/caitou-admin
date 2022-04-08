@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-button @click="handleSelectGoods">选择商品@157</a-button>
+    <a-button @click="handleSelectGoods">选择商品</a-button>
     <a-table
       v-show="selectedItems.length"
       class="table-goodsList"
@@ -35,7 +35,7 @@
             <div class="goodsSkuPrice-input">
               
                <a-form-item>
-                 规格ID：{{props.id}};  商品价格：{{props.goods_price}}元<br>
+                 规格ID：{{props.id}};  商品规格价格：{{props.goods_price}}元<br>
                 秒杀价格：¥<!-- <a-input-number
                     :min="0.01"
                     :precision="2"

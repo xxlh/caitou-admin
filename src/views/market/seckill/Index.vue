@@ -32,10 +32,10 @@
     >
   
       <!-- 商品价格 -->
-      <template slot="goods_price_min" slot-scope="item">
+      <!-- <template slot="goods_price_min" slot-scope="item">
         <span class="c-p mlr-2">{{ item.goods_price_min }}</span>
         <span>元</span>
-      </template>
+      </template> -->
       
       <template slot="duetime" slot-scope="item">
          <template>
@@ -43,9 +43,9 @@
         </template>
       </template>
       
-      <!-- 优惠方式 -->
+      <!-- 秒杀价格 -->
       <template slot="seckil_price" slot-scope="item">
-          <span class="c-p mlr-2">{{ item.seckil_price }}</span>
+          <span class="c-p mlr-2">{{ item.goods_price_min }}~{{ item.goods_price_max }}</span>
           <span>元</span>
       </template>
       <!-- 状态 -->
@@ -95,10 +95,7 @@ export default {
           title: '秒杀时间范围',
           scopedSlots: { customRender: 'duetime' }
         },
-        {
-          title: '商品价格',
-          scopedSlots: { customRender: 'goods_price_min' }
-        },
+       
         {
           title: '秒杀价格',
           scopedSlots: { customRender: 'seckil_price' }

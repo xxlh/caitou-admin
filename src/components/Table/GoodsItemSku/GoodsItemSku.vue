@@ -3,7 +3,7 @@
   <div class="goods-info clearfix">
     <!-- 商品图片 -->
     <div class="in-left">
-      <img :src="data.image" :alt="data.imageAlt" />@2228888
+      <img :src="data.image" :alt="data.imageAlt" />
     </div>
     <div class="in-right">
       <!-- 商品名称 -->

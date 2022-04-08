@@ -20,6 +20,42 @@
           :subTitleColor="true"
         />
       </template>
+      
+      <div slot="goods_price"  slot-scope="item" class="goodsSkuPrice">
+        
+         <div class="goodsSku-line clearfix" v-for="(props, idx) in item.skuList" :key="idx">
+            <!-- 规格列表-->
+            <div class="goodsSkuPrice-item">
+              <span v-for="(props2, idx2) in props.goods_props" :key="idx2">{{ props2.value.name }}，</span>
+            </div>
+            <!-- 规格金额-->
+            <div class="goodsSkuPrice-input">
+              
+               <a-form-item>
+                 规格ID：{{props.id}};  商品规格价格：{{props.goods_price}}元<br>
+                秒杀价格：¥<!-- <a-input-number
+                    :min="0.01"
+                    :precision="2"
+                    v-decorator="[`seckil_price2eeee[${idx2}]`, {validateTrigger: [ 'blur'], rules: [{ required: true, message: '请输入秒杀价格' }] }]"
+                  /> -->
+                   <!-- <a-input-number>渲染不出来数字 -->
+                  <a-input
+                  
+                  placeholder="请输入金额1"
+                  v-decorator="[ `seckilSku_price.skuid_${props.id}`, {initialValue:props.seckill_price,validateTrigger: [ 'blur'], rules: [{ required: true, message: '请输入秒杀价格' }] }]"  @change="(e) => {e.target.value = e.target.value.replace(/[^1-9.]/g,'')}"/>
+                  
+                </a-form-item>
+               
+            </div>
+            
+            
+            
+          </div>
+         
+      </div>
+      
+      
+      
       <!-- 操作项 -->
 
     </a-table>
@@ -47,6 +83,10 @@ const columns = [
   {
     title: '商品信息',
     scopedSlots: { customRender: 'item' }
+  },
+  {
+    title: '商品价格',
+     scopedSlots: { customRender: 'goods_price' }
   },
   {
     title: '操作',
@@ -145,5 +185,31 @@ export default {
 .table-goodsList {
   margin-top: 10px;
   min-width: 620px;
+}
+.goodsSkuPrice{
+  margin-top: 10px;
+  min-width: 320px;
+  
+  .goodsSku-line{
+    display: flex;
+    flex-direction: column;
+    .goodsSkuPrice-input{
+      width:100px;
+    }
+    .goodsSkuPrice-item{
+      
+          display: flex;
+      span{
+          max-width: 100px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          display: flex;
+          align-items: center;
+      }
+    }
+    
+  }
+  
 }
 </style>
