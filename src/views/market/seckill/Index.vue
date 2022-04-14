@@ -45,7 +45,7 @@
       
       <!-- 秒杀价格 -->
       <template slot="seckil_price" slot-scope="item">
-          <span class="c-p mlr-2">{{ item.goods_price_min }}~{{ item.goods_price_max }}</span>
+          <span class="c-p mlr-2">{{ item.seckill_price_array.seckill_price_min }}~{{ item.seckill_price_array.seckill_price_max }}</span>
           <span>元</span>
       </template>
       <!-- 状态 -->
