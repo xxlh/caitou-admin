@@ -1,8 +1,8 @@
 import { axios } from '@/utils/request'
 
 const apiPath = {
-  login: '/passport/login',
-  logout: '/passport/logout'
+  login: '/auth/signin',
+  logout: '/auth/signout'
 }
 
 /**

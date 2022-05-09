@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import CategoryModel from '../Category'
 import * as GoodsApi from '@/api/goods'
+import * as CategoryApi from '@/api/category'
 import * as GradeApi from '@/api/user/grade'
 import * as ServiceApi from '@/api/goods/service'
 import * as DeliveryApi from '@/api/setting/delivery'
@@ -18,6 +19,10 @@ export default {
   formData: {
     // 当前商品记录
     goods: {},
+    goodsCategories: {},
+    // 规格数据
+    specs: [],
+    skus: [],
     // 分类列表
     categoryList: [],
     // 运费模板
@@ -31,7 +36,7 @@ export default {
   },
 
   // 获取form所需的数据
-  getFromData (goodsId = null) {
+  getFormData (goodsId = null) {
     // 记录商品ID (编辑时)
     this.goodsId = goodsId
     return new Promise((resolve, reject) => {
@@ -41,11 +46,11 @@ export default {
         // 获取分类列表
         this.getCategoryList(),
         // 获取运费模板列表
-        this.getDeliveryList(),
+        // this.getDeliveryList(),  // API not supported
         // 获取服务与承诺
-        this.getServiceList(),
+        // this.getServiceList(),  // API not supported
         // 获取会员等级列表
-        this.getUserGradeList()
+        // this.getUserGradeList()  // API not supported
       ]).then(() => {
         // 设置默认数据
         this.setDefaultData()
@@ -60,7 +65,10 @@ export default {
     return new Promise((resolve, reject) => {
       GoodsApi.detail({ goodsId })
         .then(result => {
-          this.formData.goods = result.data.goodsInfo
+          this.formData.goods = result.product
+          this.formData.goodsCategories = result.product.categories
+          this.formData.specs = result.specs
+          this.formData.skus = result.skus
           resolve()
         })
     })
@@ -71,18 +79,20 @@ export default {
     // 商品详情信息
     const goodsInfo = this.formData.goods
     // 格式化categoryIds
-    goodsInfo.categorys = this.formatCategoryIds(goodsInfo.categoryIds)
+    goodsInfo.categorys = this.formatCategoryIds(this.formData.goodsCategories)
+    // 判断单规格还是多规格
+    goodsInfo.spec_type = this.formData.skus.length > 1 ? 20 : 10
     // 商品基本数据
-    const goodsFormData = _.pick(goodsInfo, [
-      'goods_name', 'categorys', 'goods_no', 'delivery_type', 'sort',
-      'delivery_id', 'status', 'spec_type', 'deduct_stock_type', 'content',
-      'selling_point', 'serviceIds', 'sales_initial', 'is_points_gift',
-      'is_points_discount', 'is_enable_grade', 'is_alone_grade'
-    ])
+    // const goodsFormData = _.pick(goodsInfo, [
+    //   'goods_name', 'categorys', 'goods_no', 'delivery_type', 'sort',
+    //   'delivery_id', 'status', 'spec_type', 'deduct_stock_type', 'content',
+    //   'selling_point', 'serviceIds', 'sold_inital', 'is_points_gift',
+    //   'is_points_discount', 'is_enable_grade', 'is_alone_grade'
+    // ])
     // 单规格数据
-    const skuOne = _.pick(goodsInfo.skuList[0], ['goods_price', 'line_price', 'stock_num', 'goods_weight'])
+    const skuOne = _.pick(this.formData.skus[0], ['price', 'retail_price', 'yonghui_price', 'cost_price', 'stock', 'weight', 'no', 'daily_price', 'timing_price'])
     return {
-      ...goodsFormData,
+      ...goodsInfo,
       ...skuOne
     }
   },
@@ -91,8 +101,8 @@ export default {
    * 格式化categoryIds (用于表单元素选中)
    * @param {*} categoryIds
    */
-  formatCategoryIds (categoryIds) {
-    return categoryIds.map(id => { return { value: id } })
+  formatCategoryIds (categories) {
+    return categories.map(c => { return { value: c.id } })
   },
 
   // 获取分类列表

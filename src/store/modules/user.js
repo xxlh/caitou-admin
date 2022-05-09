@@ -42,10 +42,10 @@ const user = {
       return new Promise((resolve, reject) => {
         login(userInfo)
           .then(response => {
-            const data = response.data
+            const data = response
             // token保存7天
-            storage.set(ACCESS_TOKEN, data.token, 7 * 24 * 60 * 60 * 1000)
-            commit('SET_TOKEN', data.token)
+            storage.set(ACCESS_TOKEN, `${data.token_type} ${data.token}`, 7 * 24 * 60 * 60 * 1000)
+            commit('SET_TOKEN', `${data.token_type} ${data.token}`)
             resolve(response)
           })
           .catch((error) => {
@@ -58,7 +58,8 @@ const user = {
     GetInfo ({ commit }) {
       return new Promise((resolve, reject) => {
         getInfo().then(response => {
-          const data = response.data
+          const data = response
+          /* API no supoort
           const roles = data.roles
           // 遍历整理 actionList
           roles.permissions.map(item => {
@@ -67,10 +68,15 @@ const user = {
               item.actionList = item.actionEntitySet.map(action => action.action)
             }
           })
-          roles.permissionList = roles.permissions.map(item => item.permissionId)
-          commit('SET_ROLES', roles)
-          commit('SET_INFO', data.userInfo)
-          commit('SET_NAME', { name: data.userInfo.real_name, welcome: welcome() })
+          roles.permissionList = roles.permissions.map(item => item.permissionId) */
+          data.roles = {
+            isSuper: data.is_super,
+            permissionList: data.permissions,
+          }
+          delete data.permissions;
+          commit('SET_ROLES', data.roles)
+          commit('SET_INFO', data)
+          commit('SET_NAME', { name: data.name, welcome: welcome() })
           // commit('SET_AVATAR', result.avatar)
           resolve(data)
         }).catch(error => {

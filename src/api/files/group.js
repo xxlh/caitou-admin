@@ -4,7 +4,7 @@ import { axios } from '@/utils/request'
  * api接口列表
  */
 const api = {
-  list: '/files.group/list',
+  list: '/medias/collections',
   add: '/files.group/add',
   edit: '/files.group/edit',
   delete: '/files.group/delete'

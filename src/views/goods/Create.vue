@@ -15,7 +15,7 @@
             <a-form-item label="商品名称" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-input
                 placeholder="请输入商品名称"
-                v-decorator="['goods_name', {rules: [{required: true, min: 2, message: '请输入至少2个字符'}]}]"
+                v-decorator="['title', {rules: [{required: true, min: 2, message: '请输入至少2个字符'}]}]"
               />
             </a-form-item>
             <a-form-item label="商品分类" :labelCol="labelCol" :wrapperCol="wrapperCol">
@@ -40,18 +40,19 @@
               extra="建议尺寸：750*750像素, 最多上传10张, 可拖拽图片调整顺序, 第1张将作为商品首图"
             >
               <SelectImage
+                collection="product_images"
                 multiple
                 :maxNum="10"
-                v-decorator="['imagesIds', {rules: [{required: true, message: '请至少上传1张商品图片'}]}]"
+                v-decorator="['image_ids', {rules: [{required: true, message: '请至少上传1张商品图片'}]}]"
               />
             </a-form-item>
-            <a-form-item label="商品编码" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <!-- <a-form-item label="商品编码" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-input placeholder="请输入商品编码" v-decorator="['goods_no']" />
-            </a-form-item>
+            </a-form-item> -->
             <a-form-item label="运费模板" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-select
                 style="width: 300px"
-                v-decorator="['delivery_id', {rules: [{required: true, message: '请选择运费模板'}]}]"
+                v-decorator="['delivery_id', {rules: [{required: false, message: '请选择运费模板'}]}]"
                 placeholder="请选择运费模板"
               >
                 <a-select-option
@@ -70,17 +71,11 @@
             </a-form-item>
             <a-form-item label="商品状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-radio-group
-                v-decorator="['status', {initialValue: 10, rules: [{ required: true }]}]"
+                v-decorator="['on_sale', {initialValue: true, rules: [{ required: true }]}]"
               >
-                <a-radio :value="10">上架</a-radio>
-                <a-radio :value="20">下架</a-radio>
+                <a-radio :value="true">上架</a-radio>
+                <a-radio :value="false">下架</a-radio>
               </a-radio-group>
-            </a-form-item>
-            <a-form-item label="商品排序" :labelCol="labelCol" :wrapperCol="wrapperCol" extra="数字越小越靠前">
-              <a-input-number
-                :min="0"
-                v-decorator="['sort', {initialValue: 100, rules:[{ required: true }]}]"
-              />
             </a-form-item>
           </div>
 
@@ -92,7 +87,9 @@
                 @change="onForceUpdate()"
               >
                 <a-radio :value="10">单规格</a-radio>
-                <a-radio :value="20">多规格</a-radio>
+                <a-tooltip title="保存后可编辑多规格">
+                  <a-radio :value="20" disabled>多规格</a-radio>
+                </a-tooltip>
               </a-radio-group>
             </a-form-item>
             <!-- 多规格的表单内容 -->
@@ -110,17 +107,35 @@
                 <a-input-number
                   :min="0.01"
                   :precision="2"
-                  v-decorator="['goods_price', { initialValue: 1, rules: [{ required: true, message: '请输入商品价格' }] }]"
+                  v-decorator="['price', { initialValue: 1, rules: [{ required: true, message: '请输入商品价格' }] }]"
                 />
                 <span class="ml-10">元</span>
               </a-form-item>
               <a-form-item
-                label="划线价"
+                label="零售价"
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
-                extra="划线价仅用于商品页展示"
+                extra="零售价仅用于商品页展示"
               >
-                <a-input-number :min="0" :precision="2" v-decorator="['line_price']" />
+                <a-input-number :min="0" :precision="2" v-decorator="['retail_price']" />
+                <span class="ml-10">元</span>
+              </a-form-item>
+              <a-form-item
+                label="永辉价"
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                extra="永辉价仅用于商品页展示"
+              >
+                <a-input-number :min="0" :precision="2" v-decorator="['yonghui_price']" />
+                <span class="ml-10">元</span>
+              </a-form-item>
+              <a-form-item
+                label="成本价"
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                extra="成本价仅用于计算盈亏"
+              >
+                <a-input-number :min="0" :precision="2" v-decorator="['cost_price']" />
                 <span class="ml-10">元</span>
               </a-form-item>
               <a-form-item
@@ -132,7 +147,7 @@
                 <a-input-number
                   :min="0"
                   :precision="0"
-                  v-decorator="['stock_num', { initialValue: 100, rules:[{ required: true, message: '请输入库存数量' }] }]"
+                  v-decorator="['stock', { initialValue: 100, rules:[{ required: true, message: '请输入库存数量' }] }]"
                 />
                 <span class="ml-10">件</span>
               </a-form-item>
@@ -144,7 +159,7 @@
               >
                 <a-input-number
                   :min="0"
-                  v-decorator="['goods_weight', { initialValue: 0, rules:[{ required: true, message: '请输入库存数量' }] }]"
+                  v-decorator="['weight', { initialValue: 0, rules:[{ required: false, message: '请输入库存数量' }] }]"
                 />
                 <span class="ml-10">千克 (Kg)</span>
               </a-form-item>
@@ -162,8 +177,8 @@
           <!-- 商品详情 -->
           <div class="tab-pane" v-show="tabKey == 2">
             <a-form-item label="商品详情" :labelCol="labelCol" :wrapperCol="{span: 16}">
-              <Ueditor
-                v-decorator="['content', { rules: [{ required: true, message: '商品详情不能为空' }] }]"
+              <Ueditor collection="desc_images"
+                v-decorator="['description', { rules: [{ required: true, message: '商品详情不能为空' }] }]"
               />
             </a-form-item>
           </div>
@@ -176,7 +191,7 @@
               :wrapperCol="wrapperCol"
               extra="建议视频宽高比19:9，建议时长8-45秒"
             >
-              <SelectVideo :multiple="false" v-decorator="['video_id']" />
+              <SelectVideo collection="product_video" :multiple="false" v-decorator="['video_id']" />
             </a-form-item>
             <a-form-item
               label="视频封面"
@@ -184,7 +199,7 @@
               :wrapperCol="wrapperCol"
               extra="建议尺寸：750像素*750像素"
             >
-              <SelectImage :multiple="false" v-decorator="['video_cover_id']" />
+              <SelectImage collection="video_cover" :multiple="false" v-decorator="['video_cover_id']" />
             </a-form-item>
             <a-form-item
               label="商品卖点"
@@ -218,7 +233,7 @@
               :wrapperCol="wrapperCol"
               extra="用户端展示的销量 = 初始销量 + 实际销量"
             >
-              <a-input-number v-decorator="['sales_initial', {initialValue: 0}]" />
+              <a-input-number v-decorator="['sold_inital', {initialValue: 0}]" />
             </a-form-item>
 
             <a-divider orientation="left">积分设置</a-divider>
@@ -313,6 +328,7 @@ import * as GoodsApi from '@/api/goods'
 import { SelectImage, SelectVideo, Ueditor, InputNumberGroup } from '@/components'
 import GoodsModel from '@/common/model/goods/Index'
 import MultiSpec from './modules/MultiSpec'
+import ChannelEnum from '@/common/enum/file/Channel'
 
 export default {
   components: {
@@ -336,14 +352,15 @@ export default {
       // 当前表单元素
       form: this.$form.createForm(this),
       // 表单数据
-      formData: GoodsModel.formData
+      formData: GoodsModel.formData,
+      channel: ChannelEnum.PRODUCT.value,
     }
   },
   // 初始化数据
   created () {
     this.isLoading = true
     // 获取form所需的数据
-    GoodsModel.getFromData()
+    GoodsModel.getFormData()
       .then(() => {
         this.isLoading = false
       })
@@ -410,10 +427,12 @@ export default {
             return false
           }
           // 记录多规格数据
-          values.specData = MultiSpec.getFromSpecData()
+          values.specData = MultiSpec.getFormSpecData()
+          delete values.price
+          delete values.stock
         }
         // 整理商品分类ID集
-        values.categoryIds = values.categorys.map(item => item.value)
+        values.category_ids = values.categorys.map(item => item.value)
         delete values.categorys
         // 提交到后端api
         this.onFormSubmit(values)
@@ -428,8 +447,8 @@ export default {
       // 表单字段与tabKey对应关系
       // 只需要必填字段就可
       const tabsFieldsMap = [
-        ['goods_name', 'categorys', 'imagesIds', 'delivery_id'],
-        ['spec_type', 'goods_price'],
+        ['title', 'categorys', 'image_ids', 'delivery_id'],
+        ['spec_type', 'price'],
         ['content'],
         ['alone_grade_equity', 'first_money', 'second_money', 'third_money']
       ]
@@ -448,21 +467,26 @@ export default {
     onFormSubmit (values) {
       this.isLoading = true
       this.isBtnLoading = true
-      GoodsApi.add({ form: values })
-        .then(result => {
-          // 显示提示信息
-          this.$message.success(result.message, 1.5)
-          // 跳转到列表页
-          setTimeout(() => {
-            this.$router.push('./index')
-          }, 1500)
-        })
-        .catch(() => {
-          this.isBtnLoading = false
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
+      // Promise.all([
+        // Todo
+        // GoodsApi.saveSku(this.goodsId, values.specData.skuList),
+      // ]).then(() => {
+        GoodsApi.add(values)
+          .then(result => {
+            // 显示提示信息
+            this.$message.success('创建成功', 1.5)
+            // 跳转到列表页
+            setTimeout(() => {
+              this.$router.push('./index')
+            }, 1500)
+          })
+          .catch(() => {
+            this.isBtnLoading = false
+          })
+          .finally(() => {
+            this.isLoading = false
+          })
+        // })
     }
 
   }

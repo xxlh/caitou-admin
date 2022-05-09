@@ -6,10 +6,10 @@
       <a-row class="row-item-search">
         <a-form class="search-form" :form="searchForm" layout="inline" @submit="handleSearch">
           <a-form-item label="商品名称">
-            <a-input v-decorator="['goodsName']" placeholder="请输入商品名称" />
+            <a-input v-decorator="['title']" placeholder="请输入商品名称" />
           </a-form-item>
           <a-form-item label="商品编码">
-            <a-input v-decorator="['goodsNo']" placeholder="请输入商品编码" />
+            <a-input v-decorator="['no']" placeholder="请输入商品编码" />
           </a-form-item>
           <a-form-item label="商品分类">
             <a-tree-select
@@ -63,7 +63,7 @@
     </div>
     <s-table
       ref="table"
-      rowKey="goods_id"
+      rowKey="id"
       :loading="isLoading"
       :columns="columns"
       :data="loadData"
@@ -71,27 +71,27 @@
       :pageSize="15"
     >
       <!-- 商品图片 -->
-      <span slot="goods_image" slot-scope="text">
+      <span slot="image" slot-scope="text">
         <a title="点击查看原图" :href="text" target="_blank">
           <img width="50" height="50" :src="text" alt="商品图片" />
         </a>
       </span>
       <!-- 商品名称 -->
-      <span slot="goods_name" slot-scope="text">
+      <span slot="goods_title" slot-scope="text">
         <p class="twoline-hide" style="width: 270px;">{{ text }}</p>
       </span>
       <!-- 商品状态 -->
-      <span slot="status" slot-scope="text, item">
+      <span slot="on_sale" slot-scope="text, item">
         <a-tag
           class="cur-p"
-          :color="text == 10 ? 'green' : 'red'"
-          @click="handleUpdateStatus([item.goods_id], text != 10)"
-        >{{ text == 10 ? '上架' : '下架' }}</a-tag>
+          :color="text ? 'green' : 'red'"
+          @click="handleUpdateStatus([item.id], !text)"
+        >{{ text ? '在售' : '下架' }}</a-tag>
       </span>
       <!-- 操作项 -->
       <div class="actions" slot="action" slot-scope="text, item">
         <a v-if="$auth('/goods/update')" @click="handleEdit(item)">编辑</a>
-        <a v-action:delete @click="handleDelete([item.goods_id])">删除</a>
+        <a v-action:delete @click="handleDelete([item.id])">删除</a>
       </div>
     </s-table>
   </a-card>
@@ -106,26 +106,25 @@ import CategoryModel from '@/common/model/Category'
 const columns = [
   {
     title: '商品ID',
-    dataIndex: 'goods_id'
+    dataIndex: 'id'
   },
   {
     title: '商品图片',
-    dataIndex: 'goods_image',
-    scopedSlots: { customRender: 'goods_image' }
+    dataIndex: 'image',
+    scopedSlots: { customRender: 'image' }
   },
   {
     title: '商品名称',
-    dataIndex: 'goods_name',
-    scopedSlots: { customRender: 'goods_name' }
+    dataIndex: 'title',
+    scopedSlots: { customRender: 'goods_title' }
   },
   {
-    title: '商品价格',
-    dataIndex: 'goods_price_min',
-    scopedSlots: { customRender: 'goods_price_min' }
+    title: '商品最低价格',
+    dataIndex: 'price_lowest',
   },
   {
     title: '总销量',
-    dataIndex: 'sales_actual'
+    dataIndex: 'sold_count'
   },
   {
     title: '库存总量',
@@ -133,16 +132,12 @@ const columns = [
   },
   {
     title: '状态',
-    dataIndex: 'status',
-    scopedSlots: { customRender: 'status' }
-  },
-  {
-    title: '排序',
-    dataIndex: 'sort'
+    dataIndex: 'on_sale',
+    scopedSlots: { customRender: 'on_sale' }
   },
   {
     title: '添加时间',
-    dataIndex: 'create_time'
+    dataIndex: 'created_at'
   },
   {
     title: '操作',
@@ -178,7 +173,7 @@ export default {
       loadData: param => {
         return GoodsApi.list({ ...param, ...this.queryParam })
           .then(response => {
-            return response.data.list
+            return response
           })
       }
     }
@@ -289,7 +284,7 @@ export default {
      * 编辑记录
      */
     handleEdit (item) {
-      this.$router.push({ path: '/goods/update', query: { goodsId: item.goods_id } })
+      this.$router.push({ path: '/goods/update', query: { goodsId: item.id } })
     },
 
     /**

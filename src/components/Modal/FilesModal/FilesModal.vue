@@ -22,7 +22,7 @@
               @select="onSelectGroup"
             ></a-directory-tree>
           </div>
-          <a class="group-add" href="javascript:void(0);" @click="handleAddGroup">新增分组</a>
+          <!-- <a class="group-add" href="javascript:void(0);" @click="handleAddGroup">新增分组</a> -->
         </div>
         <!-- 文件列表 -->
         <div class="file-list">
@@ -33,7 +33,7 @@
               class="fl-l"
               style="width: 200px"
               placeholder="搜索文件名称"
-              v-model="queryParam.fileName"
+              v-model="queryParam.search"
               @search="onSearch"
             />
             <!-- 上传按钮 -->
@@ -82,7 +82,7 @@
                 <a-config-provider :auto-insert-space-in-button="false">
                   <a-button-group>
                     <a-button class="btn-mini" size="small" @click="handleDelete()">删除</a-button>
-                    <a-button class="btn-mini" size="small" @click="handleBatchMove()">移动</a-button>
+                    <!-- <a-button class="btn-mini" size="small" @click="handleBatchMove()">移动</a-button> -->
                   </a-button-group>
                 </a-config-provider>
               </div>
@@ -92,7 +92,7 @@
                 size="small"
                 v-model="fileList.current_page"
                 :total="fileList.total"
-                :defaultPageSize="15"
+                :defaultPageSize="fileList.per_page"
                 hideOnSinglePage
                 @change="handleNextPage"
               />
@@ -102,9 +102,9 @@
       </div>
     </a-spin>
     <!-- 新增分组 -->
-    <AddGroupForm ref="AddGroupForm" :groupList="groupList" @handleSubmit="getGroupList" />
+    <!-- <AddGroupForm ref="AddGroupForm" :groupList="groupList" @handleSubmit="getGroupList" /> -->
     <!-- 移动分组 -->
-    <MoveGroupForm ref="MoveGroupForm" :groupList="groupListTree" @handleSubmit="handleRefresh" />
+    <!-- <MoveGroupForm ref="MoveGroupForm" :groupList="groupListTree" @handleSubmit="handleRefresh" /> -->
   </a-modal>
 </template>
 
@@ -134,7 +134,11 @@ export default {
     // 已选择的数量
     selectedNum: PropTypes.integer.def(0),
     // 文件类型 (10图片 30视频)
-    fileType: PropTypes.integer.def(FileTypeEnum.IMAGE.value),
+    fileType: PropTypes.string.def(FileTypeEnum.IMAGE.value),
+    // 类别
+    channel: PropTypes.string.def(ChannelEnum.PRODUCT.value),
+    channel_id: PropTypes.integer.def(0),
+    collection: PropTypes.string.def(''),
   },
   data () {
     return {
@@ -153,15 +157,15 @@ export default {
       // 查询参数
       queryParam: {
         // 文件类型: 图片
-        fileType: FileTypeEnum.IMAGE.value,
+        type: FileTypeEnum.IMAGE.value,
         // 上传来源: 商户后台
-        channel: ChannelEnum.STORE.value,
+        channel: '',
         // 当前页码
         page: 1,
         // 文件名称
-        fileName: '',
+        search: '',
         // 文件分组
-        groupId: 0,
+        collection: '',
       },
       // modal(对话框)确定按钮 loading
       isLoading: true,
@@ -210,7 +214,7 @@ export default {
         this.uploadUrl = UploadApi.video
         this.uploadSizeLimit = publicConfig.uploadVideoSize || 10
       }
-      this.queryParam.fileType = this.fileType
+      this.queryParam.type = this.fileType
     },
 
     // 获取文件分组列表
@@ -218,7 +222,7 @@ export default {
       // this.isLoading = true
       GroupApi.list({}).then(result => {
         // 记录列表数据
-        const groupList = result.data.list
+        const groupList = result
         this.groupList = groupList
         // 格式化分组列表
         const groupListTree = this.formatTreeData(groupList)
@@ -227,12 +231,8 @@ export default {
         // 记录 groupListTreeSelect
         this.groupListTreeSelect = [{
           title: '全部',
-          key: -1,
-          value: -1
-        }, {
-          title: '未分组',
-          key: 0,
-          value: 0
+          key: '',
+          value: ''
         }].concat(groupListTree)
         // this.isLoading = false
       })
@@ -243,7 +243,7 @@ export default {
       this.isLoading = true
       FileApi.list(this.queryParam)
         .then(result => {
-          this.fileList = result.data.list
+          this.fileList = result
           this.isLoading = false
         })
     },
@@ -256,9 +256,9 @@ export default {
       list.forEach(item => {
         // 新的元素
         const netItem = {
-          title: item.name,
-          key: item.group_id,
-          value: item.group_id
+          title: item.title,
+          key: item.collection_name,
+          value: item.collection_name
         }
         // 递归整理子集
         if (item.children && item.children.length) {
@@ -274,7 +274,8 @@ export default {
 
     // 记录选中的分组
     onSelectGroup (selectedKeys) {
-      this.queryParam.groupId = selectedKeys[0]
+      console.log(selectedKeys);
+      this.queryParam.collection = selectedKeys[0]
       this.handleRefresh(true)
     },
 
@@ -331,8 +332,10 @@ export default {
       this.uploading.push(true)
       // 构建上传参数
       const formData = new FormData()
-      formData.append('iFile', info.file)
-      formData.append('groupId', this.queryParam.groupId)
+      formData.append('file', info.file)
+      if (this.channel) formData.append('channel', this.channel || this.queryParam.channel)
+      if (this.channel_id) formData.append('channel_id', this.channel_id)
+      formData.append('collection', this.collection || this.queryParam.collection)
       // 开始上传
       this.uploadUrl(formData)
         .finally(() => {
@@ -376,7 +379,7 @@ export default {
         title: '您确定要删除该文件吗?',
         content: '删除后不可恢复，请谨慎操作',
         onOk () {
-          return FileApi.deleted({ fileIds })
+          return FileApi.deleted({ ids: fileIds })
             .then(result => {
               that.$message.success(result.message, 1.5)
               that.handleRefresh()
@@ -398,7 +401,7 @@ export default {
     // 获取选中的文件id集
     getSelectedItemIds () {
       const selectedItems = this.getSelectedItems()
-      return selectedItems.map(item => item.file_id)
+      return selectedItems.map(item => item.id)
     },
 
     // 获取选中的文件

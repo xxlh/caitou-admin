@@ -4,10 +4,11 @@ import { axios } from '@/utils/request'
  * api接口列表
  */
 const api = {
-  list: '/files/list',
+  list: '/medias',
   edit: '/files/edit',
-  delete: '/files/delete',
-  moveGroup: '/files/moveGroup'
+  delete: '/medias',
+  moveGroup: '/files/moveGroup',
+  attach: '/medias/{id}/attach',
 }
 
 /**
@@ -40,7 +41,7 @@ export function edit (data) {
 export function deleted (data) {
   return axios({
     url: api.delete,
-    method: 'post',
+    method: 'delete',
     data: data
   })
 }
@@ -54,5 +55,17 @@ export function moveGroup (data) {
     url: api.moveGroup,
     method: 'post',
     data: data
+  })
+}
+
+/**
+ * 分配所属
+ * @param {*} data
+ */
+ export function attach (goodsId, data) {
+  return axios({
+    url: api.attach.replace('{id}', goodsId),
+    method: 'post',
+    data
   })
 }

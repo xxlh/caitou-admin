@@ -4,8 +4,8 @@ import { axios } from '@/utils/request'
  * api接口列表
  */
 const api = {
-  image: '/upload/image',
-  video: '/upload/video'
+  image: '/medias',
+  video: '/medias'
 }
 
 /**

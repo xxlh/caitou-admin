@@ -5,7 +5,7 @@ import Enum from '../enum'
  * FileTypeEnum
  */
 export default new Enum([
-    { key: 'IMAGE', name: '图片', value: 10 },
-    { key: 'ANNEX', name: '附件', value: 20 },
-    { key: 'VIDEO', name: '视频', value: 30 }
+    { key: 'IMAGE', name: '图片', value: 'image' },
+    { key: 'ANNEX', name: '附件', value: 'file' },
+    { key: 'VIDEO', name: '视频', value: 'video' }
 ])

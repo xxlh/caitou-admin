@@ -11,7 +11,7 @@ export default {
     return new Promise((resolve, reject) => {
       Api.list()
         .then(result => {
-          const categoryList = result.data.list
+          const categoryList = result
           // 格式化分类列表
           const treeData = this.formatTreeData(categoryList)
           resolve(treeData)
@@ -24,7 +24,7 @@ export default {
     return new Promise((resolve, reject) => {
       Api.list().then(result => {
         // 格式化分类列表
-        const resultList = result.data.list
+        const resultList = result.data
         // 格式化为 select列表数据
         const selectList = [{
           title: '全部分类',
@@ -47,12 +47,12 @@ export default {
       // 新的元素
       const netItem = {
         title: item.name,
-        key: item.category_id,
-        value: item.category_id
+        key: item.id,
+        value: item.id
       }
       // 禁用的分类
       if (
-        [item.category_id, item.parent_id].includes(disabledParentId) ||
+        [item.id, item.parent_id||0].includes(disabledParentId) ||
         disabled === true
       ) {
         netItem.disabled = true

@@ -6,7 +6,7 @@
     </div>
     <a-table
       v-if="!isLoading"
-      rowKey="category_id"
+      rowKey="id"
       :columns="columns"
       :dataSource="categoryList"
       :defaultExpandAllRows="true"
@@ -14,6 +14,9 @@
       :pagination="false"
       :loading="isLoading"
     >
+      <span slot="image" slot-scope="text">
+        <img v-if="text" :src="text.preview_url" width="30" height="30" />
+      </span>
       <!-- 状态 -->
       <span slot="status" slot-scope="text">
         <a-tag :color="text ? 'green' : ''">{{ text ? '显示' : '隐藏' }}</a-tag>
@@ -53,24 +56,25 @@ export default {
       columns: [
         {
           title: '分类ID',
-          dataIndex: 'category_id'
+          dataIndex: 'id'
         },
         {
           title: '分类名称',
           dataIndex: 'name'
         },
         {
-          title: '状态',
-          dataIndex: 'status',
-          scopedSlots: { customRender: 'status' }
+          title: '分类图标',
+          dataIndex: 'image',
+          scopedSlots: { customRender: 'image' }
         },
-        {
-          title: '排序',
-          dataIndex: 'sort'
-        },
+        // {
+        //   title: '状态',
+        //   dataIndex: 'status',
+        //   scopedSlots: { customRender: 'status' }
+        // },
         {
           title: '添加时间',
-          dataIndex: 'create_time'
+          dataIndex: 'created_at'
         },
         {
           title: '操作',
@@ -94,7 +98,7 @@ export default {
       bool && (this.isLoading = true)
       Api.list()
         .then(result => {
-          this.categoryList = result.data.list
+          this.categoryList = result
         })
         .finally(result => {
           this.isLoading = false
@@ -124,7 +128,7 @@ export default {
         title: '您确定要删除该记录吗?',
         content: '删除后不可恢复',
         onOk () {
-          return Api.deleted({ categoryId: item['category_id'] })
+          return Api.deleted({ categoryId: item['id'] })
             .then((result) => {
               self.$message.success(result.message, 1.5)
               self.handleRefresh()

@@ -1,63 +1,76 @@
 <template>
   <div>
-    <a-form-item label="商品规格" :labelCol="labelCol" :wrapperCol="wrapperCol">
-      <div v-if="true" class="form-item-help" style="line-height: 36px">
-        <small>最多添加3个商品规格组，生成的SKU数量不能超出50个</small>
+    <a-form-item label="规格键值" :labelCol="labelCol" :wrapperCol="wrapperCol">
+      <div v-if="!multiSpecData.specList.length" class="form-item-help" style="line-height: 36px">
+        <small>添加规格键值后设置每个规格的价格！</small>
       </div>
-      <!-- 规格组 -->
-      <div class="spec-group" v-for="(item, index) in multiSpecData.specList" :key="index">
-        <div class="spec-group-item clearfix">
-          <a-input
-            class="group-item-input"
-            v-model="item.spec_name"
-            :readOnly="isSpecLocked"
-            placeholder="请输入规格名称"
-            @change="onChangeSpecGroupIpt"
-          />
-          <a
-            v-if="!isSpecLocked"
-            class="group-item-delete"
-            href="javascript:;"
-            @click="handleDeleteSpecGroup(index)"
-          >删除规格组</a>
+      <a-button v-if="!isSpecLocked" class="spec-group-add-btn" :icon="multiSpecData.specList.length ? 'edit' : 'plus'" @click="isShowSpecEditor=true">
+        {{multiSpecData.specList.length ? '编辑规格键值' : '添加规格键值'}}
+      </a-button>
+      <!-- 编辑规格键值 -->
+      <a-drawer
+        title="规格键值编辑"
+        placement="right"
+        :closable="false"
+        :visible="isShowSpecEditor"
+        :after-visible-change="specVisibleChange"
+        :width="640"
+      >
+        <a-table
+          rowKey="id"
+          class="spec-list"
+          :columns="multiSpecData.specColumns"
+          :dataSource="multiSpecData.specList"
+          :scroll="{ x: true }"
+          :pagination="false"
+          bordered
+        >
+          <!-- 规格键名 -->
+          <template slot="key" slot-scope="text, item">
+            <a-auto-complete v-model="item.key" :data-source="specKeys" placeholder="输入新键或选择已有" />
+          </template>
+          <!-- 规格键值 -->
+          <template slot="name" slot-scope="text, item">
+            <a-input v-model="item.name" size="small" />
+          </template>
+          <!-- 要求提交字段 -->
+          <template slot="request_field_ids" slot-scope="text, item">
+            <a-select mode="multiple" v-model="item.request_field_ids" placeholder="Please select" :style="{width:'100%'}">
+              <a-select-option v-for="field in multiSpecData.fields" :key="field.id">
+                {{ field.name }}
+              </a-select-option>
+            </a-select>
+          </template>
+          <!-- 操作 -->
+          <template slot="actions" slot-scope="text, record">
+            <a-popconfirm v-if="multiSpecData.specList.length" title="确定删除?" @confirm="() => MultiSpecModel.handleDeleteSpec(record.id)">
+              <a href="javascript:;">删除</a>
+            </a-popconfirm>
+          </template>
+        </a-table>
+        <a-button class="editable-add-btn" block @click="() => MultiSpecModel.handleAddSpec()">新增一条</a-button>
+        <div
+          :style="{
+            position: 'absolute',
+            right: 0,
+            bottom: 0,
+            width: '100%',
+            borderTop: '1px solid #e9e9e9',
+            padding: '10px 16px',
+            background: '#fff',
+            textAlign: 'right',
+            zIndex: 1,
+          }"
+        >
+          <a-button :style="{ marginRight: '8px' }" @click="isShowSpecEditor=false">取消</a-button>
+          <a-button type="primary" @click="() => handleSaveSpecs()" :loading="isSavingSpec">保存</a-button>
         </div>
-        <div class="spec-value clearfix">
-          <div class="spec-value-item" v-for="(itm, idx) in item.valueList" :key="idx">
-            <a-input
-              class="value-item-input"
-              v-model="itm.spec_value"
-              :readOnly="isSpecLocked"
-              placeholder="请输入规格值"
-              @change="onChangeSpecValueIpt"
-            />
-            <a-icon
-              v-if="!isSpecLocked"
-              class="icon-close"
-              theme="filled"
-              type="close-circle"
-              @click="handleDeleteSpecValue(index, idx)"
-            />
-          </div>
-          <div v-if="!isSpecLocked" class="spec-value-add">
-            <a
-              class="group-item-delete"
-              href="javascript:;"
-              @click="handleAddSpecValue(index)"
-            >新增规格值</a>
-          </div>
-        </div>
-      </div>
-      <!-- 添加规格按钮 -->
-      <a-button
-        v-if="!isSpecLocked && multiSpecData.specList.length < 3"
-        class="spec-group-add-btn"
-        icon="plus"
-        @click="handleAddSpecGroup"
-      >添加规格组</a-button>
+      </a-drawer>
     </a-form-item>
+    <!-- 规格价格库存设置 -->
     <a-form-item
       v-show="multiSpecData.skuList.length"
-      label="SKU列表"
+      label="规格数据"
       :labelCol="labelCol"
       :wrapperCol="wrapperCol"
     >
@@ -65,30 +78,42 @@
       <div v-if="multiSpecData.skuList.length > 1" class="sku-batch">
         <span class="title">批量设置:</span>
         <a-input-number
-          v-model="multiSpecData.skuBatchForm.goods_price"
+          v-model="multiSpecData.skuBatchForm.price"
           placeholder="商品价格"
           :min="0.01"
           :precision="2"
         />
         <a-input-number
-          v-model="multiSpecData.skuBatchForm.line_price"
-          placeholder="划线价格"
+          v-model="multiSpecData.skuBatchForm.retail_price"
+          placeholder="零售价格"
           :min="0"
           :precision="2"
         />
         <a-input-number
-          v-model="multiSpecData.skuBatchForm.stock_num"
+          v-model="multiSpecData.skuBatchForm.yonghui_price"
+          placeholder="永辉价格"
+          :min="0"
+          :precision="2"
+        />
+        <a-input-number
+          v-model="multiSpecData.skuBatchForm.cost_price"
+          placeholder="成本价格"
+          :min="0"
+          :precision="2"
+        />
+        <a-input-number
+          v-model="multiSpecData.skuBatchForm.stock"
           placeholder="库存数量"
           :min="0"
           :precision="0"
         />
         <a-input-number
-          v-model="multiSpecData.skuBatchForm.goods_weight"
+          v-model="multiSpecData.skuBatchForm.weight"
           placeholder="商品重量"
           :min="0"
           :precision="2"
         />
-        <a-input v-model="multiSpecData.skuBatchForm.goods_sku_no" placeholder="sku编码" />
+        <!-- <a-input v-model="multiSpecData.skuBatchForm.no" placeholder="sku编码" /> -->
         <a-button @click="handleSkuBatch">立即设置</a-button>
       </div>
       <!-- sku列表table -->
@@ -103,30 +128,41 @@
         <!-- 预览图 -->
         <template slot="image" slot-scope="text, item">
           <SelectImage
+            :channel="channel"
+            :channel_id="item.id"
+            collection="sku_image"
             v-model="item.image_id"
-            :defaultList="(item.image_id > 0 && item.image) ? [item.image] : []"
+            :defaultList="item.image ? [item.image] : []"
             :width="50"
           />
         </template>
         <!-- 商品价格 -->
-        <template slot="goods_price" slot-scope="text, item">
-          <a-input-number v-model="item.goods_price" size="small" :min="0.01" :precision="2" />
+        <template slot="price" slot-scope="text, item">
+          <a-input-number v-model="item.price" size="small" :min="0.01" :precision="2" />
         </template>
-        <!-- 划线价格 -->
-        <template slot="line_price" slot-scope="text, item">
-          <a-input-number v-model="item.line_price" size="small" :min="0" :precision="2" />
+        <!-- 零售价格 -->
+        <template slot="retail_price" slot-scope="text, item">
+          <a-input-number v-model="item.retail_price" size="small" :min="0" :precision="2" />
+        </template>
+        <!-- 永辉价格 -->
+        <template slot="yonghui_price" slot-scope="text, item">
+          <a-input-number v-model="item.yonghui_price" size="small" :min="0" :precision="2" />
+        </template>
+        <!-- 成本价格 -->
+        <template slot="cost_price" slot-scope="text, item">
+          <a-input-number v-model="item.cost_price" size="small" :min="0" :precision="2" />
         </template>
         <!-- 库存数量 -->
-        <template slot="stock_num" slot-scope="text, item">
-          <a-input-number v-model="item.stock_num" size="small" :min="0" :precision="0" />
+        <template slot="stock" slot-scope="text, item">
+          <a-input-number v-model="item.stock" size="small" :min="0" :precision="0" />
         </template>
         <!-- 商品重量 -->
-        <template slot="goods_weight" slot-scope="text, item">
-          <a-input-number v-model="item.goods_weight" size="small" :min="0" :precision="2" />
+        <template slot="weight" slot-scope="text, item">
+          <a-input-number v-model="item.weight" size="small" :min="0" :precision="2" />
         </template>
         <!-- sku编码 -->
-        <template slot="goods_sku_no" slot-scope="text, item">
-          <a-input v-model="item.goods_sku_no" size="small" />
+        <template slot="no" slot-scope="text, item">
+          <a-input v-model="item.no" size="small" />
         </template>
       </a-table>
     </a-form-item>
@@ -137,12 +173,15 @@
 import PropTypes from 'ant-design-vue/es/_util/vue-types'
 import MultiSpecModel from '@/common/model/goods/MultiSpec'
 import { SelectImage } from '@/components'
+import * as GoodsApi from '@/api/goods'
+import ChannelEnum from '@/common/enum/file/Channel'
 
 export default {
   components: {
     SelectImage
   },
   props: {
+    goodsId: null,
     // 默认的规格列表
     defaultSpecList: PropTypes.array.def([]),
     // 默认的SKU列表
@@ -156,6 +195,7 @@ export default {
       labelCol: { span: 3 },
       // 输入框布局属性
       wrapperCol: { span: 21 },
+      isShowSpecEditor: false,
       // 商品多规格模型
       MultiSpecModel: new MultiSpecModel(),
       // MultiSpecModel: Object,
@@ -164,7 +204,10 @@ export default {
         specList: [],
         // SKU列表
         skuList: []
-      }
+      },
+      channel: ChannelEnum.SKU.value,
+      fields: [],
+      isSavingSpec: false,
     }
   },
   watch: {
@@ -172,6 +215,11 @@ export default {
       if (val.length && this.MultiSpecModel.isEmpty()) {
         this.getData()
       }
+    }
+  },
+  computed: {
+    specKeys () {
+      return _(this.multiSpecData.specList).map('key').uniq().value().filter(k => k != '')
     }
   },
   // 初始化数据
@@ -188,74 +236,19 @@ export default {
     },
 
     // 获取规格及SKU信息(表单提交)
-    getFromSpecData () {
-      return this.MultiSpecModel.getFromSpecData()
+    getFormSpecData () {
+      return this.MultiSpecModel.getFormSpecData()
     },
 
-    // 添加规格组
-    handleAddSpecGroup () {
-      if (this.checkSkuMaxNum()) {
-        this.MultiSpecModel.handleAddSpecGroup()
-      }
-    },
-
-    // 删除规格组
-    handleDeleteSpecGroup (groupIndex) {
-      const app = this
-      const modal = this.$confirm({
-        title: '您确定要删除该规格组吗?',
-        content: '删除后不可恢复',
-        onOk () {
-          // 删除元素
-          app.MultiSpecModel.handleDeleteSpecGroup(groupIndex)
-          // 关闭对话框
-          modal.destroy()
-        }
-      })
-    },
-
-    // 新增规格值
-    handleAddSpecValue (groupIndex) {
-      if (this.checkSkuMaxNum()) {
-        this.MultiSpecModel.handleAddSpecValue(groupIndex)
-      }
-    },
-
-    // 删除规格值
-    handleDeleteSpecValue (groupIndex, valueIndex) {
-      const app = this
-      const modal = this.$confirm({
-        title: '您确定要删除该规格值吗?',
-        content: '删除后不可恢复',
-        onOk () {
-          // 删除元素
-          app.MultiSpecModel.handleDeleteSpecValue(groupIndex, valueIndex)
-          // 关闭对话框
-          modal.destroy()
-        }
-      })
-    },
-
-    // 规格组输入框change事件
-    onChangeSpecGroupIpt () {
-      // 更新skuList
-      this.MultiSpecModel.onUpdate(true)
-    },
-
-    // 规格值输入框change事件
-    onChangeSpecValueIpt (event, itm) {
-      // 更新skuList
-      this.MultiSpecModel.onUpdate(true)
-    },
-
-    // 验证最大sku数量
-    checkSkuMaxNum () {
-      const skuList = this.multiSpecData.skuList
-      if (skuList.length >= 50) {
-        this.$message.error(`生成的sku列表数量不能大于50个，当前数量：${skuList.length}个`, 2.5)
-        return false
-      }
-      return true
+    // 保存规格键值
+    async handleSaveSpecs() {
+      this.isSavingSpec = true
+      let data = _(this.multiSpecData.specList).filter('key').groupBy('key').value();
+      let result = await GoodsApi.saveSpec(this.goodsId, data)
+      this.multiSpecData.skuList = result.skus
+      this.MultiSpecModel.onUpdate(false)
+      this.isSavingSpec = false
+      this.isShowSpecEditor = false
     },
 
     // 批量设置sku事件
@@ -270,7 +263,14 @@ export default {
         return false
       }
       return true
-    }
+    },
+
+    // 打开spec编辑窗时加载字段列表
+    async specVisibleChange(v) {
+      if (v) await this.MultiSpecModel.getFields();
+    },
+
+    // 报错
 
   }
 }

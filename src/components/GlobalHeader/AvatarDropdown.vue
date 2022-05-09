@@ -3,7 +3,7 @@
     <span class="ant-pro-account-avatar oneline-hide">
       <!-- <a-avatar size="small" src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png" class="antd-pro-global-header-index-avatar" /> -->
       <a-icon type="user" :style="{ fontSize: '16px', marginRight: '5px' }"></a-icon>
-      <span>{{ currentUser.real_name || currentUser.user_name }}</span>
+      <span>{{ currentUser.real_name || currentUser.name }}</span>
     </span>
     <template v-slot:overlay>
       <a-menu class="ant-pro-drop-down menu" :selected-keys="[]">

@@ -12,7 +12,7 @@
       <transition-group class="draggable-item" type="transition" :name="'flip-list'">
         <div
           v-for="(item, index) in selectedItems"
-          :key="item.file_id"
+          :key="item.id"
           class="file-item"
           :style="{ width: `${width}px`, height: `${width}px` }"
         >
@@ -45,6 +45,9 @@
     <!-- 文件选择器 -->
     <FilesModal
       ref="FilesModal"
+      :channel="channel"
+      :channel_id="channel_id"
+      :collection="collection"
       :multiple="multiple"
       :maxNum="maxNum"
       :selectedNum="selectedItems.length"
@@ -78,7 +81,11 @@ export default {
     // 默认选中的文件
     defaultList: PropTypes.array.def([]),
     // 元素的尺寸(宽)
-    width: PropTypes.integer.def(80)
+    width: PropTypes.integer.def(80),
+    // 类别
+    channel: PropTypes.string.def(''),
+    channel_id: PropTypes.integer.def(0),
+    collection: PropTypes.string.def(''),
   },
   data () {
     return {
@@ -142,7 +149,7 @@ export default {
         return this.$emit('change', multiple ? [] : 0)
       }
       // 生成fileId
-      const fileId = multiple ? selectedItems.map(item => item.file_id) : selectedItems[0].file_id
+      const fileId = multiple ? selectedItems.map(item => item.id) : selectedItems[0].id
       // 触发change事件
       return this.$emit('change', fileId, selectedItems)
     }

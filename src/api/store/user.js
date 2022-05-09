@@ -4,7 +4,7 @@ import { axios } from '@/utils/request'
  * api接口列表
  */
 const api = {
-  info: '/store.user/info',
+  info: '/auth/info',
   list: '/store.user/list',
   add: '/store.user/add',
   edit: '/store.user/edit',

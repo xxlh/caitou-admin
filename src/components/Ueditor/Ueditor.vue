@@ -10,6 +10,9 @@
     <!-- 文件选择器 -->
     <FilesModal
       ref="FilesModal"
+      :channel="channel"
+      :channel_id="channel_id"
+      :collection="collection"
       :fileType="filesModalType"
       :multiple="true"
       @handleSubmit="handleFilesSelect"
@@ -43,7 +46,11 @@ export default {
     // eslint-disable-next-line vue/require-default-prop
     value: PropTypes.string,
     // 编辑器配置
-    config: PropTypes.object.def({})
+    config: PropTypes.object.def({}),
+    // 类别
+    channel: PropTypes.string.def(''),
+    channel_id: PropTypes.number.def(0),
+    collection: PropTypes.string.def(''),
   },
   data () {
     const myConfig = _.merge(defaultConfig, this.config)
@@ -118,6 +125,7 @@ export default {
           // 点击时执行的命令
           onclick: () => {
             app.filesModalType = FileTypeEnum.VIDEO.value
+            app.collection = app.collection.replace('_image', '_video')
             app.$nextTick(() => {
               app.$refs.FilesModal.show()
             })

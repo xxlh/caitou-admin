@@ -51,7 +51,8 @@ import {
   Cascader,
   Collapse,
   Slider,
-  FormModel
+  FormModel,
+  AutoComplete,
 } from 'ant-design-vue'
 import Viser from 'viser-vue'
 
@@ -111,6 +112,7 @@ Vue.use(TreeSelect)
 Vue.use(Collapse)
 Vue.use(Slider)
 Vue.use(FormModel)
+Vue.use(AutoComplete)
 
 Vue.prototype.$confirm = Modal.confirm
 Vue.prototype.$message = message

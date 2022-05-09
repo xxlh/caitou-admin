@@ -117,7 +117,7 @@ export default {
     loginSuccess (res) {
       this.isLoginError = false
       // 显示提示信息
-      this.$message.success(res.message, 1.5)
+      this.$message.success('登录成功！', 1.5)
       setTimeout(() => {
         // 跳转到后台首页
         this.$router.push({ path: '/' })
@@ -134,7 +134,7 @@ export default {
      */
     loginFailed (response) {
       this.isLoginError = true
-      this.loginErrorMsg = response.message
+      this.loginErrorMsg = response.msg
     }
   }
 }

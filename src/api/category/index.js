@@ -4,10 +4,11 @@ import { axios } from '@/utils/request'
  * api接口列表
  */
 const api = {
-  list: '/category/list',
-  add: '/category/add',
-  edit: '/category/edit',
-  delete: '/category/delete'
+  list: '/categories',
+  add: '/categories',
+  edit: '/categories/{id}',
+  delete: '/category/delete',
+  attach: '/products/{id}/categorize',
 }
 
 /**
@@ -37,10 +38,10 @@ export function add (data) {
  * 编辑记录
  * @param {*} data
  */
-export function edit (data) {
+export function edit (id, data) {
   return axios({
-    url: api.edit,
-    method: 'post',
+    url: api.edit.replace('{id}', id),
+    method: 'patch',
     data
   })
 }
@@ -54,5 +55,17 @@ export function deleted (data) {
     url: api.delete,
     method: 'post',
     data: data
+  })
+}
+
+/**
+ * 分配类目
+ * @param {*} data
+ */
+export function attach (goodsId, category_ids) {
+  return axios({
+    url: api.attach.replace('{id}', goodsId),
+    method: 'post',
+    data: {category_ids}
   })
 }

@@ -1,6 +1,6 @@
 <template>
   <pro-layout
-    :title="storeInfo.store_name"
+    :title="storeInfo.store_name || '菜头商城管理平台'"
     :menus="menus"
     :hasSubMenu="hasSubMenu"
     :subMenus="subMenus"
@@ -133,10 +133,11 @@ export default {
 
     // 获取商城基本信息
     getStoreInfo () {
+      /* 多商户通过数据获取商城名称等信息, API no support
       Api.info().then((result) => {
         const { data: { storeInfo } } = result
         this.storeInfo = storeInfo
-      })
+      }) */
     },
 
     // 更新侧栏状态

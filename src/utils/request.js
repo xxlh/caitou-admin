@@ -27,7 +27,7 @@ service.interceptors.request.use(config => {
   // 让每个请求携带当前用户token
   const token = storage.get(ACCESS_TOKEN)
   if (token) {
-    config.headers['Access-Token'] = token
+    config.headers['Authorization'] = token
   }
   return config
 })
@@ -35,22 +35,28 @@ service.interceptors.request.use(config => {
 // 接口响应拦截
 service.interceptors.response.use((response) => {
   const result = response.data
+  /* 强制验证返回值为json对象
   if (!isObject(result)) {
     const error = { message: '服务端api返回的数据格式不正确' }
     return Promise.reject(error)
-  }
+  } */
   // result.status [ 200正常 500有错误 401未登录 403没有权限访问 ]
   // api报错信息
   if (result.status === 500) {
     message.error(result.message, 1.8)
     return Promise.reject(result)
   }
+  return result
+}, (error) => {
+  // 网络请求出错
+  const result = (error.response || {}).data;
+  const errMsg = (result || {}).msg || '请求出现错误，请稍后再试'
   // 鉴权失败: 未登录
-  if (result.status === 401) {
+  if (error.response && error.response.status === 401) {
     store.dispatch('Logout').then(() => {
       notification.error({
         message: '错误',
-        description: result.message,
+        description: errMsg,
         duration: 3
       })
       setTimeout(() => {
@@ -58,17 +64,16 @@ service.interceptors.response.use((response) => {
       }, 1200)
     })
     return Promise.reject(result)
+  } else if (error.response && error.response.status === 500) {
+    message.error(errMsg, 1.8)
+    return Promise.reject(result)
   }
-  return result
-}, (error) => {
-  // 网络请求出错
-  const errMsg = ((error.response || {}).data || {}).message || '请求出现错误，请稍后再试'
   notification.error({
     message: '网络请求出错',
     description: errMsg,
     duration: 3
   })
-  return Promise.reject(error)
+  return Promise.reject(result)
 })
 
 const installer = {

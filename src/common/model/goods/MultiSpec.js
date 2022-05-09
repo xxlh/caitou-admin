@@ -1,4 +1,4 @@
-
+import * as FieldsApi from '@/api/field'
 import _ from 'lodash'
 import { debounce, isEmpty } from '@/utils/util'
 
@@ -12,67 +12,100 @@ const defaultColumns = [
   },
   {
     title: '商品价格',
-    dataIndex: 'goods_price',
-    width: 120,
-    scopedSlots: { customRender: 'goods_price' }
+    dataIndex: 'price',
+    width: 100,
+    scopedSlots: { customRender: 'price' }
   },
   {
-    title: '划线价格',
-    dataIndex: 'line_price',
-    width: 120,
-    scopedSlots: { customRender: 'line_price' }
+    title: '零售价格',
+    dataIndex: 'retail_price',
+    width: 80,
+    scopedSlots: { customRender: 'retail_price' }
+  },
+  {
+    title: '永辉价格',
+    dataIndex: 'yonghui_price',
+    width: 80,
+    scopedSlots: { customRender: 'yonghui_price' }
+  },
+  {
+    title: '成本价格',
+    dataIndex: 'cost_price',
+    width: 80,
+    scopedSlots: { customRender: 'cost_price' }
   },
   {
     title: '库存数量',
-    dataIndex: 'stock_num',
-    width: 120,
-    scopedSlots: { customRender: 'stock_num' }
+    dataIndex: 'stock',
+    width: 80,
+    scopedSlots: { customRender: 'stock' }
   },
   {
-    title: '商品重量 (KG)',
-    dataIndex: 'goods_weight',
-    width: 120,
-    scopedSlots: { customRender: 'goods_weight' }
+    title: '重量 (KG)',
+    dataIndex: 'weight',
+    width: 80,
+    scopedSlots: { customRender: 'weight' }
   },
   {
     title: 'SKU编码',
-    dataIndex: 'goods_sku_no',
+    dataIndex: 'no',
     width: 140,
-    scopedSlots: { customRender: 'goods_sku_no' }
+    scopedSlots: { customRender: 'no' }
   }
 ]
 
 // 默认的sku记录值
 const defaultSkuItemData = {
+  id: 0,
+  product_id: 0,
   image_id: 0,
-  image: {},
-  // imageList: [],
-  goods_price: '',
-  line_price: '',
-  stock_num: '',
-  goods_weight: '',
-  goods_sku_no: ''
+  image: '',
+  own_spec: [],
+  price: '',
+  retail_price: '',
+  yonghui_price: '',
+  cost_price: '',
+  stock: '',
+  weight: '',
+  no: '',
+  spec_ids: '',
 }
 
-// const demoSpecList = [
-//   {
-//     key: 0,
-//     spec_name: '颜色',
-//     valueList: [
-//       { key: 0, groupKey: 0, /* spec_value_id: 10001, */ spec_value: '红色' },
-//       { key: 1, groupKey: 0, spec_value: '白色' },
-//       { key: 2, groupKey: 0, spec_value: '蓝色' }
-//     ]
-//   },
-//   {
-//     key: 1,
-//     spec_name: '尺码',
-//     valueList: [
-//       { key: 0, groupKey: 1, spec_value: 'XXL' },
-//       { key: 1, groupKey: 1, spec_value: 'XL' }
-//     ]
-//   }
-// ]
+// 默认的spec记录值
+const defaultSpecItemData = {
+  key: '',
+  name: '',
+  request_field_ids: [],
+}
+
+// 默认spec字段
+const defaultSpecColumns = [
+  {
+    title: '规格类别',
+    dataIndex: 'key',
+    scopedSlots: { customRender: 'key' },
+  },
+  {
+    title: '规格名称',
+    dataIndex: 'name',
+    scopedSlots: { customRender: 'name' },
+  },
+  {
+    title: '要求提交',
+    dataIndex: 'request_field_ids',
+    valueType: 'select',
+    scopedSlots: { customRender: 'request_field_ids' },
+    // fieldProps: {
+    //   options: fields,
+    //   mode: 'multiple',
+    // }
+  },
+  {
+    title: '操作',
+    dataIndex: 'actions',
+    scopedSlots: { customRender: 'actions' },
+  },
+];
 
 /**
  * 商品 model类
@@ -94,19 +127,26 @@ export default class MultiSpec {
     this.multiSpecData = {
       // 规格列表
       specList: [],
+      // Spec字段
+      specColumns: _.cloneDeep(defaultSpecColumns),
       // SKU列表
       skuList: [],
       // SKU字段
       skuColumns: _.cloneDeep(defaultColumns),
       // 批量设置sku
-      skuBatchForm: _.cloneDeep(defaultSkuItemData)
+      skuBatchForm: _.cloneDeep(defaultSkuItemData),
+      // 自定义提交字段
+      fields: [],
     }
   }
 
   // 生成并获取多规格数据
   getData (specList = [], skuList = []) {
     if (specList.length) {
-      this.multiSpecData.specList = _.cloneDeep(specList)
+      this.multiSpecData.specList = _.cloneDeep(specList).map(spec => {
+        spec.request_field_ids = spec.request_field_ids || []
+        return spec
+      })
       this.multiSpecData.skuList = _.cloneDeep(skuList)
     }
     // 整理所有的规格组
@@ -116,11 +156,24 @@ export default class MultiSpec {
     // 合并单元格
     const rowSpanArr = this.rowSpanArr(specGroupArr, cartesianList)
     // 生成sku字段名
-    this.buildSkuColumns(rowSpanArr)
+    this.buildSkuColumns(rowSpanArr, specGroupArr)
     // 生成sku列表数据
     this.buildSkuList(cartesianList)
+    console.log(this.multiSpecData.skuList);
     // 返回多规格数据
     return this.multiSpecData
+  }
+
+  // 获取字段
+  getFields() {
+    return new Promise((resolve, reject) => {
+      if (this.multiSpecData.fields.length) {resolve(this.multiSpecData.fields); return}
+      FieldsApi.list()
+        .then(result => {
+          this.multiSpecData.fields = result
+          resolve(result)
+        })
+    })
   }
 
   // 数据是否为空
@@ -135,14 +188,15 @@ export default class MultiSpec {
 
   // 整理所有的规格
   specGroupArr () {
-    const specGroupArr = []
-    this.multiSpecData.specList.forEach(specGroup => {
-      const itemArr = []
-      specGroup.valueList.forEach(value => {
-        itemArr.push(value)
-      })
-      specGroupArr.push(itemArr)
-    })
+    const specGroupArr = _(this.multiSpecData.specList).groupBy('key').values().value();
+    // const specGroupArr = []
+    // this.multiSpecData.specList.forEach(specGroup => {
+    //   const itemArr = []
+    //   specGroup.valueList.forEach(value => {
+    //     itemArr.push(value)
+    //   })
+    //   specGroupArr.push(itemArr)
+    // })
     return specGroupArr
   }
 
@@ -166,17 +220,17 @@ export default class MultiSpec {
         ...defaultSkuItemData,
         key: i,
         // skuKey用于合并旧记录
-        skuKey: cartesianList[i].map(item => item.key).join('_'),
+        skuKey: cartesianList[i].map(item => item.id).join(','),
         // skuKeys用于传参给后端
-        skuKeys: cartesianList[i].map(item => {
-          return {
-            groupKey: item.groupKey,
-            valueKey: item.key
-          }
-        })
+        // skuKeys: cartesianList[i].map(item => {
+        //   return {
+        //     groupKey: item.groupKey,
+        //     valueKey: item.key
+        //   }
+        // })
       }
       cartesianList[i].forEach((val, idx) => {
-        newSkuItem[`spec_value_${idx}`] = val.spec_value
+        newSkuItem[`spec_value_${idx}`] = val.name
       })
       newSkuList.push(newSkuItem)
     }
@@ -205,7 +259,8 @@ export default class MultiSpec {
       if (oldSkuItem) {
         newSkuList[index] = {
           ...newSkuList[index],
-          ..._.pick(oldSkuItem, Object.keys(defaultSkuItemData))
+          // ..._.pick(oldSkuItem, Object.keys(defaultSkuItemData)),
+          ...oldSkuItem,
         }
         // console.log(newSkuList[index].image)
       }
@@ -214,7 +269,7 @@ export default class MultiSpec {
   }
 
   // 生成sku表格字段名
-  buildSkuColumns (rowSpanArr) {
+  buildSkuColumns (rowSpanArr, specGroupArr) {
     const specList = this.multiSpecData.specList
     const newColumns = defaultColumns.concat()
     // 渲染字段的rowSpan
@@ -232,10 +287,10 @@ export default class MultiSpec {
       return obj
     }
     // 遍历规格组整理字段
-    for (let specIndex = specList.length; specIndex > 0; specIndex--) {
-      const specGroupItem = specList[specIndex - 1]
+    for (let specIndex = specGroupArr.length; specIndex > 0; specIndex--) {
+      const specGroupItem = specGroupArr[specIndex - 1]
       newColumns.unshift({
-        title: specGroupItem.spec_name,
+        title: specGroupItem[0].key,
         dataIndex: `spec_value_${specIndex - 1}`,
         customRender: (value, row, index) => customRender(specIndex, value, row, index)
       })
@@ -243,40 +298,14 @@ export default class MultiSpec {
     this.multiSpecData.skuColumns = newColumns
   }
 
-  // 添加规格组
-  handleAddSpecGroup () {
-    const specList = this.multiSpecData.specList
-    specList.push({
-      key: specList.length || 0,
-      spec_name: '',
-      valueList: []
-    })
-    // 默认规格值
-    const groupIndex = specList.length - 1
-    this.handleAddSpecValue(groupIndex)
+  // 删除规格键值
+  handleDeleteSpec (id) {
+    this.multiSpecData.specList = this.multiSpecData.specList.filter(spec => spec.id != id)
   }
 
-  // 添加规格值
-  handleAddSpecValue (groupIndex) {
-    const specGroupItem = this.multiSpecData.specList[groupIndex]
-    const specValueList = specGroupItem.valueList
-    specValueList.push({
-      key: specValueList.length || 0,
-      groupKey: specGroupItem.key,
-      spec_value: ''
-    })
-  }
-
-  // 删除规格组
-  handleDeleteSpecGroup (groupIndex) {
-    this.multiSpecData.specList.splice(groupIndex, 1)
-    this.onUpdate(false)
-  }
-
-  // 删除规格值
-  handleDeleteSpecValue (groupIndex, valueIndex) {
-    this.multiSpecData.specList[groupIndex].valueList.splice(valueIndex, 1)
-    this.onUpdate(false)
+  // 添加规格键值
+  handleAddSpec () {
+    this.multiSpecData.specList.push({...defaultSpecItemData})
   }
 
   // 批量设置sku事件
@@ -286,7 +315,7 @@ export default class MultiSpec {
     // if (!skuBatchForm.image_id) {
     //   delete skuBatchForm.image
     // }
-    console.log('skuBatchForm', skuBatchForm)
+    // console.log('skuBatchForm', skuBatchForm)
     for (const index in skuList) {
       skuList[index] = { ...skuList[index], ...skuBatchForm }
     }
@@ -317,9 +346,9 @@ export default class MultiSpec {
   // 表单验证
   verifyForm () {
     // 验证规格
-    if (!this.verifySpec()) {
-      return false
-    }
+    // if (!this.verifySpec()) {
+    //   return false
+    // }
     // 验证sku
     if (!this.verifySkuList()) {
       return false
@@ -330,9 +359,9 @@ export default class MultiSpec {
   // 验证sku
   verifySkuList () {
     const columns = [
-      { field: 'goods_price', name: '商品价格' },
-      { field: 'stock_num', name: '库存数量' },
-      { field: 'goods_weight', name: '商品重量' }
+      { field: 'price', name: '商品价格' },
+      { field: 'stock', name: '库存数量' },
+      // { field: 'weight', name: '商品重量' }
     ]
     const skuList = this.multiSpecData.skuList
     for (const skuIndex in skuList) {
@@ -347,7 +376,7 @@ export default class MultiSpec {
     }
     return true
   }
-
+/* Deprecated
   // 验证规格
   verifySpec () {
     const specList = this.multiSpecData.specList
@@ -358,7 +387,7 @@ export default class MultiSpec {
     for (const index in specList) {
       // 验证规格组
       const specGroup = specList[index]
-      if (isEmpty(specGroup.spec_name)) {
+      if (isEmpty(specGroup.name)) {
         this.error = '规格组名称不能为空~'
         return false
       }
@@ -369,17 +398,17 @@ export default class MultiSpec {
         return false
       }
       for (const i in valueList) {
-        if (isEmpty(valueList[i].spec_value)) {
+        if (isEmpty(valueList[i].name)) {
           this.error = '规格值不能为空~'
           return false
         }
       }
     }
     return true
-  }
+  } */
 
   // 获取规格及SKU信息(表单提交)
-  getFromSpecData () {
+  getFormSpecData () {
     const { multiSpecData: { specList, skuList } } = this
     const specData = {
       specList: _.cloneDeep(specList),
