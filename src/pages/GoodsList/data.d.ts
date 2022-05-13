@@ -4,6 +4,7 @@ export type GoodsItemType = {
   description?: string;
   image: string;
   images: Array;
+  categories: Array;
   on_sale: number;
   rating: number;
   sold_count: number;

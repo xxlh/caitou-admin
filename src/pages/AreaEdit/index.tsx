@@ -2,9 +2,6 @@ import { DeleteOutlined, EditOutlined, EnvironmentOutlined, PieChartOutlined, Pl
 import { Button, message, Drawer, Card, Cascader, Space, Menu, Layout } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
-import ProForm, { ModalForm, ProFormSelect, ProFormText, ProFormTextArea, QueryFilter } from '@ant-design/pro-form';
 import cityData from "./city";
 import { request } from 'umi';
 import AddArea from './add-area';
@@ -22,7 +19,7 @@ let polygons = [];
 const TableList: React.FC = () => {
   const [areasById, setAreasById] = useState<Record<string, AreaType>>({});
   const [currentAreaId, setCurrentAreaId] = useState<number>();
-  // const [polygons, setPolygons] = useState<[]>([]);  // state在useEffect中延迟取值取不到最新值
+  // const [polygons, setPolygons] = useState<[]>([]);  // state在useEffect(fun, [])中绑定的事件延迟执行时 取不到最新值 https://zhuanlan.zhihu.com/p/84697185
   const [province, setProvince] = useState<string>('');
   const [city, setCity] = useState<string>('');
   const [district, setDistrict] = useState<string>('');
@@ -64,7 +61,7 @@ const TableList: React.FC = () => {
     let paths = polygons.map(polygon => polygon.getPath()).filter(p => p.length);
     
     request(`/admin/areas/` + currentAreaId, {
-      method: 'POST',
+      method: 'PATCH',
       data: {paths},
     }).then(res => {
       areasById[currentAreaId].paths = paths;
@@ -115,7 +112,6 @@ const TableList: React.FC = () => {
     (async () => {
       const [areaData, AMap] = await Promise.all([request<{data:AreaType[]}>(`/admin/areas`, {params: {pageSize:50}}), AMapLoader.load({
         key: "8eed729112431178d5b9adaff42b33c1", // 申请好的Web端开发者Key，首次调用 load 时必填
-        securityJsCode:'cc376bf07ec7a861cbfada9c7de5b86f',
         version: "2.0", // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
         plugins: ['AMap.PolygonEditor'] //插件列表
       })]);
@@ -147,7 +143,7 @@ const TableList: React.FC = () => {
     <PageContainer>
       <Card>
         <Cascader options={cityData} placeholder="请选择城市" onChange={cityChange} changeOnSelect />
-        <AddArea onComplete={onAddArea} />
+        <div style={{float:'right'}}><AddArea onComplete={onAddArea} /></div>
       </Card>
       <Card>
         <Layout>

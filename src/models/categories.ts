@@ -13,8 +13,8 @@ export default () => {
           method: 'GET',
           params,
         });
-        let catData = _.keyBy(cat.data, 'id');
-        setCategories(cat.data);
+        let catData = _.keyBy(cat, 'id');
+        setCategories(cat);
         setCategoriesByid(catData);
         return cat.data;
     }

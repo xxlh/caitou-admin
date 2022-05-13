@@ -2,8 +2,6 @@ import React, { useRef, useState, useEffect, ReactNode } from 'react';
 import { Button, message, Calendar, Badge, Popconfirm, Cascader, Space } from 'antd';
 import ProForm, {DrawerForm, ModalForm, ProFormDateRangePicker, ProFormSelect, ProFormText} from '@ant-design/pro-form';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { DailypriceItemType, SkuDataType, SpecDataType } from './data';
-import moment, { Moment } from 'moment';
 import cityData from "./city";
 import { CascaderOptionType, CascaderValueType } from 'antd/lib/cascader';
 import { request } from 'umi';
@@ -27,17 +25,14 @@ export default (props:{areaId?:number, areaData?:AreaType, plain?:boolean, onOpe
     };
     if (props.areaId) {
       let res = await request(`/admin/areas/` + props.areaId, {
-        method: 'POST',
+        method: 'PATCH',
         data,
       });
       props.onComplete?.(res);
     } else {
       let res = await request(`/admin/areas`, {
         method: 'POST',
-        data: {
-          ...data,
-          paths:[''],
-        },
+        data,
       });
       props.onComplete?.(res);
     }
@@ -49,7 +44,7 @@ export default (props:{areaId?:number, areaData?:AreaType, plain?:boolean, onOpe
       trigger={
         props.plain ?
           <Button icon={<EditOutlined />} style={{borderRadius:'50%'}}></Button> :
-          <Button type="primary" style={{float:'right'}}>新增区域</Button>
+          <Button type="primary" icon={<PlusOutlined />}>新增区域</Button>
       }
       onFinish={submit}
       layout="horizontal"

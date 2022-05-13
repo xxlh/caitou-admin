@@ -23,6 +23,7 @@ import _ from 'lodash/collection';
 import _a from 'lodash/array';
 import AddNotify from './add-notify';
 import AddDailyprice from './add-dailyprice';
+import { keyBy } from 'lodash';
 
 
 export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps, onComplete?:()=>{}}, ref:any) => {
@@ -68,8 +69,10 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
           }));
           setSpecData(goods?.specs);
           setSpecKeys(_a.union(goods?.specs?.map?.(spec => spec.key)));
-          goodsCategories = await getGoodsCategories(id);
+          // goodsCategories = await getGoodsCategories(id);
+          goodsCategories = goods?.product?.categories;
           setCategoriesDefault(goodsCategories?.map((cat:any) => cat.id));
+          
           setEnableMultiCheckout(!!goods.product.multi_checkout);
         }
         /* 查询类别 */
@@ -117,7 +120,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
     
 
     try {
-      if (typeof fields?.images == 'object') fields.images = fields?.images?.map((img:any) => typeof img=='string' ? img : (img?.url||(img?.response?.Location?'http://'+img?.response?.Location:null)));
+      if (typeof fields?.images == 'object') fields.images = fields?.images?.map((img:any) => typeof img=='string' ? img : (img?.external_url||(img?.response?.Location?'http://'+img?.response?.Location:null)));
       fields.description = fields.description?.toHTML?.();
       if (goodsId) await updateGoods(goodsId, { ...fields });
       else await addGoods({ ...fields });
@@ -278,7 +281,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
         <ProFormSelect
           options={secondCategories}
           width="sm"
-          name="categories"
+          name="category_ids"
           label="子类别"
           mode="multiple"
           initialValue={categoriesDefault}
@@ -367,7 +370,7 @@ export default forwardRef((props: {goodsId?:number, fieldProps?:DrawerFormProps,
       <Divider plain orientation="left">商品图片 (建议600x600)</Divider>
       <ProForm.Group>
         <ProForm.Item name="images">
-          <PicturesWall key={goodsData?.id} fileList={(goodsData.images||[]).map((url:string, k:number) => ({id:k, url:url}))} />
+          <PicturesWall key={goodsData?.id} fileList={(goodsData.images||[]).map((img:any, k:number) => typeof img == 'object' ? {id:img.id, url:img.preview_url} : {id:k, url:img})} />
         </ProForm.Item>
       </ProForm.Group>
       <Divider plain orientation="left">消息推送</Divider>

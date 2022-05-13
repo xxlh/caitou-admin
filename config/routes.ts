@@ -18,9 +18,12 @@ export default [
     ],
   },
   { name: '订单管理', icon: 'ShoppingCartOutlined', path: '/order', component: './OrderList' },
-  { name: '查询用户表格', icon: 'table', path: '/user-list', component: './UserList' },
+  { name: '配送单管理', icon: 'CarOutlined', path: '/order', component: './OrderList' },
+  { name: '查询用户表格', icon: 'TeamOutlined', path: '/user-list', component: './UserList' },
   { name: '商品管理', icon: 'SkinOutlined', path: '/goods', component: './GoodsList' },
-  { name: '区域管理', icon: 'SkinOutlined', path: '/area', component: './AreaEdit' },
+  { name: '区域管理', icon: 'RadiusUprightOutlined', path: '/area', component: './AreaEdit' },
+  { name: 'App发版管理', icon: 'AndroidOutlined', path: 'http://upgrade.admin.caitou.ieexx.com/admin', },
+
   { path: '/', redirect: '/welcome' },
   { component: './404' },
 ];

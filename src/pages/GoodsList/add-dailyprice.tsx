@@ -29,7 +29,7 @@ export default (props:{goodsId:number, skuData:SkuDataType[], onOpen?:()=>Promis
     return (
       <ul className="events" key={forceRefreshCalendar}>
         {Object.values(dailypriceData[dateString]).map(item => (
-        <li key={item.sku_id}><Badge status="default" text={`¥${item.price} (${item.sku_name}')`} /></li>
+        typeof item == 'object' && <li key={item.sku_id}><Badge status="default" text={`¥${item.price} (${item.sku_name}')`} /></li>
         ))}
       </ul>
     );
