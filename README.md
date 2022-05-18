@@ -28,6 +28,12 @@ npm run serve
 ```bash
 npm run build
 ```
+### Deploy project
+
+```bash
+npm run deploy
+```
+It will run build and deploy the ./dist folder to gh-pages branch, which needs to setup webhook for auto retrieve gh-pages branch in server.
 
 ### Check code style
 

@@ -159,7 +159,6 @@ export default class MultiSpec {
     this.buildSkuColumns(rowSpanArr, specGroupArr)
     // 生成sku列表数据
     this.buildSkuList(cartesianList)
-    console.log(this.multiSpecData.skuList);
     // 返回多规格数据
     return this.multiSpecData
   }
