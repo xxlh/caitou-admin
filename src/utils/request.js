@@ -16,7 +16,8 @@ const service = axios.create({
   // 服务端api地址
   // baseURL: process.env.NODE_ENV === 'production' ? publicConfig.BASE_API : process.env.VUE_APP_API_BASE_URL,
   baseURL: publicConfig.BASE_API,
-  timeout: 25 * 1000 // 请求超时时间，25秒, 如果上传大文件需要更长
+  timeout: 25 * 1000, // 请求超时时间，25秒, 如果上传大文件需要更长
+  withCredentials: false,
 })
 
 // 接口请求拦截

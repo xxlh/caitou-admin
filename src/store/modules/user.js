@@ -59,20 +59,19 @@ const user = {
       return new Promise((resolve, reject) => {
         getInfo().then(response => {
           const data = response
-          /* API no supoort
+          data.roles = {
+            isSuper: data.is_super,
+            permissions: data.permissions,
+          }
           const roles = data.roles
           // 遍历整理 actionList
           roles.permissions.map(item => {
-            item.actionList = []
-            if (item.actionEntitySet && item.actionEntitySet.length > 0) {
-              item.actionList = item.actionEntitySet.map(action => action.action)
-            }
+            // item.actionList = []
+            // if (item.actionEntitySet && item.actionEntitySet.length > 0) {
+            //   item.actionList = item.actionEntitySet.map(action => action.action)
+            // }
+            item.actionList = item.actions || []
           })
-          roles.permissionList = roles.permissions.map(item => item.permissionId) */
-          data.roles = {
-            isSuper: data.is_super,
-            permissionList: data.permissions,
-          }
           delete data.permissions;
           commit('SET_ROLES', data.roles)
           commit('SET_INFO', data)

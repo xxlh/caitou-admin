@@ -29,7 +29,7 @@ function plugin (Vue) {
           // console.log('permissionList', roles.permissions)
           // 查找指定的权限
           const findPermission = roles.permissions.find((val) => {
-            return val.permissionId === permission
+            return permission.indexOf(val.page_path) != -1
           })
           if (!findPermission) {
             // console.error(`未找到权限: ${permission}`)

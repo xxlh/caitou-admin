@@ -90,8 +90,8 @@
       </span>
       <!-- 操作项 -->
       <div class="actions" slot="action" slot-scope="text, item">
-        <a v-if="$auth('/goods/update')" @click="handleEdit(item)">编辑</a>
-        <a v-action:delete @click="handleDelete([item.id])">删除</a>
+        <a v-if="$auth('/goods/update.edit')" @click="handleEdit(item)">编辑</a>
+        <a v-if="$auth('/goods/update.delete')" v-action:delete @click="handleDelete([item.id])">删除</a>
       </div>
     </s-table>
   </a-card>

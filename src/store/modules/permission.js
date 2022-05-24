@@ -10,7 +10,10 @@ function hasPermission (permission, route) {
   if (route.meta && route.meta.permission) {
     let flag = false
     for (let i = 0, len = permission.length; i < len; i++) {
-      flag = route.meta.permission.includes(permission[i])
+      // flag = route.meta.permission.includes(permission[i])
+      route.meta.permission.forEach(p => {
+        flag = p.indexOf(permission[i].page_path) != -1
+      })
       if (flag) {
         return true
       }
@@ -42,7 +45,7 @@ function hasRole (roles, route) {
  */
 function filterAsyncRouter (routerMap, roles) {
   const accessedRouters = routerMap.filter(route => {
-    if (hasPermission(roles.permissionList, route)) {
+    if (hasPermission(roles.permissions, route)) {
       if (route.children && route.children.length) {
         route.children = filterAsyncRouter(route.children, roles)
       }
