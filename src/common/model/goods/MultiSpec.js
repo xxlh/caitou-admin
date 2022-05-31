@@ -147,7 +147,10 @@ export default class MultiSpec {
         spec.request_field_ids = spec.request_field_ids || []
         return spec
       })
-      this.multiSpecData.skuList = _.cloneDeep(skuList)
+      this.multiSpecData.skuList = _.cloneDeep(skuList).map(sku => {
+        sku.skuKey = sku.spec_ids
+        return sku
+      })
     }
     // 整理所有的规格组
     const specGroupArr = this.specGroupArr()
@@ -255,6 +258,7 @@ export default class MultiSpec {
         })
       }
       // 写入新纪录
+      console.log(oldSkuItem, oldSkuList, newSkuList);
       if (oldSkuItem) {
         newSkuList[index] = {
           ...newSkuList[index],

@@ -171,7 +171,7 @@ export default {
       selectedRowKeys: [],
       // 加载数据方法 必须为 Promise 对象
       loadData: param => {
-        return GoodsApi.list({ ...param, ...this.queryParam })
+        return GoodsApi.list({ ...param, ...this.queryParam, ...{store_id: this.$store.getters.storeId} })
           .then(response => {
             return response
           })

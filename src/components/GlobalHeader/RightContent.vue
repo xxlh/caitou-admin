@@ -1,5 +1,6 @@
 <template>
   <div :class="wrpCls">
+    <store-dropdown v-if="stores.length > 0" :stores="stores" />
     <avatar-dropdown :menu="showMenu" :current-user="currentUser" :class="prefixCls" />
     <!-- <select-lang :class="prefixCls" /> -->
   </div>
@@ -7,12 +8,14 @@
 
 <script>
 import AvatarDropdown from './AvatarDropdown'
+import StoreDropdown from './StoreDropdown'
 // import SelectLang from '@/components/SelectLang'
 
 export default {
   name: 'RightContent',
   components: {
-    AvatarDropdown
+    AvatarDropdown,
+    StoreDropdown,
     // SelectLang
   },
   props: {
@@ -35,9 +38,11 @@ export default {
   },
   data () {
     const currentUser = this.$store.getters.userInfo
+    const stores = currentUser.roles.stores
     return {
       showMenu: true,
-      currentUser
+      currentUser,
+      stores,
     }
   },
   computed: {

@@ -1,7 +1,7 @@
 import storage from 'store'
 import { login, logout } from '@/api/login'
 import { getInfo } from '@/api/store/user'
-import { ACCESS_TOKEN } from '@/store/mutation-types'
+import { ACCESS_TOKEN, CURRENT_STORE_ID } from '@/store/mutation-types'
 import { welcome } from '@/utils/util'
 
 const user = {
@@ -19,6 +19,10 @@ const user = {
   mutations: {
     SET_TOKEN: (state, token) => {
       state.token = token
+    },
+    SET_CURRENT_STORE_ID: (state, storeId) => {
+      state.currentStoreId = storeId
+      storage.set(CURRENT_STORE_ID, storeId)
     },
     SET_NAME: (state, { name, welcome }) => {
       state.name = name
@@ -62,6 +66,7 @@ const user = {
           data.roles = {
             isSuper: data.is_super,
             permissions: data.permissions,
+            stores: data.stores,
           }
           const roles = data.roles
           // 遍历整理 actionList
@@ -73,6 +78,12 @@ const user = {
             item.actionList = item.actions || []
           })
           delete data.permissions;
+          delete data.stores;
+          // 处理选中store
+          let currentStoreId = storage.get(CURRENT_STORE_ID)
+          if (!currentStoreId) currentStoreId = roles.stores.length ? roles.stores[0] : null
+          if (!roles.stores.filter(s => s.id == currentStoreId).length) currentStoreId = null
+          commit('SET_CURRENT_STORE_ID', currentStoreId)
           commit('SET_ROLES', data.roles)
           commit('SET_INFO', data)
           commit('SET_NAME', { name: data.name, welcome: welcome() })
