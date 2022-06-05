@@ -62,10 +62,10 @@ function filterAsyncRouter (routerMap, roles) {
  * @param {*} roles
  */
 function getAccessRouter (routerMap, roles) {
-  // isSuper 代表超级管理员, 拥有所有权限
-  // roles.isSuper = false
+  // is_super 代表超级管理员, 拥有所有权限
+  // roles.is_super = false
   // 根据角色过滤有访问权限的路由
-  const accessedRouters = roles.isSuper ? routerMap : filterAsyncRouter(routerMap, roles)
+  const accessedRouters = roles.is_super ? routerMap : filterAsyncRouter(routerMap, roles)
   // 动态设置一级菜单的redirect
   return setPrimaryMenuRedirect(accessedRouters)
 }
@@ -139,9 +139,9 @@ const permission = {
      */
     GenerateRoutes ({ commit }, data) {
       return new Promise(resolve => {
-        const { roles } = data
+        const { role } = data
         // 根据角色获取有访问权限的路由
-        const accessedRouters = getAccessRouter(asyncRouterMap, roles)
+        const accessedRouters = getAccessRouter(asyncRouterMap, role)
         commit('SET_ROUTERS', accessedRouters)
         resolve(accessedRouters)
       })

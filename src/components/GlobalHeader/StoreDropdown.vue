@@ -41,6 +41,7 @@ export default {
     handleSelect (id) {
       this.$store.commit('SET_CURRENT_STORE_ID', id)
       this.current = this.stores.filter(s => s.id == id)[0]
+      // 应该都刷新，不刷新无法刷新权限路由表
       if (/(goods|store|page)/.test(this.$route.path)) window.location.reload()
     },
   }

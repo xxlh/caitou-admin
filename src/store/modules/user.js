@@ -3,6 +3,7 @@ import { login, logout } from '@/api/login'
 import { getInfo } from '@/api/store/user'
 import { ACCESS_TOKEN, CURRENT_STORE_ID } from '@/store/mutation-types'
 import { welcome } from '@/utils/util'
+import _ from 'lodash'
 
 const user = {
   state: {
@@ -63,28 +64,15 @@ const user = {
       return new Promise((resolve, reject) => {
         getInfo().then(response => {
           const data = response
-          data.roles = {
-            isSuper: data.is_super,
-            permissions: data.permissions,
-            stores: data.stores,
-          }
-          const roles = data.roles
-          // 遍历整理 actionList
-          roles.permissions.map(item => {
-            // item.actionList = []
-            // if (item.actionEntitySet && item.actionEntitySet.length > 0) {
-            //   item.actionList = item.actionEntitySet.map(action => action.action)
-            // }
-            item.actionList = item.actions || []
-          })
-          delete data.permissions;
-          delete data.stores;
           // 处理选中store
           let currentStoreId = storage.get(CURRENT_STORE_ID)
-          if (!currentStoreId) currentStoreId = roles.stores.length ? roles.stores[0] : null
-          if (!roles.stores.filter(s => s.id == currentStoreId).length) currentStoreId = null
+          if (!currentStoreId) currentStoreId = data.stores.length ? data.stores[0].id : null
+          if (!data.stores.filter(s => s.id == currentStoreId).length) currentStoreId = null
           commit('SET_CURRENT_STORE_ID', currentStoreId)
           commit('SET_ROLES', data.roles)
+          data.role = data.roles.filter(r => r.store_id == currentStoreId)
+          data.role = data.role.length > 0 ? data.role[0] : data.roles.filter(r => r.store_id == null);
+          data.role = data.role.length > 0 ? data.role[0] : data.roles[0];
           commit('SET_INFO', data)
           commit('SET_NAME', { name: data.name, welcome: welcome() })
           // commit('SET_AVATAR', result.avatar)

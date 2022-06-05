@@ -1,6 +1,6 @@
 <template>
   <div :class="wrpCls">
-    <store-dropdown v-if="stores.length > 0" :stores="stores" />
+    <store-dropdown v-if="currentUser.stores.length > 0" :stores="currentUser.stores" />
     <avatar-dropdown :menu="showMenu" :current-user="currentUser" :class="prefixCls" />
     <!-- <select-lang :class="prefixCls" /> -->
   </div>
@@ -38,11 +38,9 @@ export default {
   },
   data () {
     const currentUser = this.$store.getters.userInfo
-    const stores = currentUser.roles.stores
     return {
       showMenu: true,
       currentUser,
-      stores,
     }
   },
   computed: {

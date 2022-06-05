@@ -18,7 +18,7 @@ const action = Vue.directive('action', {
   inserted: function (el, binding, vnode) {
     const actionName = binding.arg
     const roles = store.getters.roles
-    if (roles.isSuper) {
+    if (roles.is_super) {
       return
     }
     const elVal = vnode.context.$route.meta.permission
@@ -28,7 +28,7 @@ const action = Vue.directive('action', {
         return
       }
       // 无权限的话 抹除该元素
-      if (p.actionList && !p.actionList.includes(actionName)) {
+      if (p.actions && !p.actions.includes(actionName)) {
         el.parentNode && el.parentNode.removeChild(el) || (el.style.display = 'none')
       }
     })

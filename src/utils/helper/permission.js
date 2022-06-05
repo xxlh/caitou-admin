@@ -23,7 +23,7 @@ function plugin (Vue) {
           const [permission, action] = permissions.split('.')
           const roles = _this.$store.getters.roles
           // 如果是超管用户直接返回true
-          if (roles.isSuper) {
+          if (roles.is_super) {
             return true
           }
           // console.log('permissionList', roles.permissions)
@@ -39,7 +39,7 @@ function plugin (Vue) {
           if (action === undefined) {
             return true
           }
-          return findPermission.actionList.findIndex((val) => {
+          return findPermission.actions.findIndex((val) => {
             return val === action
           }) > -1
 

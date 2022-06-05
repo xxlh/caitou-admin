@@ -39,14 +39,14 @@ router.beforeEach((to, from, next) => {
       NProgress.done()
     } else {
       // check login user.roles is null
-      if (isEmpty(store.getters.roles)) {
+      if (isEmpty(store.getters.userInfo.roles)) {
         // 获取当前登录的用户信息
         store
           .dispatch('GetInfo')
           .then(data => {
-            const roles = data.roles
+            const role = data.role
             // 根据roles权限生成可访问的路由表
-            store.dispatch('GenerateRoutes', { roles })
+            store.dispatch('GenerateRoutes', { role })
               .then(routers => {
                 // 动态添加可访问路由表
                 router.addRoutes(routers)

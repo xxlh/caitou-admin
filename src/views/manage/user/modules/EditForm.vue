@@ -21,7 +21,7 @@
           />
         </a-form-item>
         <a-form-item
-          v-if="!record.is_super"
+          v-if="!record.rol.rolee.is_super"
           label="所属角色"
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
@@ -112,7 +112,7 @@ export default {
       // 当前管理员记录
       this.record = record
       // 获取角色列表
-      !record['is_super'] && this.getRoleList()
+      !record.role['is_super'] && this.getRoleList()
       // 设置默认值
       this.setFieldsValue()
     },

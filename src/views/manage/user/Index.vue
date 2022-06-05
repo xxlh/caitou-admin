@@ -26,11 +26,11 @@
     >
       <div slot="user_name" slot-scope="text, item">
         <span style="margin-right: 6px">{{ text }}</span>
-        <a-tag v-if="item.is_super" color="green">超级管理员</a-tag>
+        <a-tag v-if="item.role.is_super" color="green">超级管理员</a-tag>
       </div>
       <div class="actions" slot="action" slot-scope="text, item">
         <a v-action:edit @click="handleEdit(item)">编辑</a>
-        <template v-if="!item.is_super">
+        <template v-if="!item.role.is_super">
           <a v-action:delete @click="handleDelete(item)">删除</a>
         </template>
       </div>
