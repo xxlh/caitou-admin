@@ -62,17 +62,17 @@ const user = {
     // 获取用户信息
     GetInfo ({ commit }) {
       return new Promise((resolve, reject) => {
-        getInfo().then(response => {
+        let currentStoreId = storage.get(CURRENT_STORE_ID)
+        getInfo({store_id: currentStoreId}).then(response => {
           const data = response
           // 处理选中store
-          let currentStoreId = storage.get(CURRENT_STORE_ID)
           if (!currentStoreId) currentStoreId = data.stores.length ? data.stores[0].id : null
           if (!data.stores.filter(s => s.id == currentStoreId).length) currentStoreId = null
           commit('SET_CURRENT_STORE_ID', currentStoreId)
           commit('SET_ROLES', data.roles)
-          data.role = data.roles.filter(r => r.store_id == currentStoreId)
-          data.role = data.role.length > 0 ? data.role[0] : data.roles.filter(r => r.store_id == null);
-          data.role = data.role.length > 0 ? data.role[0] : data.roles[0];
+          // data.current_role = data.roles.filter(r => r.store_id == currentStoreId)
+          // data.current_role = data.current_role.length > 0 ? data.current_role[0] : data.roles.filter(r => r.store_id == null);
+          // data.current_role = data.current_role.length > 0 ? data.current_role[0] : data.roles[0];
           commit('SET_INFO', data)
           commit('SET_NAME', { name: data.name, welcome: welcome() })
           // commit('SET_AVATAR', result.avatar)

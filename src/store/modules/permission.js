@@ -139,9 +139,9 @@ const permission = {
      */
     GenerateRoutes ({ commit }, data) {
       return new Promise(resolve => {
-        const { role } = data
+        const { current_role } = data
         // 根据角色获取有访问权限的路由
-        const accessedRouters = getAccessRouter(asyncRouterMap, role)
+        const accessedRouters = getAccessRouter(asyncRouterMap, current_role)
         commit('SET_ROUTERS', accessedRouters)
         resolve(accessedRouters)
       })

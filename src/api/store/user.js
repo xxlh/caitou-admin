@@ -15,10 +15,11 @@ const api = {
 /**
  * 获取当前登录的用户信息
  */
-export function getInfo () {
+export function getInfo (params) {
   return axios({
     url: api.info,
-    method: 'get'
+    method: 'get',
+    params
   })
 }
 
