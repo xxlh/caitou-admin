@@ -44,17 +44,17 @@
       <template slot="item" slot-scope="item">
         <GoodsItem
           :data="{
-            image: item.goods_image,
+            image: item.image,
             imageAlt: '商品图片',
-            title: item.goods_name,
-            subtitle: `¥${item.goods_price_min}`
+            title: item.title,
+            subtitle: `¥${item.price_lowest}`
           }"
           :subTitleColor="true"
         />
       </template>
       <!-- 商品状态 -->
-      <span slot="status" slot-scope="text">
-        <a-tag :color="text == 10 ? 'green' : 'red'">{{ text == 10 ? '上架' : '下架' }}</a-tag>
+      <span slot="on_sale" slot-scope="text">
+        <a-tag :color="text == true ? 'green' : 'red'">{{ text == true ? '上架' : '下架' }}</a-tag>
       </span>
     </s-table>
   </a-modal>
@@ -71,7 +71,7 @@ import { STable, GoodsItem } from '@/components/Table'
 const columns = [
   {
     title: '商品ID',
-    dataIndex: 'goods_id'
+    dataIndex: 'id'
   },
   {
     title: '商品信息',
@@ -80,8 +80,8 @@ const columns = [
   },
   {
     title: '商品价格',
-    dataIndex: 'goods_price_min',
-    scopedSlots: { customRender: 'goods_price_min' }
+    dataIndex: 'price_lowest',
+    scopedSlots: { customRender: 'price_lowest' }
   },
   {
     title: '库存总量',
@@ -89,8 +89,8 @@ const columns = [
   },
   {
     title: '状态',
-    dataIndex: 'status',
-    scopedSlots: { customRender: 'status' }
+    dataIndex: 'on_sale',
+    scopedSlots: { customRender: 'on_sale' }
   }
 ]
 
@@ -126,11 +126,11 @@ export default {
       loadData: param => {
         return GoodsApi.list({ ...param, ...this.queryParam })
           .then(response => {
-            return response.data.list
+            return response
           })
       },
       // 主键ID字段名
-      fieldName: 'goods_id',
+      fieldName: 'id',
       // 已选择的元素
       selectedRowKeys: [],
       // 已选择的列表记录

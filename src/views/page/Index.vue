@@ -18,27 +18,27 @@
     </div>
     <s-table
       ref="table"
-      rowKey="page_id"
+      rowKey="id"
       :loading="isLoading"
       :columns="columns"
       :data="loadData"
       :pageSize="15"
     >
       <!-- 页面类型 -->
-      <template slot="page_type" slot-scope="text">
-        <a-tag :color="text == PageTypeEnum.HOME.value ? 'green' : ''">{{ PageTypeEnum[text].name }}</a-tag>
+      <template slot="type" slot-scope="text">
+        <a-tag :color="text == PageTypeEnum.HOME.value ? 'green' : (text == PageTypeEnum.CATEGORY.value ? 'blue' : '')">{{ PageTypeEnum[text].name }}</a-tag>
       </template>
       <!-- 操作 -->
       <span class="actions" slot="action" slot-scope="item">
         <a v-if="$auth('/page/update')" @click="handleEdit(item)">编辑</a>
         <a
           v-action:setHome
-          v-if="item.page_type != PageTypeEnum.HOME.value"
+          v-if="item.type != PageTypeEnum.HOME.value"
           @click="handleSetHome(item)"
         >设为首页</a>
         <a
           v-action:delete
-          v-if="item.page_type != PageTypeEnum.HOME.value"
+          v-if="item.type != PageTypeEnum.HOME.value"
           @click="handleDelete(item)"
         >删除</a>
       </span>
@@ -50,28 +50,29 @@
 import * as Api from '@/api/page'
 import { STable } from '@/components'
 import { PageTypeEnum } from '@/common/enum/page'
+import store from '@/store'
 
 const columns = [
   {
     title: '页面ID',
-    dataIndex: 'page_id'
+    dataIndex: 'id'
   },
   {
     title: '页面名称',
-    dataIndex: 'page_name'
+    dataIndex: 'name'
   },
   {
     title: '页面类型',
-    dataIndex: 'page_type',
-    scopedSlots: { customRender: 'page_type' }
+    dataIndex: 'type',
+    scopedSlots: { customRender: 'type' }
   },
   {
     title: '添加时间',
-    dataIndex: 'create_time'
+    dataIndex: 'created_at'
   },
   {
     title: '更新时间',
-    dataIndex: 'update_time'
+    dataIndex: 'updated_at'
   },
   {
     title: '操作',
@@ -88,7 +89,10 @@ export default {
   data () {
     return {
       // 查询参数
-      queryParam: { name: '' },
+      queryParam: {
+        name: '',
+        area_id: store.getters.areaId
+      },
       // 枚举类
       PageTypeEnum,
       // 正在加载
@@ -99,13 +103,12 @@ export default {
       loadData: param => {
         return Api.list({ ...param, ...this.queryParam })
           .then(response => {
-            return response.data.list
+            return response
           })
       }
     }
   },
   created () {
-
   },
   methods: {
 
@@ -116,7 +119,7 @@ export default {
 
     // 编辑页面
     handleEdit (item) {
-      this.$router.push({ path: './update', query: { pageId: item.page_id } })
+      this.$router.push({ path: './update', query: { pageId: item.id } })
     },
 
     // 设置为首页
@@ -125,7 +128,7 @@ export default {
       const modal = this.$confirm({
         title: '您确定要设置为首页吗?',
         onOk () {
-          return Api.setHome({ pageId: item.page_id })
+          return Api.setHome({ pageId: item.id })
             .then((result) => {
               app.$message.success(result.message, 1.5)
               app.handleRefresh()
@@ -144,7 +147,7 @@ export default {
         title: '您确定要删除该记录吗?',
         content: '删除后不可恢复',
         onOk () {
-          return Api.deleted({ pageId: item.page_id })
+          return Api.deleted({ pageId: item.id })
             .then((result) => {
               app.$message.success(result.message, 1.5)
               app.handleRefresh()

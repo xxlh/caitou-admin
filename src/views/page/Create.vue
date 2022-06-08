@@ -40,6 +40,7 @@ import { inArray } from '@/utils/util'
 import * as Api from '@/api/page'
 import { SelectImage } from '@/components'
 import { Components, Phone, Editor } from './modules'
+import store from '@/store'
 
 export default {
   components: {
@@ -60,7 +61,8 @@ export default {
       // 当前选中的元素索引
       selectedIndex: 'page',
       // 当前选中的元素
-      curItem: {}
+      curItem: {},
+      area_id: store.getters.areaId,
     }
   },
   // 初始化数据
@@ -95,7 +97,7 @@ export default {
       return new Promise((resolve, reject) => {
         Api.defaultData()
           .then(result => {
-            this.defaultData = result.data
+            this.defaultData = result
             resolve()
           })
       })
@@ -172,8 +174,10 @@ export default {
     // 提交到后端api
     onFormSubmit () {
       this.isLoading = true
-      const { data, $message } = this
-      Api.add({ form: data })
+      const { data, $message, area_id } = this
+      const name = data.page.params.name
+      const type = data.page.params.type
+      Api.add({ data, area_id, ...name?{name}:{}, ...type?{type}:{} })
         .then(result => {
           // 显示成功
           $message.success(result.message, 1.5)

@@ -19,6 +19,14 @@
               </div>
             </div>
             <div class="block-item">
+              <span class="label">页面类型</span>
+              <div class="flex-box">
+                <!-- <a-auto-complete v-model="data.page.params.type" :data-source="[{value:'index',text:'首页'}, {value:'category',text:'分类页'}]" placeholder="输入类型或选择已有" /> -->
+                <a-select v-model="data.page.params.type" :options="[{value:'index',label:'首页'}, {value:'category',label:'分类页'}, {value:'landingpage',label:'落地页'}]" style="width: 100%" />
+                <div class="tips">页面名称仅用于后台管理</div>
+              </div>
+            </div>
+            <div class="block-item">
               <span class="label">分享标题</span>
               <div class="flex-box">
                 <a-input v-model="data.page.params.shareTitle" />
@@ -292,7 +300,7 @@
           <div class="block-title">文章内容</div>
           <div class="block-item">
             <span class="label">文章分类</span>
-            <SArticleCate v-model="curItem.params.auto.category" />
+            <SArticleCate v-model="curItem.params.auto.category_id" />
           </div>
           <div class="block-item">
             <span class="label">显示数量</span>
@@ -326,7 +334,7 @@
               <div class="block-item">
                 <span class="label">客服图标</span>
                 <span class="tips-wrap">建议尺寸：90×90</span>
-                <SImage v-model="curItem.params.image" :width="60" :height="60" />
+                <SImage v-model="curItem.params.image" :channel="channel" :channel_id="pageId" collection="icons" :width="60" :height="60" />
               </div>
             </div>
           </a-tab-pane>
@@ -384,7 +392,7 @@
               <div class="block-item">
                 <span class="label">视频封面</span>
                 <div class="flex-box">
-                  <SImage v-model="curItem.params.poster" :width="160" :height="90" />
+                  <SImage v-model="curItem.params.poster" :channel="channel" :channel_id="pageId" collection="video_cover" :width="160" :height="90" />
                   <div class="tips">建议封面图片尺寸与视频比例一致</div>
                 </div>
               </div>
@@ -463,6 +471,7 @@
                   <div class="block-item-custom">
                     <SImage
                       v-model="item.imgUrl"
+                      :channel="channel" :channel_id="pageId" collection="carousel_images"
                       tips="建议尺寸：宽750"
                       @update="item.imgName = $event.file_name"
                     />
@@ -540,6 +549,7 @@
                   <div class="block-item-custom">
                     <SImage
                       v-model="item.imgUrl"
+                      :channel="channel" :channel_id="pageId" collection="video_cover"
                       tips="建议尺寸：750×400"
                       @update="item.imgName = $event.file_name"
                     />
@@ -610,20 +620,20 @@
               <div class="block-title">商品内容</div>
               <div class="block-item">
                 <span class="label">商品分类</span>
-                <SGoodsCate v-model="curItem.params.auto.category" />
+                <SGoodsCate v-model="curItem.params.auto.category_id" />
               </div>
               <div class="block-item">
                 <span class="label">商品排序</span>
-                <a-radio-group buttonStyle="solid" v-model="curItem.params.auto.goodsSort">
-                  <a-radio-button value="all">默认</a-radio-button>
-                  <a-radio-button value="sales">销量</a-radio-button>
-                  <a-radio-button value="price">价格</a-radio-button>
+                <a-radio-group buttonStyle="solid" v-model="curItem.params.auto.sort">
+                  <a-radio-button value="">默认</a-radio-button>
+                  <a-radio-button value="sales_desc">销量</a-radio-button>
+                  <a-radio-button value="price_asc">价格</a-radio-button>
                 </a-radio-group>
               </div>
               <div class="block-item">
                 <span class="label">显示数量</span>
                 <div class="block-item-right">
-                  <a-input-number v-model="curItem.params.auto.showNum" :min="1" :max="50" />
+                  <a-input-number v-model="curItem.params.auto.per_page" :min="1" :max="50" />
                   <span class="unit-text">
                     <span>件</span>
                   </span>
@@ -705,7 +715,7 @@
                     </div>
                   </div>
                   <div class="block-item-custom">
-                    <SImage v-model="item.imgUrl" tips="建议尺寸：100×100" />
+                    <SImage v-model="item.imgUrl" :channel="channel" :channel_id="pageId" collection="icons" tips="建议尺寸：100×100" />
                   </div>
                 </div>
               </div>
@@ -789,7 +799,7 @@
                     </div>
                   </div>
                   <div class="block-item-custom">
-                    <SImage v-model="item.imgUrl" @update="item.imgName = $event.file_name" />
+                    <SImage v-model="item.imgUrl" :channel="channel" :channel_id="pageId" collection="carousel_images" @update="item.imgName = $event.file_name" />
                   </div>
                 </div>
               </div>
@@ -858,6 +868,7 @@ import PropTypes from 'ant-design-vue/es/_util/vue-types'
 import draggable from 'vuedraggable'
 import { Ueditor } from '@/components'
 import { SImage, SArticleCate, SGoods, SGoodsCate, SLink } from './modules'
+import ChannelEnum from '@/common/enum/file/Channel'
 
 Vue.use(vcolorpicker)
 
@@ -870,7 +881,8 @@ export default {
     // 当前选中的元素
     curItem: PropTypes.object.def({}),
     // 当前选中的元素索引
-    selectedIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).def(0)
+    selectedIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).def(0),
+    pageId: PropTypes.integer.def(0),
   },
   components: {
     draggable,
@@ -882,7 +894,19 @@ export default {
     SLink
   },
   data () {
-    return {}
+    return {
+      channel: ChannelEnum.PAGE.value,
+    }
+  },
+  watch: {
+    'curItem.data': function() {
+      if (/^(goods|article)$/.test(this.curItem.type) && this.curItem.data && this.curItem.data.length) {
+        this.curItem.params.choice = {
+          ids: this.curItem.data.map(d => d.id),
+          sku_ids: this.curItem.data.filter(d => d.sku_id).map(d => d.sku_id),
+        }
+      }
+    }
   },
   methods: {
 

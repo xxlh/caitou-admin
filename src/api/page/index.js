@@ -4,12 +4,12 @@ import { axios } from '@/utils/request'
  * api接口列表
  */
 const api = {
-  list: '/page/list',
-  defaultData: '/page/defaultData',
-  detail: '/page/detail',
-  add: '/page/add',
-  edit: '/page/edit',
-  delete: '/page/delete',
+  list: '/pages',
+  defaultData: '/pages/default',
+  detail: '/pages/{id}',
+  add: '/pages',
+  edit: '/pages/{id}',
+  delete: '/pages/{id}',
   setHome: '/page/setHome'
 }
 
@@ -40,7 +40,7 @@ export function defaultData (params) {
  */
 export function detail (params) {
   return axios({
-    url: api.detail,
+    url: api.detail.replace('{id}', params.pageId),
     method: 'get',
     params
   })
@@ -76,8 +76,8 @@ export function add (data) {
  */
 export function edit (data) {
   return axios({
-    url: api.edit,
-    method: 'post',
+    url: api.edit.replace('{id}', data.pageId),
+    method: 'patch',
     data
   })
 }
@@ -88,8 +88,8 @@ export function edit (data) {
  */
 export function deleted (data) {
   return axios({
-    url: api.delete,
-    method: 'post',
+    url: api.delete.replace('{id}', data.pageId),
+    method: 'delete',
     data: data
   })
 }

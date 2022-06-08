@@ -24,7 +24,7 @@ export default {
     return new Promise((resolve, reject) => {
       Api.list().then(result => {
         // 格式化分类列表
-        const resultList = result.data
+        const resultList = result
         // 格式化为 select列表数据
         const selectList = [{
           title: '全部分类',

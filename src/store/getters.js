@@ -5,6 +5,7 @@ const getters = {
   color: state => state.app.color,
   token: state => state.user.token,
   storeId: state => state.user.currentStoreId,
+  areaId: state => state.user.info.stores.filter(s => s.id == state.user.currentStoreId)?.[0]?.delivery_area_id,
   // avatar: state => state.user.avatar,
   nickname: state => state.user.name,
   welcome: state => state.user.welcome,

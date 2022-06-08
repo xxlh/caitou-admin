@@ -14,11 +14,11 @@
           />
           <a-tooltip>
             <template slot="title">
-              <span class="f-12">{{ item.goods_name }}</span>
+              <span class="f-12">{{ item.title }}</span>
             </template>
             <div class="item-inner">
               <div class="item-image">
-                <img :src="item.goods_image" alt />
+                <img :src="item.image" alt />
               </div>
             </div>
           </a-tooltip>
@@ -44,7 +44,7 @@ import { pick } from 'lodash'
 import { GoodsModal } from '@/components/Modal'
 
 // 仅需要的字段
-const itemColumns = ['goods_id', 'goods_name', 'goods_image', 'goods_price_min', 'line_price_min', 'selling_point', 'goods_sales']
+const itemColumns = ['id', 'title', 'image', 'price_lowest', 'retail_price', 'selling_point', 'sold_count']
 
 // 图片选择器组件
 export default {

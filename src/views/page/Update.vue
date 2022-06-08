@@ -20,6 +20,7 @@
           :data="data"
           :selectedIndex="selectedIndex"
           :curItem="curItem"
+          :pageId="parseInt(pageId)"
         />
       </div>
       <!-- 操作栏 -->
@@ -92,7 +93,7 @@ export default {
       return new Promise((resolve, reject) => {
         Api.defaultData()
           .then(result => {
-            this.defaultData = result.data
+            this.defaultData = result
             resolve()
           })
       })
@@ -104,7 +105,7 @@ export default {
       return new Promise((resolve, reject) => {
         Api.detail({ pageId })
           .then(result => {
-            this.data = result.data.detail.page_data
+            this.data = result.data
             resolve()
           })
       })
@@ -182,7 +183,9 @@ export default {
     onFormSubmit () {
       this.isLoading = true
       const { pageId, data, $message } = this
-      Api.edit({ pageId, form: data })
+      const name = data.page.params.name
+      const type = data.page.params.type
+      Api.edit({ pageId, data, ...name?{name}:{}, ...type?{type}:{} })
         .then(result => {
           // 显示成功
           $message.success(result.message, 1.5)

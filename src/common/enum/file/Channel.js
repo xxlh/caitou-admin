@@ -10,4 +10,5 @@ export default new Enum([
     { key: 'PRODUCT', name: '商品', value: 'Product' },
     { key: 'SKU', name: '商品规格', value: 'ProductSku' },
     { key: 'CATEGORY', name: '商品分类', value: 'Category' },
+    { key: 'PAGE', name: '落地页', value: 'Page' },
 ])

@@ -242,41 +242,41 @@
                   <div class="flex">
                     <!-- 商品图片 -->
                     <div class="goods-item_left">
-                      <img :src="dataItm.goods_image" />
+                      <img :src="dataItm.image" />
                     </div>
                     <div class="goods-item_right">
                       <!-- 商品名称 -->
                       <div
-                        v-if="item.style.show.includes('goodsName')"
+                        v-if="item.style.show.includes('title')"
                         class="goods-item_title twolist-hidden"
                       >
-                        <span>{{ dataItm.goods_name }}</span>
+                        <span>{{ dataItm.title }}</span>
                       </div>
                       <div class="goods-item_desc">
                         <!-- 商品卖点 -->
                         <div
-                          v-if="item.style.show.includes('sellingPoint')"
+                          v-if="item.style.show.includes('selling_point')"
                           class="desc-selling_point oneline-hide"
                         >
                           <span>{{ dataItm.selling_point }}</span>
                         </div>
                         <!-- 商品销量 -->
                         <div
-                          v-if="item.style.show.includes('goodsSales')"
+                          v-if="item.style.show.includes('sold_count')"
                           class="desc-goods_sales oneline-hide"
                         >
-                          <span>已售{{ dataItm.goods_sales }}件</span>
+                          <span>已售{{ dataItm.sold_count }}件</span>
                         </div>
                         <!-- 商品价格 -->
                         <div class="desc_footer">
-                          <span v-if="item.style.show.includes('goodsPrice')" class="price_x">
+                          <span v-if="item.style.show.includes('price_lowest')" class="price_x">
                             <span class="small-unit">¥</span>
-                            <span>{{ dataItm.goods_price_min }}</span>
+                            <span>{{ dataItm.price_lowest }}</span>
                           </span>
                           <span
                             class="price_y"
-                            v-if="item.style.show.includes('linePrice') && dataItm.line_price_min > 0"
-                          >¥{{ dataItm.line_price_min }}</span>
+                            v-if="item.style.show.includes('retail_price') && dataItm.retail_price > 0"
+                          >¥{{ dataItm.retail_price }}</span>
                         </div>
                       </div>
                     </div>
@@ -285,24 +285,24 @@
                 <!-- 两列三列 -->
                 <template v-else>
                   <div class="goods-image">
-                    <img :src="dataItm.goods_image" />
+                    <img :src="dataItm.image" />
                   </div>
                   <div class="detail">
                     <p
                       v-if="item.style.show.includes('goodsName')"
                       class="goods-name twolist-hidden"
-                    >{{ dataItm.goods_name }}</p>
+                    >{{ dataItm.title }}</p>
                     <p class="detail-price">
                       <span v-if="item.style.show.includes('goodsPrice')" class="goods-price">
                         <span class="small-unit">¥</span>
-                        <span>{{ dataItm.goods_price_min }}</span>
+                        <span>{{ dataItm.price_lowest }}</span>
                       </span>
                       <span
-                        v-if="item.style.show.includes('linePrice') && dataItm.line_price_min > 0"
+                        v-if="item.style.show.includes('linePrice') && dataItm.retail_price > 0"
                         class="line-price"
                       >
                         <span class="small-unit">¥</span>
-                        <span>{{ dataItm.line_price_min }}</span>
+                        <span>{{ dataItm.retail_price }}</span>
                       </span>
                     </p>
                   </div>

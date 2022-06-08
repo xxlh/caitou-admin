@@ -184,6 +184,7 @@ export default {
     }
   },
   created () {
+    // if (this.collection) this.queryParam.collection = this.collection
   },
   methods: {
 
@@ -274,7 +275,6 @@ export default {
 
     // 记录选中的分组
     onSelectGroup (selectedKeys) {
-      console.log(selectedKeys);
       this.queryParam.collection = selectedKeys[0]
       this.handleRefresh(true)
     },
@@ -342,6 +342,7 @@ export default {
           this.uploading.pop()
           if (this.uploading.length === 0) {
             this.isLoading = false
+            if (this.collection) this.queryParam.collection = this.collection
             this.handleRefresh(true)
           }
         })

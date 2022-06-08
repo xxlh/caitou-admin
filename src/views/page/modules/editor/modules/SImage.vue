@@ -9,7 +9,10 @@
       </div>
     </a-tooltip>
     <!-- 图片选择器 -->
-    <FilesModal ref="FilesModal" :multiple="false" @handleSubmit="handleSelectImageSubmit" />
+    <FilesModal ref="FilesModal" :multiple="false" @handleSubmit="handleSelectImageSubmit"
+      :channel="channel"
+      :channel_id="channel_id"
+      :collection="collection" />
   </div>
 </template>
 
@@ -35,7 +38,11 @@ export default {
     // 元素的尺寸(宽)
     width: PropTypes.integer.def(70),
     // 元素的尺寸(高)
-    height: PropTypes.integer.def(70)
+    height: PropTypes.integer.def(70),
+    // 类别
+    channel: PropTypes.string.def(''),
+    channel_id: PropTypes.integer.def(0),
+    collection: PropTypes.string.def(''),
 
   },
   data () {
