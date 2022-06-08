@@ -384,6 +384,9 @@ export default {
   beforeDestroy () {
     // 销毁商品详情
     GoodsModel.formData.goods = {}
+    GoodsModel.formData.goodsCategories = []
+    GoodsModel.formData.skus = []
+    GoodsModel.formData.specs = []
   },
   methods: {
 

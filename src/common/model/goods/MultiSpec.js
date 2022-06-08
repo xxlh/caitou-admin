@@ -1,6 +1,7 @@
 import * as FieldsApi from '@/api/field'
 import _ from 'lodash'
 import { debounce, isEmpty } from '@/utils/util'
+import store from '@/store'
 
 // 默认的sku字段属性
 const defaultColumns = [
@@ -125,6 +126,7 @@ export default class MultiSpec {
    */
   constructor() {
     this.multiSpecData = {
+      storeId: store.getters.storeId,
       // 规格列表
       specList: [],
       // Spec字段
@@ -238,6 +240,7 @@ export default class MultiSpec {
     }
     // 兼容旧的sku数据
     this.multiSpecData.skuList = this.oldSkuList(newSkuList)
+    console.log(this.multiSpecData.skuList);
   }
 
   // 合并已存在的sku数据
@@ -254,7 +257,7 @@ export default class MultiSpec {
         oldSkuItem = _.cloneDeep(oldSkuList[index])
       } else {
         oldSkuItem = oldSkuList.find(item => {
-          return item.skuKey === newSkuList[index].skuKey
+          return item.skuKey === newSkuList[index].skuKey && item.store_id == this.multiSpecData.storeId
         })
       }
       // 写入新纪录

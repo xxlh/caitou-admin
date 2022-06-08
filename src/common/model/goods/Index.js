@@ -19,7 +19,7 @@ export default {
   formData: {
     // 当前商品记录
     goods: {},
-    goodsCategories: {},
+    goodsCategories: [],
     // 规格数据
     specs: [],
     skus: [],
