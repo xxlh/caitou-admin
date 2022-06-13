@@ -12,7 +12,7 @@ export default {
   // 从服务端获取全部地区数据(树状)
   getTreeDataFromApi () {
     return new Promise((resolve, reject) => {
-      Api.tree().then(result => resolve(result.data.list))
+      Api.tree().then(result => resolve(result))
     })
   },
 

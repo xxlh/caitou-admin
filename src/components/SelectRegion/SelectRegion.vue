@@ -1,5 +1,5 @@
 <template>
-  <a-cascader v-model="sValue" :options="options" :placeholder="placeholder" @change="onChange" />
+  <a-cascader v-model="sValue" :options="options" :placeholder="placeholder" @change="onChange" change-on-select />
 </template>
 
 <script>
@@ -56,7 +56,7 @@ export default {
         const item = regions[index]
         const children = getChildren(item)
         const optionItem = {
-          value: item.id,
+          value: item.name,
           label: item.name
         }
         if (children !== false) {

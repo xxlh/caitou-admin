@@ -64,24 +64,24 @@ export const asyncRouterMap = [
         path: '/store',
         name: 'store',
         component: RouteView,
-        redirect: '/store/setting',
-        meta: { title: '店铺管理', icon: Icons.shop, permission: ['/store'] },
+        redirect: '/store/address/index',
+        meta: { title: '仓储管理', icon: Icons.shop, permission: ['/store'] },
         children: [
-          {
-            path: '/store/setting',
-            component: () => import(/* webpackChunkName: "store" */ '@/views/store/Setting'),
-            meta: { title: '店铺设置', keepAlive: false, permission: ['/store/setting'] }
-          },
+          // {
+          //   path: '/store/setting',
+          //   component: () => import(/* webpackChunkName: "store" */ '@/views/store/Setting'),
+          //   meta: { title: '店铺设置', keepAlive: false, permission: ['/store/setting'] }
+          // },
           {
             path: '/store/address/index',
             component: () => import(/* webpackChunkName: "store" */ '@/views/store/address/Index'),
-            meta: { title: '地址管理', keepAlive: false, permission: ['/store/address/index'] }
+            meta: { title: '仓储地址', keepAlive: false, permission: ['/store/address/index'] }
           },
           {
             path: '/page',
             component: RouteView,
             redirect: '/page/index',
-            meta: { title: '店铺页面', keepAlive: false, permission: ['/page'] },
+            meta: { title: '页面展示', keepAlive: false, permission: ['/page'] },
             children: [
               {
                 path: '/page/index',
@@ -102,11 +102,11 @@ export const asyncRouterMap = [
                 meta: { title: '编辑页面', keepAlive: false, permission: ['/page/update'] },
                 hidden: true
               },
-              {
-                path: '/page/category',
-                component: () => import(/* webpackChunkName: "page" */ '@/views/page/category/Index'),
-                meta: { title: '分类模板', keepAlive: false, permission: ['/page/category'] }
-              }
+              // {
+              //   path: '/page/category',
+              //   component: () => import(/* webpackChunkName: "page" */ '@/views/page/category/Index'),
+              //   meta: { title: '分类模板', keepAlive: false, permission: ['/page/category'] }
+              // }
             ]
           }
         ]

@@ -1,8 +1,8 @@
 import { axios } from '@/utils/request'
 
 const api = {
-  all: '/region/all',
-  tree: '/region/tree'
+  all: '/regions',
+  tree: '/regions/tree'
 }
 
 /**

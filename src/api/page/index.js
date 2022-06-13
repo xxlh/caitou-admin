@@ -38,11 +38,10 @@ export function defaultData (params) {
 /**
  * 页面详情
  */
-export function detail (params) {
+export function detail (id) {
   return axios({
-    url: api.detail.replace('{id}', params.pageId),
+    url: api.detail.replace('{id}', id),
     method: 'get',
-    params
   })
 }
 
@@ -74,9 +73,9 @@ export function add (data) {
  * 编辑页面
  * @param {*} data
  */
-export function edit (data) {
+export function edit (id, data) {
   return axios({
-    url: api.edit.replace('{id}', data.pageId),
+    url: api.edit.replace('{id}', id),
     method: 'patch',
     data
   })
@@ -86,10 +85,9 @@ export function edit (data) {
  * 删除记录
  * @param {*} data
  */
-export function deleted (data) {
+export function deleted (id) {
   return axios({
-    url: api.delete.replace('{id}', data.pageId),
+    url: api.delete.replace('{id}', id),
     method: 'delete',
-    data: data
   })
 }

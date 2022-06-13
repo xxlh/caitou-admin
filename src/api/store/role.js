@@ -40,7 +40,7 @@ export function add (data) {
 export function edit (data) {
   return axios({
     url: api.edit,
-    method: 'post',
+    method: 'patch',
     data
   })
 }
@@ -52,7 +52,7 @@ export function edit (data) {
 export function deleted (data) {
   return axios({
     url: api.delete,
-    method: 'post',
+    method: 'delete',
     data: data
   })
 }

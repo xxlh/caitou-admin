@@ -147,9 +147,9 @@ export default {
         title: '您确定要删除该记录吗?',
         content: '删除后不可恢复',
         onOk () {
-          return Api.deleted({ pageId: item.id })
+          return Api.deleted(item.id)
             .then((result) => {
-              app.$message.success(result.message, 1.5)
+              app.$message.success('已删除', 1.5)
               app.handleRefresh()
             })
             .finally(result => {

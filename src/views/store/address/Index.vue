@@ -27,7 +27,7 @@
     </div>
     <s-table
       ref="table"
-      rowKey="address_id"
+      rowKey="id"
       :loading="isLoading"
       :columns="columns"
       :data="loadData"
@@ -38,9 +38,9 @@
         <p class="twoline-hide" style="width: 270px;">{{ text }}</p>
       </span>
       <!-- 地址类型 -->
-      <span slot="type" slot-scope="text">
+      <!-- <span slot="type" slot-scope="text">
         <a-tag>{{ text == 10 ? '发货地址' : '退货地址' }}</a-tag>
-      </span>
+      </span> -->
       <!-- 操作 -->
       <span slot="action" slot-scope="text, item">
         <a v-action:edit style="margin-right: 8px;" @click="handleEdit(item)">编辑</a>
@@ -73,16 +73,20 @@ export default {
       // 表头
       columns: [
         {
-          title: '地址ID',
-          dataIndex: 'address_id'
+          title: '所属区域ID',
+          dataIndex: 'delivery_area_id'
         },
         {
-          title: '联系人姓名',
+          title: '仓储名',
           dataIndex: 'name'
         },
         {
+          title: '联系人姓名',
+          dataIndex: 'contact_name'
+        },
+        {
           title: '联系电话',
-          dataIndex: 'phone'
+          dataIndex: 'contact_phone'
         },
         {
           title: '详细地址',
@@ -90,17 +94,12 @@ export default {
           scopedSlots: { customRender: 'full_address' }
         },
         {
-          title: '地址类型',
-          dataIndex: 'type',
-          scopedSlots: { customRender: 'type' }
-        },
-        {
-          title: '排序',
-          dataIndex: 'sort'
+          title: '评分',
+          dataIndex: 'rating'
         },
         {
           title: '添加时间',
-          dataIndex: 'create_time'
+          dataIndex: 'created_at'
         },
         {
           title: '操作',
@@ -113,7 +112,7 @@ export default {
       loadData: param => {
         return Api.list({ ...param, ...this.queryParam })
           .then(response => {
-            return response.data.list
+            return response
           })
       }
     }
@@ -146,9 +145,9 @@ export default {
         title: '您确定要删除该记录吗?',
         content: '删除后不可恢复',
         onOk () {
-          return Api.deleted({ addressId: item.address_id })
+          return Api.deleted(item.id)
             .then((result) => {
-              app.$message.success(result.message, 1.5)
+              app.$message.success('已删除', 1.5)
               app.handleRefresh()
             })
             .finally(result => {

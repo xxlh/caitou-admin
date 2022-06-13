@@ -103,7 +103,7 @@ export default {
     getPageData () {
       const { pageId } = this
       return new Promise((resolve, reject) => {
-        Api.detail({ pageId })
+        Api.detail(pageId)
           .then(result => {
             this.data = result.data
             resolve()
@@ -185,14 +185,17 @@ export default {
       const { pageId, data, $message } = this
       const name = data.page.params.name
       const type = data.page.params.type
-      Api.edit({ pageId, data, ...name?{name}:{}, ...type?{type}:{} })
+      Api.edit(pageId, { data, ...name?{name}:{}, ...type?{type}:{} })
         .then(result => {
           // 显示成功
-          $message.success(result.message, 1.5)
+          $message.success('更新成功', 1.5)
           // 跳转到列表页
           setTimeout(() => {
             this.$router.push('./index')
           }, 1200)
+        })
+        .catch(res => {
+          $message.error(res.msg, 3)
         })
         .finally(() => {
           setTimeout(() => {
