@@ -41,7 +41,7 @@ export default {
     this.AMap = await AMapLoader.load({
       key: "8eed729112431178d5b9adaff42b33c1", // 申请好的Web端开发者Key，首次调用 load 时必填
       version: "2.0", // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
-      plugins: ['AMap.PolygonEditor'] //插件列表
+      plugins: ['AMap.Geocoder'] //插件列表
     })
     // this.$nextTick(() => {
       this.map = new this.AMap.Map("map", {
@@ -95,24 +95,22 @@ export default {
         return false
       }
       if (!this.AMap) message.error('地图尚未初始化，请稍后或刷新重试', 3)
-      this.AMap.plugin('AMap.Geocoder', () => {
-        var geocoder = new this.AMap.Geocoder({
-          // city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
-          // city: '010'
-        })
-        geocoder.getAddress([this.longitude, this.latitude], (status, result) => {
-          if (status === 'complete' && result.info === 'OK') {
-            // result为对应的地理位置详细信息
-            let addrC = result?.regeocode?.addressComponent
-            this.address = addrC.township + addrC.street + addrC.streetNumber
-            if (!this.address) this.address = result?.regeocode?.formattedAddress
-          }
-          this.$emit('change', false)
-          this.$emit('complete', {
-            lng: this.longitude,
-            lat: this.latitude,
-            address: this.address,
-          })
+      var geocoder = new this.AMap.Geocoder({
+        // city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
+        // city: '010'
+      })
+      geocoder.getAddress([this.longitude, this.latitude], (status, result) => {
+        if (status === 'complete' && result.info === 'OK') {
+          // result为对应的地理位置详细信息
+          let addrC = result?.regeocode?.addressComponent
+          this.address = addrC.township + addrC.street + addrC.streetNumber
+          if (!this.address) this.address = result?.regeocode?.formattedAddress
+        }
+        this.$emit('change', false)
+        this.$emit('complete', {
+          lng: this.longitude,
+          lat: this.latitude,
+          address: this.address,
         })
       })
     },

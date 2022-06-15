@@ -7,7 +7,12 @@
           <a-button v-action:add type="primary" icon="plus" @click="handleAdd">新增</a-button>
         </a-col>
         <a-col class="flex flex-x-end" :span="11" :offset="8">
-          <a-select
+          <SelectRegion
+            placeholder="请选择省市区"
+            v-model="cascader"
+            @change="onCascaderChange"
+          />
+          <!-- <a-select
             style="width: 220px; margin-right: 20px;"
             placeholder="请选择地址类型"
             v-model="queryParam.type"
@@ -15,11 +20,11 @@
             <a-select-option :value="0">全部</a-select-option>
             <a-select-option :value="10">发货地址</a-select-option>
             <a-select-option :value="20">退货地址</a-select-option>
-          </a-select>
+          </a-select> -->
           <a-input-search
             style="max-width: 300px; min-width: 150px;"
             v-model="queryParam.search"
-            placeholder="请输入姓名/联系电话"
+            placeholder="搜索名称地址联系人"
             @search="onSearch"
           />
         </a-col>
@@ -56,18 +61,21 @@
 import * as Api from '@/api/store/address'
 import { STable } from '@/components'
 import { AddForm, EditForm } from './modules'
+import { SelectRegion } from '@/components'
 
 export default {
   name: 'Index',
   components: {
     STable,
     AddForm,
-    EditForm
+    EditForm,
+    SelectRegion,
   },
   data () {
     return {
       // 查询参数
       queryParam: {},
+      cascader: [],
       // 正在加载
       isLoading: false,
       // 表头
@@ -170,7 +178,12 @@ export default {
      */
     onSearch () {
       this.handleRefresh(true)
-    }
+    },
+    onCascaderChange(value) {
+      const [province, city, district] = value
+      this.queryParam = {...this.queryParam, province, city, district}
+      this.handleRefresh(true)
+    },
 
   }
 }

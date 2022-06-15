@@ -78,6 +78,11 @@ export const asyncRouterMap = [
             meta: { title: '仓储地址', keepAlive: false, permission: ['/store/address/index'] }
           },
           {
+            path: '/area/index',
+            component: () => import(/* webpackChunkName: "store" */ '@/views/area/Index'),
+            meta: { title: '区域管理', keepAlive: false, permission: ['/area/index'] }
+          },
+          {
             path: '/page',
             component: RouteView,
             redirect: '/page/index',

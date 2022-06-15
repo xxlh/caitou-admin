@@ -5,6 +5,8 @@ import { axios } from '@/utils/request'
  */
 const api = {
   list: '/areas',
+  add: '/areas',
+  edit: '/areas/{id}',
 }
 
 /**
@@ -15,5 +17,29 @@ export function list (params) {
     url: api.list,
     method: 'get',
     params
+  })
+}
+
+/**
+ * 新增记录
+ * @param {*} data
+ */
+export function add (data) {
+  return axios({
+    url: api.add,
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 编辑记录
+ * @param {*} data
+ */
+export function edit (id, data) {
+  return axios({
+    url: api.edit.replace('{id}', id),
+    method: 'patch',
+    data
   })
 }
