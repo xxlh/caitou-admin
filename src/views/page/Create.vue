@@ -180,7 +180,7 @@ export default {
       Api.add({ data, area_id, ...name?{name}:{}, ...type?{type}:{} })
         .then(result => {
           // 显示成功
-          $message.success(result.message, 1.5)
+          $message.success('新建了一个页面', 1.5)
           // 跳转到列表页
           setTimeout(() => {
             this.$router.push('./index')

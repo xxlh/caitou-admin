@@ -240,7 +240,6 @@ export default class MultiSpec {
     }
     // 兼容旧的sku数据
     this.multiSpecData.skuList = this.oldSkuList(newSkuList)
-    console.log(this.multiSpecData.skuList);
   }
 
   // 合并已存在的sku数据
@@ -261,7 +260,6 @@ export default class MultiSpec {
         })
       }
       // 写入新纪录
-      console.log(oldSkuItem, oldSkuList, newSkuList);
       if (oldSkuItem) {
         newSkuList[index] = {
           ...newSkuList[index],

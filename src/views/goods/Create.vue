@@ -18,6 +18,15 @@
                 v-decorator="['title', {rules: [{required: true, min: 2, message: '请输入至少2个字符'}]}]"
               />
             </a-form-item>
+            <a-form-item label="商品类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <a-radio-group v-decorator="['type', {initialValue: $store.getters.storeId ? 'intra-city' : 'physical', rules: [{required: true}]}]">
+                <a-radio value="physical">实物商品</a-radio>
+                <a-radio value="virtual">虚拟商品</a-radio>
+                <a-radio value="travel">旅游商品</a-radio>
+                <a-radio value="verification">核销商品</a-radio>
+                <a-radio value="intra-city">同城配送</a-radio>
+              </a-radio-group>
+            </a-form-item>
             <a-form-item label="商品分类" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-tree-select
                 placeholder="请选择商品分类"
@@ -467,6 +476,7 @@ export default {
     onFormSubmit (values) {
       this.isLoading = true
       this.isBtnLoading = true
+      values.store_id = this.$store.getters.storeId
       // Promise.all([
         // Todo
         // GoodsApi.saveSku(this.goodsId, values.specData.skuList),

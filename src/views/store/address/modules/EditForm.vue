@@ -34,7 +34,7 @@
           <a-input v-decorator="['address', {rules: [{required: true, message: '请输入详细地址'}]}]" />
         </a-form-item>
         <a-form-item label="所属区域" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-select v-decorator="['area_id', {rules: [{required: false}]}]" :options="areas"></a-select>
+          <a-select v-decorator="['delivery_area_id', {rules: [{required: false}]}]" :options="areas"></a-select>
         </a-form-item>
       </a-form>
     </a-spin>

@@ -16,7 +16,7 @@
               :treeData="categoryListTree"
               :dropdownStyle="{ maxHeight: '500px', overflow: 'auto' }"
               allowClear
-              v-decorator="['categoryId', { initialValue: 0 }]"
+              v-decorator="['category_ids', { initialValue: 0 }]"
             ></a-tree-select>
           </a-form-item>
           <a-form-item class="search-btn">
@@ -42,8 +42,8 @@
           class="fl-l"
           type="primary"
           icon="plus"
-          @click="handleCreate"
-        >创建商品</a-button>
+          @click="handleAdd"
+        >添加商品</a-button>
         <div v-if="selectedRowKeys.length" class="button-group">
           <a-button-group class="ml-10">
             <a-button
@@ -94,6 +94,91 @@
         <a v-if="$auth('/goods/update.delete')" v-action:delete @click="handleDelete([item.id])">删除</a>
       </div>
     </s-table>
+
+    <!-- 从主仓库中添加商品 -->
+    <a-drawer
+      title="从主仓库添加商品"
+      placement="right"
+      :closable="false"
+      :visible="visibleGoodsPicker"
+      :width="640"
+    >
+      <template v-if="showPickerList">
+        <div class="table-operator">
+          <!-- 搜索板块 -->
+          <a-row class="row-item-search">
+            <a-form class="search-form" layout="inline">
+              <a-form-item label="商品分类">
+                <a-tree-select
+                  v-model="pickerParams.category_ids"
+                  :treeData="categoryListTree"
+                  defaultValue="0"
+                  :dropdownStyle="{ maxHeight: '500px', overflow: 'auto' }"
+                  allowClear
+                  @change="searchGoodsPicker(pickerParams.search)"
+                ></a-tree-select>
+              </a-form-item>
+              <a-input-search
+                v-model="pickerParams.search"
+                style="max-width: 250px; min-width: 150px;"
+                placeholder="搜索商品名称"
+                @search="searchGoodsPicker"
+              />
+            </a-form>
+          </a-row>
+        </div>
+        <s-table
+          ref="goodsPickerTable"
+          rowKey="id"
+          :loading="isLoading"
+          :columns="columnsGoodsPicker"
+          :data="loadGoodsPickerData"
+          :rowSelection="{
+            selectedRowKeys: selectedRowKeysPicker,
+            onChange: keys => selectedRowKeysPicker = keys
+          }"
+          :pageSize="16"
+        >
+          <!-- 商品图片 -->
+          <span slot="image" slot-scope="text">
+            <a title="点击查看原图" :href="text" target="_blank">
+              <img width="50" height="50" :src="text" alt="商品图片" />
+            </a>
+          </span>
+          <!-- 商品名称 -->
+          <span slot="goods_title" slot-scope="text">
+            <p class="twoline-hide" style="width: 270px;">{{ text }}</p>
+          </span>
+        </s-table>
+      </template>
+      <template v-else>
+        <div style="height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <a-input-search
+            placeholder="搜索商品名称"
+            @search="searchGoodsPicker"
+            size="large"
+            style=""
+          />
+        </div>
+      </template>
+      <div
+        :style="{
+          position: 'absolute',
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          borderTop: '1px solid #e9e9e9',
+          padding: '10px 16px',
+          background: '#fff',
+          textAlign: 'right',
+          zIndex: 1,
+        }"
+      >
+        <a-button type="primary" @click="handleCreate" style="float: left">创建新商品</a-button>
+        <a-button :style="{ marginRight: '8px' }" @click="visibleGoodsPicker=false">取消</a-button>
+        <a-button type="primary" @click="submitGoodspicker" :loading="isSavingPicking">添加</a-button>
+      </div>
+    </a-drawer>
   </a-card>
 </template>
 
@@ -175,7 +260,20 @@ export default {
           .then(response => {
             return response
           })
-      }
+      },
+      // 主库挑选商品
+      visibleGoodsPicker: false,
+      showPickerList: false,
+      isSavingPicking: false,
+      selectedRowKeysPicker: [],
+      pickerParams: {type: 'intra-city'},
+      columnsGoodsPicker: columns.filter(c => /^(id|image|title|price_lowest|created_at)$/.test(c.dataIndex)),
+      loadGoodsPickerData: param => {
+        return GoodsApi.list({ ...param, ...this.pickerParams, ...{except_store_id: this.$store.getters.storeId} })
+          .then(response => {
+            return response
+          })
+      },
     }
   },
   created () {
@@ -276,6 +374,9 @@ export default {
     /**
      * 新增记录
      */
+    handleAdd () {
+      this.visibleGoodsPicker = true
+    },
     handleCreate () {
       this.$router.push('/goods/create')
     },
@@ -294,8 +395,39 @@ export default {
     handleRefresh (bool = false) {
       this.selectedRowKeys = []
       this.$refs.table.refresh(bool)
-    }
+    },
 
+    /**
+     * 主库挑选商品
+     */
+    handleSearchGoodsPicker (e) {
+      e.preventDefault()
+      this.pickerSearchForm.validateFields((error, values) => {
+        if (!error) {
+          this.pickerParams = { ...this.pickerParams, ...values }
+          this.selectedRowKeysPicker = []
+          this.$refs.goodsPickerTable.refresh(true)
+        }
+      })
+    },
+    searchGoodsPicker (value) {
+      this.showPickerList = true
+      this.pickerParams.search = value
+      this.pickerParams = {...this.pickerParams}
+      this.$refs.goodsPickerTable?.refresh(true)
+    },
+    submitGoodspicker () {
+      this.isSavingPicking = true
+      GoodsApi.copySku({ product_ids: this.selectedRowKeysPicker, store_id: this.$store.getters.storeId })
+        .then(result => {
+          this.$message.success('已添加选中商品到本仓储', 1.5)
+          this.visibleGoodsPicker = false
+          this.handleRefresh(true)
+        })
+        .finally(result => {
+          this.isSavingPicking = false
+        })
+    },
   }
 }
 </script>

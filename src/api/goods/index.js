@@ -14,6 +14,7 @@ const api = {
   state: '/goods/state',
   saveSpec: '/products/{id}/spec',
   saveSku: '/products/{id}/sku',
+  copySku: '/products/copy_sku',
 }
 
 /**
@@ -123,6 +124,14 @@ export function saveSku (goodsId, data) {
   return axios({
     url: api.saveSku.replace('{id}', goodsId),
     method: 'put',
+    data: data
+  })
+}
+
+export function copySku (data) {
+  return axios({
+    url: api.copySku,
+    method: 'post',
     data: data
   })
 }
