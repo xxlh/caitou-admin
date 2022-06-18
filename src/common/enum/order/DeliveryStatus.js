@@ -5,6 +5,7 @@ import Enum from '../enum'
  * DeliveryStatusEnum
  */
 export default new Enum([
-  { key: 'NOT_DELIVERED', name: '未发货', value: 10 },
-  { key: 'DELIVERED', name: '已发货', value: 20 }
+  { key: 'NOT_DELIVERED', name: '未发货', value: 'pending' },
+  { key: 'DELIVERED', name: '已发货', value: 'delivered' },
+  { key: 'RECEIVED', name: '已发货', value: 'received' },
 ])

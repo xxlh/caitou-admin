@@ -11,7 +11,7 @@
     <a-spin :spinning="isLoading">
       <a-form :form="form">
         <a-form-item label="实付款金额" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <span>￥{{ record.pay_price }}</span>
+          <span>￥{{ record.total_amount }}</span>
         </a-form-item>
         <a-form-item
           label="审核状态"
@@ -19,10 +19,13 @@
           :wrapperCol="wrapperCol"
           extra="同意后将退回付款金额并关闭订单"
         >
-          <a-radio-group v-decorator="['status', { initialValue: 1, rules: [{ required: true }] }]">
+          <a-radio-group v-decorator="['agree', { initialValue: 1, rules: [{ required: true }] }]">
             <a-radio :value="1">同意</a-radio>
             <a-radio :value="0">拒绝</a-radio>
           </a-radio-group>
+        </a-form-item>
+        <a-form-item v-show="!form.getFieldValue('agree')" label="拒绝原因" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="['reason', {rules: [{required: !form.getFieldValue('agree'), message: '请填写拒绝原因！'}]}]" />
         </a-form-item>
       </a-form>
     </a-spin>
@@ -91,7 +94,7 @@ export default {
     */
     onFormSubmit (values) {
       this.isLoading = true
-      Api.confirmCancel({ orderId: this.record.order_id, form: values })
+      Api.confirmCancel(this.record.id, values)
         .then((result) => {
           // 显示成功
           this.$message.success(result.message, 1.5)

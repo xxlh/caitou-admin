@@ -16,7 +16,7 @@
       <!-- 商品规格 -->
       <div v-else class="goods-props clearfix">
         <div class="goods-props-item" v-for="(props, idx) in data.goodsProps" :key="idx">
-          <span>{{ props.value.name }}</span>
+          <span>{{ props }}</span>
         </div>
       </div>
     </div>

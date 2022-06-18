@@ -4,8 +4,8 @@ import { axios } from '@/utils/request'
  * api接口列表
  */
 const api = {
-  list: '/order/list',
-  detail: '/order/detail'
+  list: '/orders',
+  detail: '/orders/{id}'
 }
 
 // 列表记录
@@ -18,9 +18,10 @@ export function list (params) {
 }
 
 // 订单详情
-export function detail (params) {
+export function detail (id, params) {
+  console.log(id, api.detail.replace('{id}', id));
   return axios({
-    url: api.detail,
+    url: api.detail.replace('{id}', id),
     method: 'get',
     params
   })

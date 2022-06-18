@@ -181,27 +181,27 @@ export const asyncRouterMap = [
             meta: { title: '全部订单', keepAlive: false, permission: ['/order/list/all'] }
           },
           {
-            path: '/order/list/delivery',
+            path: '/order/list/undelivered',
             component: () => import(/* webpackChunkName: "order" */ '@/views/order/Index'),
             meta: { title: '待发货', keepAlive: false, permission: ['/order/list/all'] }
           },
           {
-            path: '/order/list/receipt',
+            path: '/order/list/unreceived',
             component: () => import(/* webpackChunkName: "order" */ '@/views/order/Index'),
             meta: { title: '待收货', keepAlive: false, permission: ['/order/list/all'] }
           },
           {
-            path: '/order/list/pay',
+            path: '/order/list/unpaid',
             component: () => import(/* webpackChunkName: "order" */ '@/views/order/Index'),
             meta: { title: '待付款', keepAlive: false, permission: ['/order/list/all'] }
           },
           {
-            path: '/order/list/complete',
+            path: '/order/list/completed',
             component: () => import(/* webpackChunkName: "order" */ '@/views/order/Index'),
             meta: { title: '已完成', keepAlive: false, permission: ['/order/list/all'] }
           },
           {
-            path: '/order/list/cancel',
+            path: '/order/list/canceled',
             component: () => import(/* webpackChunkName: "order" */ '@/views/order/Index'),
             meta: { title: '已取消', keepAlive: false, permission: ['/order/list/all'] }
           },

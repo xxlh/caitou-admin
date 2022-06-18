@@ -15,28 +15,28 @@
             <li>
               <span>付款</span>
               <div
-                v-if="record.pay_status == PayStatusEnum.SUCCESS.value"
+                v-if="!!record.paid_at"
                 class="tip"
-              >付款于 {{ record.pay_time }}</div>
+              >付款于 {{ record.paid_at }}</div>
             </li>
             <li>
               <span>发货</span>
-              <div
-                v-if="record.delivery_status == DeliveryStatusEnum.DELIVERED.value"
+              <!-- <div
+                v-if="record.delivery_status == DeliveryStatusEnum.UNRECEIVED.value"
                 class="tip"
-              >发货于 {{ record.delivery_time }}</div>
+              >发货于 {{ record.delivery_time }}</div> -->
             </li>
             <li>
               <span>收货</span>
-              <div
-                v-if="record.receipt_status == ReceiptStatusEnum.RECEIVED.value"
+              <!-- <div
+                v-if="record.receipt_status == ReceiptStatusEnum.REVIEWING.value"
                 class="tip"
-              >收货于 {{ record.receipt_time }}</div>
+              >收货于 {{ record.receipt_time }}</div> -->
             </li>
             <li>
               <span>完成</span>
               <div
-                v-if="record.order_status == OrderStatusEnum.COMPLETED.value"
+                v-if="record.status == OrderStatusEnum.COMPLETED.value"
                 class="tip"
               >完成于 {{ record.receipt_time }}</div>
             </li>
@@ -47,12 +47,12 @@
       <!-- 订单信息 -->
       <a-card class="mt-20" :bordered="false">
         <!-- 订单操作 -->
-        <template v-if="record.order_status != OrderStatusEnum.CANCELLED.value">
+        <template v-if="record.status != OrderStatusEnum.CANCELLED.value">
           <div class="ant-descriptions-title">订单操作</div>
           <!-- 提示栏 -->
           <div class="alerts mt-10 mb-15">
             <a-alert
-              v-if="record.order_status== OrderStatusEnum.APPLY_CANCEL.value"
+              v-if="record.status== OrderStatusEnum.REFUNDING.value"
               message="当前买家已付款并申请取消订单，请审核是否同意，如同意则自动退回付款金额（原路退款）并关闭订单。"
               banner
             />
@@ -61,17 +61,17 @@
           <div class="actions clearfix mt-10">
             <div class="action-item" v-if="$auth('/order/detail.updatePrice')">
               <a-button
-                v-if="record.pay_status == PayStatusEnum.PENDING.value"
+                v-if="!record.paid_at"
                 @click="handleUpdatePrice"
               >订单改价</a-button>
             </div>
             <div class="action-item" v-if="$auth('/order/list/all.deliver')">
               <a-button
                 v-if="(
-                  record.pay_status == PayStatusEnum.SUCCESS.value
-                    && record.delivery_type == DeliveryTypeEnum.EXPRESS.value
+                  record.paid_at
+                    // && record.delivery_type == DeliveryTypeEnum.EXPRESS.value
                     && record.delivery_status == DeliveryStatusEnum.NOT_DELIVERED.value
-                    && !inArray(record.order_status, [OrderStatusEnum.CANCELLED.value, OrderStatusEnum.APPLY_CANCEL.value])
+                    && !inArray(record.status, [OrderStatusEnum.CANCELLED.value, OrderStatusEnum.REFUNDING.value])
                 )"
                 type="primary"
                 @click="handleDelivery"
@@ -79,7 +79,7 @@
             </div>
             <div class="action-item" v-if="$auth('/order/list/all.cancel')">
               <a-button
-                v-if="record.order_status == OrderStatusEnum.APPLY_CANCEL.value"
+                v-if="record.status == OrderStatusEnum.REFUNDING.value"
                 type="primary"
                 @click="handleCancel"
               >审核取消订单</a-button>
@@ -89,28 +89,28 @@
         </template>
         <!-- 订单信息 -->
         <a-descriptions title="订单信息">
-          <a-descriptions-item label="订单号">{{ record.order_no }}</a-descriptions-item>
-          <a-descriptions-item label="实付款金额">￥{{ record.pay_price }}</a-descriptions-item>
+          <a-descriptions-item label="订单号">{{ record.no }}</a-descriptions-item>
+          <a-descriptions-item label="实付款金额">￥{{ record.total_amount }}</a-descriptions-item>
           <a-descriptions-item label="支付方式">
-            <a-tag color="green">{{ PayTypeEnum[record.pay_type].name }}</a-tag>
+            <a-tag color="green">{{ PayTypeEnum[record.payment_method].name }}</a-tag>
           </a-descriptions-item>
           <a-descriptions-item label="配送方式">
-            <a-tag color="green">{{ DeliveryTypeEnum[record.delivery_type].name }}</a-tag>
+            <!-- <a-tag color="green">{{ DeliveryTypeEnum[record.delivery_type].name }}</a-tag> -->
           </a-descriptions-item>
-          <a-descriptions-item label="运费金额">￥{{ record.express_price }}</a-descriptions-item>
+          <a-descriptions-item label="运费金额">￥{{ record.freight }}</a-descriptions-item>
           <a-descriptions-item label="订单状态">
             <a-tag
-              :color="renderOrderStatusColor(record.order_status)"
-            >{{ OrderStatusEnum[record.order_status].name }}</a-tag>
+              :color="renderOrderStatusColor(record.status)"
+            >{{ OrderStatusEnum[record.status].name }}</a-tag>
           </a-descriptions-item>
           <a-descriptions-item label="买家信息">
             <a-tooltip>
-              <template slot="title">会员ID: {{ record.user.user_id }}</template>
-              <span class="c-p">{{ record.user.nick_name }}</span>
+              <template slot="title">会员ID: {{ user.id }}</template>
+              <span class="c-p">{{ user.nickname }}</span>
             </a-tooltip>
           </a-descriptions-item>
           <a-descriptions-item label="买家留言">
-            <strong v-if="record.buyer_remark">{{ record.buyer_remark }}</strong>
+            <strong v-if="record.remark">{{ record.remark }}</strong>
             <span v-else>--</span>
           </a-descriptions-item>
         </a-descriptions>
@@ -121,26 +121,26 @@
         <div class="ant-descriptions-title">订单商品</div>
         <div class="goods-list">
           <a-table
-            rowKey="order_goods_id"
+            rowKey="id"
             :columns="goodsColumns"
-            :dataSource="record.goods"
+            :dataSource="record.items"
             :pagination="false"
           >
             <!-- 商品信息 -->
             <template slot="goodsInfo" slot-scope="text, item">
               <GoodsItem
                 :data="{
-                  image: item.goods_image,
+                  image: item.image || item.product.image,
                   imageAlt: '商品图片',
-                  title: item.goods_name,
-                  goodsProps: item.goods_props
+                  title: item.product.title,
+                  goodsProps: item.product.generic_spec
                 }"
               />
             </template>
             <!-- 商品编码 -->
-            <span slot="goods_no" slot-scope="text">{{ text ? text : '--' }}</span>
+            <span slot="no" slot-scope="text">{{ text ? text : '--' }}</span>
             <!-- 单价	 -->
-            <template slot="goods_price" slot-scope="text, item">
+            <template slot="price" slot-scope="text, item">
               <p :class="{ 'f-through': item.is_user_grade }">￥{{ text }}</p>
               <p v-if="item.is_user_grade">
                 <a-tooltip>
@@ -153,9 +153,9 @@
               </p>
             </template>
             <!-- 购买数量	 -->
-            <span slot="total_num" slot-scope="text">x{{ text }}</span>
+            <span slot="count" slot-scope="text">x{{ text }}</span>
             <!-- 商品总价 -->
-            <span slot="total_price" slot-scope="text">￥{{ text }}</span>
+            <span slot="total_price" slot-scope="text, item">￥{{ item.price * item.count }}</span>
           </a-table>
           <!-- 订单价格明细 -->
           <div class="order-price">
@@ -163,28 +163,28 @@
               <tbody>
                 <tr>
                   <td>订单总额：</td>
-                  <td>￥{{ record.total_price }}</td>
+                  <td>￥{{ record.total_amount }}</td>
                 </tr>
-                <tr v-if="record.coupon_money > 0">
+                <tr v-if="record.discount > 0">
                   <td>优惠券抵扣：</td>
-                  <td>-￥{{ record.coupon_money }}</td>
+                  <td>-￥{{ record.discount }}</td>
                 </tr>
                 <tr v-if="record.points_money > 0">
                   <td>积分抵扣：</td>
                   <td>-￥{{ record.points_money }}</td>
                 </tr>
-                <tr v-if="record.update_price.value != 0">
+                <!-- <tr v-if="record.update_price.value != 0">
                   <td>商家改价：</td>
                   <td>{{ record.update_price.symbol }}￥{{ record.update_price.value }}</td>
-                </tr>
+                </tr> -->
                 <tr>
                   <td>运费金额：</td>
-                  <td>+￥{{ record.express_price }}</td>
+                  <td>+￥{{ record.freight }}</td>
                 </tr>
                 <tr>
                   <td>实付款金额：</td>
                   <td>
-                    <strong>￥{{ record.pay_price }}</strong>
+                    <strong>￥{{ record.total_amount }}</strong>
                   </td>
                 </tr>
               </tbody>
@@ -213,9 +213,9 @@
         <!-- 发货信息 -->
         <template
           v-if="(
-            record.pay_status == PayStatusEnum.SUCCESS.value
-              && record.delivery_status == DeliveryStatusEnum.DELIVERED.value
-              && !inArray(record.order_status, [OrderStatusEnum.CANCELLED.value, OrderStatusEnum.APPLY_CANCEL.value])
+            record.paid_at
+              && record.delivery_status == DeliveryStatusEnum.UNRECEIVED.value
+              && !inArray(record.status, [OrderStatusEnum.CANCELLED.value, OrderStatusEnum.REFUNDING.value])
           )"
         >
           <a-divider class="o-divider" />
@@ -224,7 +224,7 @@
             <a-descriptions-item label="物流单号">{{ record.express_no }}</a-descriptions-item>
             <a-descriptions-item label="发货状态">
               <a-tag
-                :color="record.delivery_status == DeliveryStatusEnum.DELIVERED.value ? 'green' : ''"
+                :color="record.delivery_status == DeliveryStatusEnum.UNRECEIVED.value ? 'green' : ''"
               >{{ DeliveryStatusEnum[record.delivery_status].name }}</a-tag>
             </a-descriptions-item>
             <a-descriptions-item label="发货时间">{{ record.delivery_time }}</a-descriptions-item>
@@ -262,23 +262,23 @@ const goodsColumns = [
   },
   {
     title: '商品编码',
-    dataIndex: 'goods_no',
-    scopedSlots: { customRender: 'goods_no' }
+    dataIndex: 'product_sku.no',
+    scopedSlots: { customRender: 'no' }
   },
   {
     title: '重量(Kg)',
-    dataIndex: 'goods_weight',
+    dataIndex: 'product_sku.weight',
     scopedSlots: { customRender: 'goods_weight' }
   },
   {
     title: '单价',
-    dataIndex: 'goods_price',
-    scopedSlots: { customRender: 'goods_price' }
+    dataIndex: 'price',
+    scopedSlots: { customRender: 'price' }
   },
   {
     title: '购买数量',
-    dataIndex: 'total_num',
-    scopedSlots: { customRender: 'total_num' }
+    dataIndex: 'count',
+    scopedSlots: { customRender: 'count' }
   },
   {
     title: '商品总价',
@@ -314,6 +314,8 @@ export default {
       orderId: null,
       // 订单详情
       record: {},
+      user: {},
+      reviews: {},
       // 订单步骤位置
       progress: 2,
       // 商品内容表头
@@ -338,10 +340,13 @@ export default {
     getDetail () {
       const { orderId } = this
       this.isLoading = true
-      Api.detail({ orderId })
+      Api.detail(orderId)
         .then(result => {
+          console.log(result);
           // 当前记录
-          this.record = result.data.detail
+          this.record = result.order
+          this.user = result.user
+          this.reviews = result.reviews
           // 初始化数据
           this.initData()
         })
@@ -360,8 +365,8 @@ export default {
     initProgress () {
       const { record } = this
       this.progress = 2
-      record.pay_status === PayStatusEnum.SUCCESS.value && (this.progress += 1)
-      record.delivery_status === DeliveryStatusEnum.DELIVERED.value && (this.progress += 1)
+      record.paid_at && (this.progress += 1)
+      record.delivery_status === DeliveryStatusEnum.NOT_DELIVERED.value && (this.progress += 1)
       record.receipt_status === ReceiptStatusEnum.RECEIVED.value && (this.progress += 1)
     },
 
@@ -371,7 +376,7 @@ export default {
       const ColorEnum = {
         [OrderStatusEnum.NORMAL.value]: '',
         [OrderStatusEnum.CANCELLED.value]: 'red',
-        [OrderStatusEnum.APPLY_CANCEL.value]: 'red',
+        [OrderStatusEnum.REFUNDING.value]: 'red',
         [OrderStatusEnum.COMPLETED.value]: 'green'
       }
       return ColorEnum[orderStatus]

@@ -10,7 +10,7 @@
   >
     <a-spin :spinning="isLoading">
       <a-form :form="form">
-        <a-form-item label="物流公司" :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <!-- <a-form-item label="物流公司" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-select
             v-decorator="['express_id', { rules: [{ required: true, message: '请选择物流公司' }] }]"
             placeholder="请选择物流公司"
@@ -24,6 +24,11 @@
           <div class="form-item-help">
             <router-link target="_blank" :to="{ path: '/setting/delivery/express/index' }">物流公司管理</router-link>
           </div>
+        </a-form-item> -->
+        <a-form-item label="物流公司" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input
+            v-decorator="['express_company', { rules: [{ required: true, message: '请输入物流公司' }] }]"
+          />
         </a-form-item>
         <a-form-item
           label="物流单号"
@@ -67,7 +72,7 @@ export default {
   },
   created () {
     // 获取物流公司列表
-    this.getExpressList()
+    // this.getExpressList()
   },
   methods: {
 
@@ -119,10 +124,10 @@ export default {
     */
     onFormSubmit (values) {
       this.isLoading = true
-      Api.delivery({ orderId: this.record.order_id, form: values })
+      Api.delivery(this.record.id, values)
         .then((result) => {
           // 显示成功
-          this.$message.success(result.message, 1.5)
+          this.$message.success('已发货', 1.5)
           // 关闭对话框事件
           this.handleCancel()
           // 通知父端组件提交完成了

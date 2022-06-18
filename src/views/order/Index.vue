@@ -7,7 +7,7 @@
         <a-row class="row-item-search">
           <a-form class="search-form" :form="searchForm" layout="inline" @submit="handleSearch">
             <a-form-item label="订单查询">
-              <a-input style="width: 342px" placeholder="请输入关键词" v-decorator="['searchValue']">
+              <a-input style="width: 342px" placeholder="请输入关键词" v-decorator="['search']">
                 <a-select
                   slot="addonBefore"
                   v-decorator="['searchType', { initialValue: 10 }]"
@@ -21,7 +21,7 @@
                 </a-select>
               </a-input>
             </a-form-item>
-            <a-form-item label="订单来源">
+            <!-- <a-form-item label="订单来源">
               <a-select v-decorator="['orderSource', { initialValue: -1 }]">
                 <a-select-option :value="-1">全部</a-select-option>
                 <a-select-option
@@ -30,9 +30,9 @@
                   :value="item.value"
                 >{{ item.name }}</a-select-option>
               </a-select>
-            </a-form-item>
+            </a-form-item> -->
             <a-form-item label="支付方式">
-              <a-select v-decorator="['payType', { initialValue: -1 }]">
+              <a-select v-decorator="['payment_method', { initialValue: -1 }]">
                 <a-select-option :value="-1">全部</a-select-option>
                 <a-select-option
                   v-for="(item, index) in PayTypeEnum.data"
@@ -41,7 +41,7 @@
                 >{{ item.name }}</a-select-option>
               </a-select>
             </a-form-item>
-            <a-form-item label="配送方式">
+            <!-- <a-form-item label="配送方式">
               <a-select v-decorator="['deliveryType', { initialValue: -1 }]">
                 <a-select-option :value="-1">全部</a-select-option>
                 <a-select-option
@@ -50,9 +50,9 @@
                   :value="item.value"
                 >{{ item.name }}</a-select-option>
               </a-select>
-            </a-form-item>
+            </a-form-item> -->
             <a-form-item label="下单时间">
-              <a-range-picker format="YYYY-MM-DD" v-decorator="['betweenTime']" />
+              <a-range-picker format="YYYY-MM-DD" v-decorator="['created_between']" />
             </a-form-item>
             <a-form-item class="search-btn">
               <a-button type="primary" icon="search" html-type="submit">搜索</a-button>
@@ -86,96 +86,97 @@
               </thead>
               <tbody class="ant-table-tbody">
                 <template v-for="(item) in orderList.data">
-                  <tr class="order-empty" :key="`order_${item.order_id}_1`">
+                  <tr class="order-empty" :key="`order_${item.id}_1`">
                     <td colspan="8"></td>
                   </tr>
-                  <tr :key="`order_${item.order_id}_2`">
+                  <tr :key="`order_${item.id}_2`">
                     <td colspan="8">
-                      <span class="mr-20">{{ item.create_time }}</span>
-                      <span class="mr-20">订单号：{{ item.order_no }}</span>
+                      <span class="mr-20">{{ item.created_at }}</span>
+                      <span class="mr-20">订单号：{{ item.no }}</span>
                       <platform-icon :name="item.platform" :showTips="true" />
                     </td>
                   </tr>
                   <tr
-                    v-for="(goodsItm, goodsIdx) in item.goods"
-                    :key="`orderGoods_${item.order_id}_${goodsIdx}`"
+                    v-for="(goodsItm, goodsIdx) in item.items"
+                    :key="`orderGoods_${item.id}_${goodsIdx}`"
                   >
                     <td>
                       <GoodsItem
                         :data="{
-                          image: goodsItm.goods_image,
+                          image: goodsItm.image || goodsItm.product.image,
                           imageAlt: '商品图片',
-                          title: goodsItm.goods_name,
-                          goodsProps: goodsItm.goods_props
+                          title: goodsItm.product.title,
+                          goodsProps: goodsItm.product.generic_spec
                         }"
                       />
                     </td>
                     <td>
-                      <p>￥{{ goodsItm.goods_price }}</p>
-                      <p>×{{ goodsItm.total_num }}</p>
+                      <p>￥{{ goodsItm.price }}</p>
+                      <p>×{{ goodsItm.count }}</p>
                     </td>
                     <template v-if="goodsIdx===0">
-                      <td :rowspan="item.goods.length">
-                        <p>￥{{ item.pay_price }}</p>
-                        <p class="c-muted-1">(含运费：￥{{ item.express_price }})</p>
+                      <td :rowspan="item.items.length">
+                        <p>￥{{ item.total_amount }}</p>
+                        <p class="c-muted-1">(含运费：￥{{ item.freight }})</p>
                       </td>
-                      <td :rowspan="item.goods.length">
-                        <UserItem :user="item.user" />
+                      <td :rowspan="item.items.length">
+                        <UserItem v-if="item.user" :user="item.user" />
+                        <span v-else>{{item.user_nickname}}</span>
                       </td>
-                      <td :rowspan="item.goods.length">
-                        <a-tag>{{ PayTypeEnum[item.pay_type].name }}</a-tag>
+                      <td :rowspan="item.items.length">
+                        <a-tag>{{ PayTypeEnum[item.payment_method].name }}</a-tag>
                       </td>
-                      <td :rowspan="item.goods.length">
-                        <a-tag>{{ DeliveryTypeEnum[item.delivery_type].name }}</a-tag>
+                      <td :rowspan="item.items.length">
+                        <!-- <a-tag>{{ DeliveryTypeEnum[item.delivery_type].name }}</a-tag> -->
                       </td>
-                      <td :rowspan="item.goods.length">
+                      <td :rowspan="item.items.length">
                         <p class="mtb-2">
                           <span class="f-13">付款状态：</span>
                           <a-tag
-                            :color="item.pay_status == PayStatusEnum.SUCCESS.value ? 'green' : ''"
-                          >{{ PayStatusEnum[item.pay_status].name }}</a-tag>
+                            :color="item.paid_at ? 'green' : ''"
+                          >{{ PayStatusEnum[item.paid_at?'SUCCESS':'PENDING'].name }}</a-tag>
                         </p>
                         <p class="mtb-2">
                           <span class="f-13">发货状态：</span>
                           <a-tag
-                            :color="item.delivery_status == DeliveryStatusEnum.DELIVERED.value ? 'green' : ''"
-                          >{{ DeliveryStatusEnum[item.delivery_status].name }}</a-tag>
+                            :color="item.ship_status == DeliveryStatusEnum.DELIVERED.value ? 'green' : ''"
+                          >{{ DeliveryStatusEnum[item.ship_status].name }}</a-tag>
                         </p>
                         <p class="mtb-2">
                           <span class="f-13">收货状态：</span>
                           <a-tag
-                            :color="item.receipt_status == ReceiptStatusEnum.RECEIVED.value ? 'green' : ''"
-                          >{{ ReceiptStatusEnum[item.receipt_status].name }}</a-tag>
+                            :color="item.ship_status == ReceiptStatusEnum.RECEIVED.value ? 'green' : ''"
+                          >{{ ReceiptStatusEnum[item.ship_status].name }}</a-tag>
                         </p>
                         <p
-                          v-if="[OrderStatusEnum.CANCELLED.value,OrderStatusEnum.APPLY_CANCEL.value].includes(item.order_status)"
+                          v-if="[OrderStatusEnum.CANCELLED.value,OrderStatusEnum.REFUNDING.value].includes(item.status)"
                           class="mtb-2"
                         >
                           <span class="f-13">订单状态：</span>
                           <a-tag
-                            :color="renderOrderStatusColor(item.order_status)"
-                          >{{ OrderStatusEnum[item.order_status].name }}</a-tag>
+                            :color="renderOrderStatusColor(item.status)"
+                          >{{ OrderStatusEnum[item.status].name }}</a-tag>
                         </p>
                       </td>
-                      <td :rowspan="item.goods.length">
+                      <td :rowspan="item.items.length">
                         <div class="actions">
                           <router-link
                             v-if="$auth('/order/detail')"
-                            :to="{ path: '/order/detail', query: { orderId: item.order_id } }"
+                            :to="{ path: '/order/detail', query: { orderId: item.id } }"
                           >详情</router-link>
                           <a
                             v-action:cancel
                             v-if="(
-                              item.pay_status == PayStatusEnum.SUCCESS.value
-                                && item.delivery_type == DeliveryTypeEnum.EXPRESS.value
-                                && item.delivery_status == DeliveryStatusEnum.NOT_DELIVERED.value
-                                && !inArray(item.order_status, [OrderStatusEnum.CANCELLED.value, OrderStatusEnum.APPLY_CANCEL.value])
+                              item.paid_at
+                                // && item.delivery_type == DeliveryTypeEnum.EXPRESS.value
+                                && item.ship_status == DeliveryStatusEnum.NOT_DELIVERED.value
+                                && !inArray(item.status, [OrderStatusEnum.CANCELLED.value, OrderStatusEnum.REFUNDING.value])
                             )"
                             @click="handleDelivery(item)"
                           >发货</a>
                           <a
                             v-action:cancel
-                            v-if="item.order_status == OrderStatusEnum.APPLY_CANCEL.value"
+                            v-if="item.status == OrderStatusEnum.REFUNDING.value"
                             @click="handleCancel(item)"
                           >审核取消</a>
                           <a v-action:delete @click="handleDelete(item)">删除</a>
@@ -229,7 +230,7 @@ const columns = [
   {
     title: '商品信息',
     align: 'center',
-    dataIndex: 'goods',
+    dataIndex: 'items',
     scopedSlots: { customRender: 'goods' }
   },
   {
@@ -240,8 +241,8 @@ const columns = [
   {
     title: '实付款',
     align: 'center',
-    dataIndex: 'pay_price',
-    scopedSlots: { customRender: 'pay_price' }
+    dataIndex: 'total_amount',
+    scopedSlots: { customRender: 'total_amount' }
   },
   {
     title: '买家',
@@ -250,8 +251,8 @@ const columns = [
   },
   {
     title: '支付方式',
-    dataIndex: 'pay_type',
-    scopedSlots: { customRender: 'pay_type' }
+    dataIndex: 'payment_method',
+    scopedSlots: { customRender: 'payment_method' }
   },
   {
     title: '配送方式',
@@ -349,9 +350,9 @@ export default {
     getList () {
       const { dataType, queryParam, page } = this
       this.isLoading = true
-      return Api.list({ dataType, ...queryParam, page })
+      return Api.list({ status: dataType, ...queryParam, page })
         .then(response => {
-          this.orderList = response.data.list
+          this.orderList = response
         })
         .finally(() => {
           this.isLoading = false
@@ -364,7 +365,7 @@ export default {
       const ColorEnum = {
         [OrderStatusEnum.NORMAL.value]: '',
         [OrderStatusEnum.CANCELLED.value]: 'red',
-        [OrderStatusEnum.APPLY_CANCEL.value]: 'red',
+        [OrderStatusEnum.REFUNDING.value]: 'red',
         [OrderStatusEnum.COMPLETED.value]: 'green'
       }
       return ColorEnum[orderStatus]
@@ -408,7 +409,7 @@ export default {
         title: '您确定要删除该订单记录吗?',
         content: '删除后不可恢复，请谨慎操作',
         onOk () {
-          return EventApi.deleted(item.order_id)
+          return EventApi.deleted(item.id)
             .then((result) => {
               app.$message.success(result.message, 1.5)
               app.handleRefresh()

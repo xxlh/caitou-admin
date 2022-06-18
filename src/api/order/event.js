@@ -4,19 +4,19 @@ import { axios } from '@/utils/request'
  * api接口列表
  */
 const api = {
-  delivery: '/order.event/delivery',
+  delivery: '/orders/{id}/ship',
   updatePrice: '/order.event/updatePrice',
-  confirmCancel: '/order.event/confirmCancel',
-  delete: '/order.event/delete',
+  confirmCancel: '/orders/{id}/refund',
+  delete: '/orders/{id}',
 }
 
 /**
  * 确认发货
  * @param {*} data
  */
-export function delivery (data) {
+export function delivery (id, data) {
   return axios({
-    url: api.delivery,
+    url: api.delivery.replace('{id}', id),
     method: 'post',
     data
   })
@@ -38,9 +38,9 @@ export function updatePrice (data) {
  * 审核：用户取消订单
  * @param {*} data
  */
-export function confirmCancel (data) {
+export function confirmCancel (id, data) {
   return axios({
-    url: api.confirmCancel,
+    url: api.confirmCancel.replace('{id}', id),
     method: 'post',
     data
   })
@@ -52,8 +52,7 @@ export function confirmCancel (data) {
  */
 export function deleted (orderId) {
   return axios({
-    url: api.delete,
-    method: 'post',
-    data: { orderId }
+    url: api.delete.replace('{id}', orderId),
+    method: 'delete',
   })
 }
