@@ -20,7 +20,10 @@ export default new Vuex.Store({
     permission
   },
   state: {
-
+    WEWORK_CORPID: 'wwab032cc648e1816d',
+    WEWORK_AGENTID: process.env.NODE_ENV === 'production' ? '1000008' : '1000009',  // 需与后端配置对应
+    AMap_securityJsCode: 'cc376bf07ec7a861cbfada9c7de5b86f',
+    AMap_key: "8eed729112431178d5b9adaff42b33c1",
   },
   mutations: {
 

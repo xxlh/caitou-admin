@@ -2,7 +2,8 @@ import { axios } from '@/utils/request'
 
 const apiPath = {
   login: '/auth/signin',
-  logout: '/auth/signout'
+  logout: '/auth/signout',
+  loginWework: '/auth/wework',
 }
 
 /**
@@ -21,5 +22,17 @@ export function logout () {
   return axios({
     url: apiPath.logout,
     method: 'post'
+  })
+}
+
+/**
+ * 企业微信用户登录
+ * @param {*} data
+ */
+export function loginWework (data) {
+  return axios({
+    url: apiPath.loginWework,
+    method: 'post',
+    data
   })
 }

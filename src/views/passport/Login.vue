@@ -54,15 +54,23 @@
           class="login-button"
           :loading="state.loginBtn"
           :disabled="state.loginBtn"
-        >确定</a-button>
+        >登陆</a-button>
       </a-form-item>
     </a-form>
+    <a-popover v-if="!userAgent.includes('Mobile') && !userAgent.includes('wxwork') && !userAgent.includes('MicroMessenger')" @visibleChange="generateWeworkQRcode">
+      <a-button size="large" class="login-button" :loading="state.weworkLogin"><a-avatar shape="square" size="small" src="/static/img/icon/wework.png" style="margin: 0 10px" />企业微信登录</a-button>
+      <template slot="content">
+        <div id="wework-qrcode">Loading</div>
+      </template>
+    </a-popover>
+    <a-button v-else :loading="state.weworkLogin" @click="toWeworkAuth" size="large" class="login-button"><a-avatar shape="square" size="small" src="/static/img/icon/wework.png" style="margin: 0 10px" />企业微信登录</a-button>
   </div>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
 import { timeFix } from '@/utils/util'
+import * as API from '@/api/login'
 
 export default {
   data () {
@@ -74,12 +82,29 @@ export default {
       // 表单组件
       form: this.$form.createForm(this),
       // 页面状态
-      state: { loginBtn: false }
+      state: { loginBtn: false, weworkLogin: false },
+      // 企业微信
+      userAgent: window.navigator.userAgent,
     }
   },
-  created () { },
+  created () {
+    // 加载企业微信扫码登录js
+    const s = document.createElement('script');
+    s.type = 'text/javascript';
+    s.src = 'http://wwcdn.weixin.qq.com/node/wework/wwopen/js/wwLogin-1.2.7.js';
+    document.body.appendChild(s);
+    // 判断是否企业微信登录回调
+    this.loginWework();
+  },
+  watch: {
+    '$route.query.code': function(value, oldValue) {
+      if (value && value != oldValue) {
+        this.loginWework();
+      }
+    }
+  },
   methods: {
-    ...mapActions(['Login']),
+    ...mapActions(['Login', 'LoginWework']),
     /**
      * 表单提交: 确定登录
      */
@@ -135,7 +160,50 @@ export default {
     loginFailed (response) {
       this.isLoginError = true
       this.loginErrorMsg = response.msg
-    }
+    },
+
+    /**
+     * 企业微信
+     */
+    toWeworkAuth () {
+      this.state.weworkLogin = true
+      // 需要配置「可作为应用OAuth2.0网页授权功能的回调域名」为redirect_uri域名
+      location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + this.$store.state.WEWORK_CORPID + '&redirect_uri=' + encodeURIComponent(location.href) + '&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect';
+    },
+    generateWeworkQRcode () {
+      this.$nextTick(() => {
+        const wwLogin = new WwLogin({
+          "id": "wework-qrcode",
+          "appid": this.$store.state.WEWORK_CORPID,
+          "agentid": this.$store.state.WEWORK_AGENTID,
+          "redirect_uri": encodeURIComponent(location.href),
+          "state": "",
+          "href": "",
+          "lang": "zh",
+        });
+      })
+    },
+    async loginWework () {
+      // 企业微信授权回调验证
+      const code = this.$route.query.code
+      if (code) {
+        this.state.weworkLogin = true
+        this.LoginWework({code})
+          .then(res => this.loginSuccess(res))
+          .catch(err => {
+            this.loginFailed(err)
+            // 清除code参数
+            delete this.$route.query.code
+            delete this.$route.query.appid
+            this.$router.replace({
+              query: {...this.$route.query, weworkFail: parseInt(this.$route.query.weworkFail||0)+1},
+            })
+          })
+          .finally(() => {
+            this.state.weworkLogin = false
+          })
+      }
+    },
   }
 }
 </script>
@@ -179,7 +247,13 @@ export default {
     color: rgba(0, 0, 0, 0.45);
   }
 
-  .login-button {
+  .ant-alert-error {
+    margin-bottom: 24px;
+    background-color: #fffbfb;
+  }
+}
+
+.login-button {
     padding: 0 15px;
     font-size: 16px;
     height: 40px;
@@ -190,10 +264,4 @@ export default {
       box-shadow: 0px 9px 16px 0px rgba(34, 185, 255, 0.25) !important;
     }
   }
-
-  .ant-alert-error {
-    margin-bottom: 24px;
-    background-color: #fffbfb;
-  }
-}
 </style>

@@ -32,7 +32,7 @@ const assetsCDN = {
 // vue.config.js
 const vueConfig = {
   // 部署应用包时的基本 URL
-  publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
+  publicPath: process.env.NODE_ENV === 'production' ? '/' : '/',
 
   configureWebpack: {
     // webpack plugins

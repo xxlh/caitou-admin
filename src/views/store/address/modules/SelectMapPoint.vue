@@ -36,10 +36,10 @@ export default {
   async created () {
     // 获取地区数据
     window._AMapSecurityConfig= {
-      securityJsCode:'cc376bf07ec7a861cbfada9c7de5b86f',
+      securityJsCode: this.$store.state.AMap_securityJsCode,
     }
     this.AMap = await AMapLoader.load({
-      key: "8eed729112431178d5b9adaff42b33c1", // 申请好的Web端开发者Key，首次调用 load 时必填
+      key: this.$store.state.AMap_key, // 申请好的Web端开发者Key，首次调用 load 时必填
       version: "2.0", // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
       plugins: ['AMap.Geocoder'] //插件列表
     })

@@ -1,5 +1,5 @@
 import storage from 'store'
-import { login, logout } from '@/api/login'
+import { login, logout, loginWework } from '@/api/login'
 import { getInfo } from '@/api/store/user'
 import { ACCESS_TOKEN, CURRENT_STORE_ID } from '@/store/mutation-types'
 import { welcome } from '@/utils/util'
@@ -46,6 +46,22 @@ const user = {
     Login ({ commit }, userInfo) {
       return new Promise((resolve, reject) => {
         login(userInfo)
+          .then(response => {
+            const data = response
+            // token保存7天
+            storage.set(ACCESS_TOKEN, `${data.token_type} ${data.token}`, 7 * 24 * 60 * 60 * 1000)
+            commit('SET_TOKEN', `${data.token_type} ${data.token}`)
+            resolve(response)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
+    },
+    // 企业微信用户登录
+    LoginWework ({ commit }, data) {
+      return new Promise((resolve, reject) => {
+        loginWework(data)
           .then(response => {
             const data = response
             // token保存7天
