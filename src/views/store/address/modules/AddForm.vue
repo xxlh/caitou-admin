@@ -93,6 +93,10 @@ export default {
         this.areas = res.data.map(a => ({value:a.id, label:a.name||`${a.province}_${a.id}`}))
       })
   },
+  destroyed () {
+    this.lng = null
+    this.lat = null
+  },
   methods: {
 
     /**
@@ -122,6 +126,8 @@ export default {
     handleCancel () {
       this.visible = false
       this.form.resetFields()
+      this.lng = null
+      this.lat = null
     },
 
     /**
@@ -153,7 +159,7 @@ export default {
       const { form: { setFieldsValue, getFieldsValue } } = this
       let record = getFieldsValue()
       this.$refs.SelectMap.onOpen({
-        city: record.cascader[1] || record.cascader[0],
+        city: record.cascader?.[2] || record.cascader?.[1] || record.cascader?.[0],
         lng: this.lng,
         lat: this.lat,
       })

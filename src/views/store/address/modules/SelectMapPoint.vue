@@ -72,12 +72,12 @@ export default {
   //   this.marker = null
   // },
   methods: {
-    // 触发change事件
+    // 外部调用
     onOpen (data) {
       if (!map) return;
       this.city = data.city || this.city
-      this.lng = data.lng || this.lng
-      this.lat = data.lat || this.lat
+      this.lng = data.lng
+      this.lat = data.lat
       if (this.city) this.map.setCity(this.city)
       if (this.lng && this.lat) {
         if (this.marker) this.map.remove(this.marker)

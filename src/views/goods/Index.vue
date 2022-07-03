@@ -359,7 +359,7 @@ export default {
         title: '您确定要删除该记录吗?',
         content: '删除后不可恢复',
         onOk () {
-          return GoodsApi.deleted({ goodsIds })
+          return GoodsApi.deleted({product_ids: goodsIds, store_id: app.$store.getters.storeId})
             .then(result => {
               app.$message.success(result.message, 1.5)
               app.handleRefresh()

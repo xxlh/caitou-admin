@@ -10,7 +10,7 @@ const api = {
   basic: '/goods/basic',
   add: '/products',
   edit: '/products/{id}',
-  delete: '/goods/delete',
+  batchDelete: '/products/sku',
   state: '/goods/state',
   saveSpec: '/products/{id}/spec',
   saveSku: '/products/{id}/sku',
@@ -103,8 +103,8 @@ export function edit (goodsId, form) {
  */
 export function deleted (data) {
   return axios({
-    url: api.delete,
-    method: 'post',
+    url: api.batchDelete,
+    method: 'delete',
     data: data
   })
 }

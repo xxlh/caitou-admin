@@ -165,7 +165,7 @@ export default {
       const { form: { setFieldsValue, getFieldsValue } } = this
       let record = getFieldsValue()
       this.$refs.SelectMap.onOpen({
-        city: record.cascader[1] || record.cascader[0],
+        city: record.cascader[2] || record.cascader[1] || record.cascader[0],
         lng: this.lng,
         lat: this.lat,
       })
