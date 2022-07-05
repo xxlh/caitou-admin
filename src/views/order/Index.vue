@@ -10,7 +10,7 @@
               <a-input style="width: 342px" placeholder="请输入关键词" v-decorator="['search']">
                 <a-select
                   slot="addonBefore"
-                  v-decorator="['searchType', { initialValue: 10 }]"
+                  v-decorator="['searchType', { initialValue: 'no' }]"
                   style="width: 100px"
                 >
                   <a-select-option
@@ -101,7 +101,7 @@
                     :key="`orderGoods_${item.id}_${goodsIdx}`"
                   >
                     <td>
-                      <GoodsItem
+                      <GoodsItem v-if="goodsItm.product"
                         :data="{
                           image: goodsItm.image || goodsItm.product.image,
                           imageAlt: '商品图片',
@@ -274,9 +274,10 @@ const columns = [
 
 // 搜索关键词类型枚举
 const SearchTypeEnum = [
-  { name: '订单号', value: 10 },
-  { name: '会员昵称', value: 20 },
-  { name: '会员ID', value: 30 }
+  { name: '订单号', value: 'no' },
+  { name: '备注', value: 'remark' },
+  { name: '会员昵称', value: 'nickname' },
+  { name: '会员ID', value: 'userid' },
 ]
 
 export default {
@@ -296,6 +297,7 @@ export default {
       searchForm: this.$form.createForm(this),
       // 查询参数
       queryParam: {},
+      searchParams: {},
       // 正在加载
       isLoading: false,
       // 表格字段
@@ -348,9 +350,9 @@ export default {
 
     // 获取列表数据
     getList () {
-      const { dataType, queryParam, page } = this
+      const { dataType, queryParam, searchParams, page } = this
       this.isLoading = true
-      return Api.list({ status: dataType, ...queryParam, page })
+      return Api.list({ status: dataType, ...queryParam, ...searchParams, page })
         .then(response => {
           this.orderList = response
         })
@@ -386,6 +388,11 @@ export default {
       this.searchForm.validateFields((error, values) => {
         if (!error) {
           this.queryParam = { ...this.queryParam, ...values }
+          if (this.queryParam.searchType == 'no') this.searchParams = {no: this.queryParam.search}
+          else if (this.queryParam.searchType == 'nickname') this.searchParams = {user_nickname: this.queryParam.search}
+          else if (this.queryParam.searchType == 'userid') this.searchParams = {user_id: this.queryParam.search}
+          delete this.queryParam.search
+          delete this.queryParam.searchType
           this.handleRefresh(true)
         }
       })

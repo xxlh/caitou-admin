@@ -35,7 +35,7 @@
         </a-form-item>
         <a-form-item label="分类描述" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input
-            v-decorator="['description', {rules: [{required: true, min: 2, message: '请输入至少2个字符'}]}]"
+            v-decorator="['description', {rules: [{required: false, min: 2, message: '请输入至少2个字符'}]}]"
           />
         </a-form-item>
         <a-form-item label="分类标识" :labelCol="labelCol" :wrapperCol="wrapperCol">

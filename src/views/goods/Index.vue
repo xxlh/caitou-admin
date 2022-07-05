@@ -248,6 +248,7 @@ export default {
       queryParam: {
         listType: 'all'
       },
+      tabParams: {},
       // 正在加载
       isLoading: false,
       // 表头
@@ -256,7 +257,7 @@ export default {
       selectedRowKeys: [],
       // 加载数据方法 必须为 Promise 对象
       loadData: param => {
-        return GoodsApi.list({ ...param, ...this.queryParam, ...{store_id: this.$store.getters.storeId} })
+        return GoodsApi.list({ ...param, ...this.queryParam, ...this.tabParams, ...{store_id: this.$store.getters.storeId} })
           .then(response => {
             return response
           })
@@ -304,6 +305,9 @@ export default {
     // 切换tab
     handleTabs (e) {
       this.queryParam.listType = e.target.value
+      if (this.queryParam.listType == 'on_sale') this.tabParams = {on_sale: true}
+      else if (this.queryParam.listType == 'off_sale') this.tabParams = {on_sale: false}
+      else if (this.queryParam.listType == 'sold_out') this.tabParams = {stock: 0}
       this.handleRefresh(true)
     },
 
