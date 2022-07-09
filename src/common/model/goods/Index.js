@@ -5,6 +5,7 @@ import * as CategoryApi from '@/api/category'
 import * as GradeApi from '@/api/user/grade'
 import * as ServiceApi from '@/api/goods/service'
 import * as DeliveryApi from '@/api/setting/delivery'
+import store from '@/store'
 
 /**
  * 商品 model类
@@ -81,7 +82,8 @@ export default {
     // 格式化categoryIds
     goodsInfo.categorys = this.formatCategoryIds(this.formData.goodsCategories)
     // 判断单规格还是多规格
-    goodsInfo.spec_type = this.formData.skus.length > 1 ? 20 : 10
+    const currentStoreSkus = this.formData.skus.filter(sku => sku.store_id == store.getters.storeId || !store.getters.storeId)
+    goodsInfo.spec_type = currentStoreSkus.length > 1 ? 20 : 10
     // 商品基本数据
     // const goodsFormData = _.pick(goodsInfo, [
     //   'goods_name', 'categorys', 'goods_no', 'delivery_type', 'sort',
@@ -90,7 +92,7 @@ export default {
     //   'is_points_discount', 'is_enable_grade', 'is_alone_grade'
     // ])
     // 单规格数据
-    const skuOne = _.pick(this.formData.skus[0], ['price', 'retail_price', 'yonghui_price', 'cost_price', 'stock', 'weight', 'no', 'daily_price', 'timing_price'])
+    const skuOne = _.pick(currentStoreSkus[0], ['price', 'retail_price', 'yonghui_price', 'cost_price', 'stock', 'weight', 'no', 'daily_price', 'timing_price'])
     return {
       ...goodsInfo,
       ...skuOne

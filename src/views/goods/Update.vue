@@ -174,7 +174,7 @@
                   :min="0"
                   v-decorator="['weight', { initialValue: 0, rules:[{ required: false, message: '请输入库存数量' }] }]"
                 />
-                <span class="ml-10">千克 (Kg)</span>
+                <span class="ml-10">克 (g)</span>
               </a-form-item>
             </div>
             <a-form-item label="库存计算方式" :labelCol="labelCol" :wrapperCol="wrapperCol">
@@ -515,9 +515,11 @@ export default {
     onFormSubmit (values) {
       this.isLoading = true
       this.isBtnLoading = true
+      values.store_id = this.$store.getters.storeId
+      values.image_ids = values.image_ids?.filter(img_id => img_id)
       Promise.all([
         // CategoryApi.attach(this.goodsId, values.category_ids),
-        GoodsApi.saveSku(this.goodsId, values.specData.skuList),
+        values.specData ? GoodsApi.saveSku(this.goodsId, values.specData.skuList) : null,
         // FileApi.saveSku(this.goodsId, values.image_ids),
       ])
         .then(() => {
