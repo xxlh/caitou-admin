@@ -10,35 +10,20 @@
   >
     <a-spin :spinning="isLoading">
       <a-form :form="form">
-        <!-- <a-form-item label="物流公司" :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <a-form-item label="菜头骑士" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-select
-            v-decorator="['express_id', { rules: [{ required: true, message: '请选择物流公司' }] }]"
-            placeholder="请选择物流公司"
+            v-decorator="['man_id', { rules: [{ required: true, message: '请选择骑士' }] }]"
+            placeholder="请选择骑士"
           >
             <a-select-option
-              v-for="(item, index) in expressList"
-              :key="index"
-              :value="item.express_id"
-            >{{ item.express_name }}</a-select-option>
+              v-for="item in menList"
+              :key="item.id"
+              :value="item.id"
+            >{{ item.name }}</a-select-option>
           </a-select>
           <div class="form-item-help">
-            <router-link target="_blank" :to="{ path: '/setting/delivery/express/index' }">物流公司管理</router-link>
+            <router-link target="_blank" :to="{ path: '/setting/delivery/man/index' }">菜头骑士管理</router-link>
           </div>
-        </a-form-item> -->
-        <a-form-item label="物流公司" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input
-            v-decorator="['express_company', { rules: [{ required: true, message: '请输入物流公司' }] }]"
-          />
-        </a-form-item>
-        <a-form-item
-          label="物流单号"
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          extra="请填写发货的物流或快递单号"
-        >
-          <a-input
-            v-decorator="['express_no', { rules: [{ required: true, message: '请输入物流单号' }] }]"
-          />
         </a-form-item>
       </a-form>
     </a-spin>
@@ -46,14 +31,14 @@
 </template>
 
 <script>
-import * as Api from '@/api/order/event'
-import * as ExpressApi from '@/api/setting/express'
+import * as DealApi from '@/api/order/deal'
+import * as ManApi from '@/api/order/man'
 
 export default {
   data () {
     return {
       // 对话框标题
-      title: '订单发货',
+      title: '分配骑士',
       // 标签布局属性
       labelCol: { span: 7 },
       // 输入框布局属性
@@ -65,14 +50,14 @@ export default {
       // 当前表单元素
       form: this.$form.createForm(this),
       // 物流公司列表
-      expressList: [],
+      menList: [],
       // 当前记录
       record: {}
     }
   },
   created () {
-    // 获取物流公司列表
-    // this.getExpressList()
+    // 获取骑手列表
+    this.getMenList()
   },
   methods: {
 
@@ -87,11 +72,11 @@ export default {
     },
 
     // 获取物流公司列表
-    getExpressList () {
+    getMenList () {
       this.isLoading = true
-      ExpressApi.all()
+      ManApi.list({per_page: 99, area_id: this.$store.getters.areaId})
         .then(result => {
-          this.expressList = result.data.list
+          this.menList = result.data
         })
         .finally(() => {
           this.isLoading = false
@@ -124,10 +109,10 @@ export default {
     */
     onFormSubmit (values) {
       this.isLoading = true
-      Api.delivery(this.record.id, values)
+      DealApi.allocate(this.record.delivery_deal.id, values)
         .then((result) => {
           // 显示成功
-          this.$message.success('已发货', 1.5)
+          this.$message.success('已分配', 1.5)
           // 关闭对话框事件
           this.handleCancel()
           // 通知父端组件提交完成了

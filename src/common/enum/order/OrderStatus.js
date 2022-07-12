@@ -11,6 +11,11 @@ export default new Enum([
   { key: 'UNPAID', name: '未支付', value: 'unpaid' },
   { key: 'UNDELIVERED', name: '待发货', value: 'undelivered' },
   { key: 'UNRECEIVED', name: '未收货', value: 'unreceived' },
+    { key: 'PACKING', name: '商家打包中', value: 'packing' },
+    { key: 'PACKED', name: '打包完成', value: 'packed' },
+    { key: 'ARRIVED', name: '骑手到店', value: 'arrived' },
+    { key: 'DELIVERING', name: '配送中', value: 'delivering' },
+    { key: 'DELIVERED', name: '已送达', value: 'delivered' },
   { key: 'UNREVIEWED', name: '已收货', value: 'unreviewed' },
   { key: 'REVIEWING', name: '待评价', value: 'reviewing' },
   { key: 'COMPLETED', name: '已完成', value: 'completed' }

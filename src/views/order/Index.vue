@@ -87,10 +87,10 @@
               <tbody class="ant-table-tbody">
                 <template v-for="(item) in orderList.data">
                   <tr class="order-empty" :key="`order_${item.id}_1`">
-                    <td colspan="8"></td>
+                    <td colspan="7"></td>
                   </tr>
                   <tr :key="`order_${item.id}_2`">
-                    <td colspan="8">
+                    <td colspan="7">
                       <span class="mr-20">{{ item.created_at }}</span>
                       <span class="mr-20">订单号：{{ item.no }}</span>
                       <platform-icon :name="item.platform" :showTips="true" />
@@ -122,13 +122,27 @@
                       <td :rowspan="item.items.length">
                         <UserItem v-if="item.user" :user="item.user" />
                         <span v-else>{{item.user_nickname}}</span>
+                        <template v-if="item.delivery_deal">
+                          <br /><br />
+                          <a
+                            v-if="(
+                                item.delivery_deal.man && item.delivery_deal.man.phone
+                            )"
+                            :href="`tel://${item.delivery_deal.man.phone}`"
+                          ><a-icon type="phone" /> 骑士-{{item.delivery_deal.man.name}}</a>
+                          <template v-for="store in item.stores">
+                            <br />
+                            <a :key="store.id" v-if="store.contact_phone" :href="`tel://${store.contact_phone}`"
+                            ><a-icon type="phone" /> 商家-{{store.name}}</a>
+                          </template>
+                        </template>
                       </td>
-                      <td :rowspan="item.items.length">
+                      <!-- <td :rowspan="item.items.length">
                         <a-tag>{{ PayTypeEnum[item.payment_method].name }}</a-tag>
-                      </td>
-                      <td :rowspan="item.items.length">
-                        <!-- <a-tag>{{ DeliveryTypeEnum[item.delivery_type].name }}</a-tag> -->
-                      </td>
+                      </td> -->
+                      <!-- <td :rowspan="item.items.length">
+                        <a-tag>{{ DeliveryTypeEnum[item.delivery_type].name }}</a-tag>
+                      </td> -->
                       <td :rowspan="item.items.length">
                         <p class="mtb-2">
                           <span class="f-13">付款状态：</span>
@@ -142,7 +156,16 @@
                             :color="item.ship_status == DeliveryStatusEnum.DELIVERED.value ? 'green' : ''"
                           >{{ DeliveryStatusEnum[item.ship_status].name }}</a-tag>
                         </p>
-                        <p class="mtb-2">
+                        <p
+                          v-if="[OrderStatusEnum.UNDELIVERED.value,OrderStatusEnum.UNRECEIVED.value].includes(item.status) && item.delivery_deal"
+                          class="mtb-2"
+                        >
+                          <span class="f-13">配送状态：</span>
+                          <a-tag
+                            :color="renderOrderStatusColor(item.status)"
+                          >{{ OrderStatusEnum[item.delivery_deal.status].name }}</a-tag>
+                        </p>
+                        <p v-else class="mtb-2">
                           <span class="f-13">收货状态：</span>
                           <a-tag
                             :color="item.ship_status == ReceiptStatusEnum.RECEIVED.value ? 'green' : ''"
@@ -164,16 +187,30 @@
                             v-if="$auth('/order/detail')"
                             :to="{ path: '/order/detail', query: { orderId: item.id } }"
                           >详情</router-link>
-                          <a
-                            v-action:cancel
-                            v-if="(
-                              item.paid_at
-                                // && item.delivery_type == DeliveryTypeEnum.EXPRESS.value
-                                && item.ship_status == DeliveryStatusEnum.NOT_DELIVERED.value
-                                && !inArray(item.status, [OrderStatusEnum.CANCELLED.value, OrderStatusEnum.REFUNDING.value])
-                            )"
-                            @click="handleDelivery(item)"
-                          >发货</a>
+                          <template v-if="item.delivery_deal">
+                            <a
+                              v-action:cancel
+                              v-if="(
+                                item.paid_at
+                                  && [OrderStatusEnum.UNDELIVERED.value,OrderStatusEnum.UNRECEIVED.value].includes(item.status)
+                                  // && !item.delivery_deal.delivery_man_id
+                                  && !inArray(item.status, [OrderStatusEnum.CANCELLED.value, OrderStatusEnum.REFUNDING.value])
+                              )"
+                              @click="handleDeliveryMan(item)"
+                            >{{!item.delivery_deal.delivery_man_id ? '分配骑士' : '改派骑士'}}</a>
+                          </template>
+                          <template v-else>
+                            <a
+                              v-action:cancel
+                              v-if="(
+                                item.paid_at
+                                  // && item.delivery_type == DeliveryTypeEnum.EXPRESS.value
+                                  && item.ship_status == DeliveryStatusEnum.NOT_DELIVERED.value
+                                  && !inArray(item.status, [OrderStatusEnum.CANCELLED.value, OrderStatusEnum.REFUNDING.value])
+                              )"
+                              @click="handleDelivery(item)"
+                            >发货</a>
+                          </template>
                           <a
                             v-action:cancel
                             v-if="item.status == OrderStatusEnum.REFUNDING.value"
@@ -202,6 +239,7 @@
         />
       </div>
       <DeliveryForm ref="DeliveryForm" @handleSubmit="handleRefresh" />
+      <DeliveryManForm ref="DeliveryManForm" @handleSubmit="handleRefresh" />
       <CancelForm ref="CancelForm" @handleSubmit="handleRefresh" />
     </a-spin>
   </a-card>
@@ -223,7 +261,7 @@ import {
   PayTypeEnum,
   ReceiptStatusEnum
 } from '@/common/enum/order'
-import { DeliveryForm, CancelForm } from './modules'
+import { DeliveryForm, CancelForm, DeliveryManForm } from './modules'
 
 // 表格字段
 const columns = [
@@ -245,20 +283,20 @@ const columns = [
     scopedSlots: { customRender: 'total_amount' }
   },
   {
-    title: '买家',
+    title: '买家 / 骑士 / 商家',
     dataIndex: 'user',
     scopedSlots: { customRender: 'user' }
   },
-  {
-    title: '支付方式',
-    dataIndex: 'payment_method',
-    scopedSlots: { customRender: 'payment_method' }
-  },
-  {
-    title: '配送方式',
-    dataIndex: 'delivery_type',
-    scopedSlots: { customRender: 'delivery_type' }
-  },
+  // {
+  //   title: '支付方式',
+  //   dataIndex: 'payment_method',
+  //   scopedSlots: { customRender: 'payment_method' }
+  // },
+  // {
+  //   title: '配送方式',
+  //   dataIndex: 'delivery_type',
+  //   scopedSlots: { customRender: 'delivery_type' }
+  // },
   {
     title: '交易状态',
     dataIndex: 'status',
@@ -287,6 +325,7 @@ export default {
     GoodsItem,
     UserItem,
     DeliveryForm,
+    DeliveryManForm,
     CancelForm
   },
   data () {
@@ -368,7 +407,9 @@ export default {
         [OrderStatusEnum.NORMAL.value]: '',
         [OrderStatusEnum.CANCELLED.value]: 'red',
         [OrderStatusEnum.REFUNDING.value]: 'red',
-        [OrderStatusEnum.COMPLETED.value]: 'green'
+        [OrderStatusEnum.COMPLETED.value]: 'green',
+        [OrderStatusEnum.UNREVIEWED.value]: 'green',
+        [OrderStatusEnum.DELIVERED.value]: 'green',
       }
       return ColorEnum[orderStatus]
     },
@@ -431,6 +472,10 @@ export default {
     // 订单发货
     handleDelivery (record) {
       this.$refs.DeliveryForm.show(record)
+    },
+    // 分配骑手
+    handleDeliveryMan (record) {
+      this.$refs.DeliveryManForm.show(record)
     },
 
     // 审核取消订单
