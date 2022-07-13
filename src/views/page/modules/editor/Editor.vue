@@ -549,7 +549,7 @@
                   <div class="block-item-custom">
                     <SImage
                       v-model="item.imgUrl"
-                      :channel="channel" :channel_id="pageId" collection="video_cover"
+                      :channel="channel" :channel_id="pageId" collection="carousel_images"
                       tips="建议尺寸：750×400"
                       @update="item.imgName = $event.file_name"
                     />
@@ -607,6 +607,13 @@
                 <a-radio-group buttonStyle="solid" v-model="curItem.params.source">
                   <a-radio-button value="auto">自动获取</a-radio-button>
                   <a-radio-button value="choice">手动选择</a-radio-button>
+                </a-radio-group>
+              </div>
+              <div v-if="curItem.params.source == 'auto'" class="block-title">
+                <span>滚动加载</span>
+                <a-radio-group buttonStyle="solid" v-model="curItem.params.loadmore">
+                  <a-radio-button :value="true">无限加载</a-radio-button>
+                  <a-radio-button :value="choice">仅展示{{curItem.params.auto.per_page}}件</a-radio-button>
                 </a-radio-group>
               </div>
             </div>
