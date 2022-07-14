@@ -10,7 +10,7 @@ const api = {
   add: '/pages',
   edit: '/pages/{id}',
   delete: '/pages/{id}',
-  setHome: '/page/setHome'
+  setDefault: '/pages/{id}/set_default',
 }
 
 /**
@@ -49,9 +49,9 @@ export function detail (id) {
  * 设置默认首页
  * @param {*} data
  */
-export function setHome (data) {
+export function setDefault (id, data) {
   return axios({
-    url: api.setHome,
+    url: api.setDefault.replace('{id}', id),
     method: 'post',
     data: data
   })

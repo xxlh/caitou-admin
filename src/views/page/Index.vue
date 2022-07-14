@@ -25,17 +25,18 @@
       :pageSize="15"
     >
       <!-- 页面类型 -->
-      <template slot="type" slot-scope="text">
+      <template slot="type" slot-scope="text, item">
         <a-tag :color="text == PageTypeEnum.HOME.value ? 'green' : (text == PageTypeEnum.CATEGORY.value ? 'blue' : '')">{{ PageTypeEnum[text].name }}</a-tag>
+        <a-tag v-if="item.is_default" color="orange">全局默认</a-tag>
       </template>
       <!-- 操作 -->
       <span class="actions" slot="action" slot-scope="item">
         <a v-if="$auth('/page/update')" @click="handleEdit(item)">编辑</a>
         <a
           v-action:setHome
-          v-if="item.type != PageTypeEnum.HOME.value"
-          @click="handleSetHome(item)"
-        >设为首页</a>
+          v-if="item.type == PageTypeEnum.HOME.value && !item.is_default"
+          @click="handleSetDefault(item)"
+        >设为默认页</a>
         <a
           v-action:delete
           v-if="item.type != PageTypeEnum.HOME.value"
@@ -122,15 +123,15 @@ export default {
       this.$router.push({ path: './update', query: { pageId: item.id } })
     },
 
-    // 设置为首页
-    handleSetHome (item) {
+    // 设置为全局默认页
+    handleSetDefault (item) {
       const app = this
       const modal = this.$confirm({
-        title: '您确定要设置为首页吗?',
+        title: '您确定要设置为全局的默认页面吗？当用户定位不在配送区的时候展示。',
         onOk () {
-          return Api.setHome({ pageId: item.id })
+          return Api.setDefault(item.id)
             .then((result) => {
-              app.$message.success(result.message, 1.5)
+              app.$message.success('设置成功', 1.5)
               app.handleRefresh()
             })
             .finally(result => {
