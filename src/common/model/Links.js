@@ -1,6 +1,7 @@
 
 // 常量：链接类型 - 页面
 const LINK_TYPE_PAGE = 'PAGE'
+const LINK_TYPE_URL = 'URL'
 
 // 基础页面
 const basics = {
@@ -12,7 +13,7 @@ const basics = {
       title: '商城首页',
       type: LINK_TYPE_PAGE,
       param: {
-        path: 'pages/index/index'
+        path: 'pages/tabBar/home/index'
       }
     },
     {
@@ -20,7 +21,7 @@ const basics = {
       title: '分类页',
       type: LINK_TYPE_PAGE,
       param: {
-        path: 'pages/category/index'
+        path: 'pages/tabBar/category/category'
       }
     },
     {
@@ -28,7 +29,7 @@ const basics = {
       title: '购物车',
       type: LINK_TYPE_PAGE,
       param: {
-        path: 'pages/cart/index'
+        path: 'pages/tabBar/cart/cart'
       }
     },
     {
@@ -36,7 +37,7 @@ const basics = {
       title: '个人中心',
       type: LINK_TYPE_PAGE,
       param: {
-        path: 'pages/user/index'
+        path: 'pages/tabBar/user/user'
       }
     },
     {
@@ -44,7 +45,7 @@ const basics = {
       title: '会员登录页',
       type: LINK_TYPE_PAGE,
       param: {
-        path: 'pages/login/index'
+        path: 'pages/login/login'
       }
     }
   ]
@@ -60,12 +61,12 @@ const store = {
       title: '商品列表页',
       type: LINK_TYPE_PAGE,
       param: {
-        path: 'pages/goods/list',
+        path: 'pages/tabBar/category/category',
         query: {}
       },
       form: [
         {
-          key: 'query.categoryId',
+          key: 'query.id',
           lable: '分类ID',
           tips: '商品管理 -> 商品分类'
         },
@@ -81,12 +82,12 @@ const store = {
       title: '商品详情页',
       type: LINK_TYPE_PAGE,
       param: {
-        path: 'pages/goods/detail',
+        path: 'pages/goods/goods',
         query: {}
       },
       form: [
         {
-          key: 'query.goodsId',
+          key: 'query.id',
           lable: '商品ID',
           required: true,
           // value: '10001',    // 默认值
@@ -123,16 +124,16 @@ const personal = {
       title: '我的订单',
       type: LINK_TYPE_PAGE,
       param: {
-        path: 'pages/order/index',
+        path: 'pages/user/order_list/order_list',
         query: {}
       },
       form: [
         {
-          key: 'query.dataType',
+          key: 'query.tbIndex',
           lable: '订单类型',
           required: true,
-          value: 'all', // 默认值
-          tips: 'all 全部<br>payment 待支付<br>delivery 待发货<br>received 待收货' // 字段提示
+          value: '0', // 默认值
+          tips: '0 全部<br>1 待支付<br>2 待发货<br>3 待收货<br>4 待评价' // 字段提示
         }
       ]
     },
@@ -157,7 +158,7 @@ const personal = {
       title: '我的优惠券',
       type: LINK_TYPE_PAGE,
       param: {
-        path: 'pages/my-coupon/index'
+        path: 'pages/user/coupon/coupon'
       }
     },
     {
@@ -173,7 +174,7 @@ const personal = {
       title: '收货地址',
       type: LINK_TYPE_PAGE,
       param: {
-        path: 'pages/address/index'
+        path: 'pages/user/address/address'
       }
     },
     {
@@ -197,15 +198,15 @@ const other = {
       title: '自定义页',
       type: LINK_TYPE_PAGE,
       param: {
-        path: 'pages/custom/index',
+        path: 'pages/landing-page/index',
         query: {}
       },
       form: [
         {
-          key: 'query.pageId',
+          key: 'query.id',
           lable: '页面ID',
           required: true,
-          tips: '店铺管理 -> 店铺页面'
+          tips: '仓储管理 -> 页面设计'
         }
       ]
     },
@@ -242,7 +243,24 @@ const other = {
           tips: '内容管理 -> 文章列表'
         }
       ]
-    }
+    },
+    {
+      id: 'url',
+      title: '外链页面',
+      type: LINK_TYPE_URL,
+      param: {
+        path: '',
+        query: {}
+      },
+      form: [
+        {
+          key: 'path',
+          lable: '外链地址',
+          required: true,
+          tips: '任意http开头的页面'
+        }
+      ]
+    },
   ]
 }
 
