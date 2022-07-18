@@ -23,7 +23,7 @@
               <div class="flex-box">
                 <!-- <a-auto-complete v-model="data.page.params.type" :data-source="[{value:'index',text:'首页'}, {value:'category',text:'分类页'}]" placeholder="输入类型或选择已有" /> -->
                 <a-select v-model="data.page.params.type" :options="[{value:'index',label:'首页'}, {value:'category',label:'分类页'}, {value:'landingpage',label:'落地页'}]" style="width: 100%" />
-                <div class="tips">页面名称仅用于后台管理</div>
+                <div class="tips">仅可有一个首页</div>
               </div>
             </div>
             <div class="block-item">
@@ -60,6 +60,17 @@
                   @click="onEditorResetColor(data.page.style, 'titleBackgroundColor', '#fff')"
                 >重置</span>
                 <colorPicker v-model="data.page.style.titleBackgroundColor" defaultColor="#fff" />
+              </div>
+            </div>
+            <div class="block-item">
+              <span class="label">标题栏背景图</span>
+              <span class="tips">小程序不支持外部图片</span>
+              <div class="item-colorPicker">
+                <span
+                  class="rest-color"
+                  @click="data.page.style.titleBackgroundImage = ''"
+                >重置</span>
+                <SImage v-model="data.page.style.titleBackgroundImage" :channel="channel" :channel_id="pageId" collection="carousel_images" :width="60" :height="60" />
               </div>
             </div>
           </div>
@@ -555,6 +566,23 @@
                     />
                   </div>
                 </div>
+                <div class="block-item">
+                  <span class="label">联动导航栏颜色</span>
+                  <div class="item-colorPicker">
+                    <span
+                      class="rest-color"
+                      @click="onEditorResetColor(item, 'backgroundColor', '')"
+                    >重置</span>
+                    <colorPicker v-model="item.backgroundColor" defaultColor="" />
+                  </div>
+                </div>
+                <div class="block-item">
+                  <span class="label">联动导航栏文字颜色</span>
+                  <a-radio-group buttonStyle="solid" v-model="item.titleTextColor">
+                    <a-radio-button value="white">白色</a-radio-button>
+                    <a-radio-button value="black">黑色</a-radio-button>
+                  </a-radio-group>
+                </div>
               </div>
             </draggable>
             <div v-if="curItem.data.length < 10" class="data-add">
@@ -700,6 +728,9 @@
       <div v-if="curItem.type == 'navBar'" class="editor-content">
         <a-tabs>
           <a-tab-pane key="1" tab="内容设置">
+            <a-modal v-model="loadCategory" @ok="handleLoadCategory">
+              <SGoodsCate v-model="categoryIdToLoad" />
+            </a-modal>
             <div class="sub-title">添加导航 (最少4个，最多10个，可拖动排序)</div>
             <draggable
               :list="curItem.data"
@@ -708,7 +739,10 @@
               <div v-for="(item, index) in curItem.data" :key="index" class="block-box drag">
                 <div class="block-title">
                   <span class="left">导航 {{ index + 1 }}</span>
-                  <a class="link" @click="handleDeleleData(curItem, index)">删除</a>
+                  <span style="display:flex">
+                    <a class="link" @click="loadCategory=true; navItemToLoadCat=item" style="margin-right:10px">选择分类</a>
+                    <a class="link" @click="handleDeleleData(curItem, index)">删除</a>
+                  </span>
                 </div>
                 <div class="block-item">
                   <div class="block-item-common">
@@ -876,6 +910,8 @@ import draggable from 'vuedraggable'
 import { Ueditor } from '@/components'
 import { SImage, SArticleCate, SGoods, SGoodsCate, SLink } from './modules'
 import ChannelEnum from '@/common/enum/file/Channel'
+import * as CatApi from '@/api/category'
+import { linkList } from '@/common/model/Links'
 
 Vue.use(vcolorpicker)
 
@@ -903,6 +939,9 @@ export default {
   data () {
     return {
       channel: ChannelEnum.PAGE.value,
+      loadCategory: false,
+      categoryIdToLoad: 0,
+      navItemToLoadCat: null,
     }
   },
   watch: {
@@ -945,7 +984,26 @@ export default {
      */
     onEditorResetColor (holder, attribute, color) {
       holder[attribute] = color
-    }
+    },
+
+    /* 加载分类到导航 */
+    async handleLoadCategory () {
+      if (!this.categoryIdToLoad) return this.loadCategory = false;
+      const res = await CatApi.get(this.categoryIdToLoad)
+      this.navItemToLoadCat.text = res.name
+      this.navItemToLoadCat.imgUrl = res.image && res.image.external_url
+      const linkDefault = linkList.filter(l => l.key=='store')[0].data.filter(d => d.id=='995bf1c')[0]
+      this.navItemToLoadCat.link = {
+        ...linkDefault,
+        param: {
+          path: "pages/tabBar/category/category",
+          query: {id: this.categoryIdToLoad},
+          url: "pages/tabBar/category/category?id=" + this.categoryIdToLoad,
+        }
+      }
+      this.navItemToLoadCat.link.form.filter(f => f.key=='query.id')[0].value = this.categoryIdToLoad
+      this.loadCategory = false
+    },
 
   }
 }

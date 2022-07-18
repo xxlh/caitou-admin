@@ -5,7 +5,7 @@ import { axios } from '@/utils/request'
  */
 const api = {
   list: '/pages',
-  defaultData: '/pages/default',
+  defaultData: '/pages/init',
   detail: '/pages/{id}',
   add: '/pages',
   edit: '/pages/{id}',

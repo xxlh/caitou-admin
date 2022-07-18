@@ -6,6 +6,7 @@ import { axios } from '@/utils/request'
 const api = {
   list: '/categories',
   add: '/categories',
+  get: '/categories/{id}',
   edit: '/categories/{id}',
   delete: '/category/delete',
   attach: '/products/{id}/categorize',
@@ -19,6 +20,13 @@ export function list (params) {
     url: api.list,
     method: 'get',
     params
+  })
+}
+export function get (id, data) {
+  return axios({
+    url: api.edit.replace('{id}', id),
+    method: 'get',
+    data
   })
 }
 

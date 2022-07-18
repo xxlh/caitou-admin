@@ -80,7 +80,7 @@ export default {
     // 触发change事件
     onChange (file) {
       // 记录imgUrl
-      this.imgUrl = file.preview_url
+      this.imgUrl = file.external_url
       // v-model
       this.$emit('change', this.imgUrl)
       // 触发update事件

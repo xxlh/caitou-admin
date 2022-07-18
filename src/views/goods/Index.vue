@@ -212,6 +212,10 @@ const columns = [
     dataIndex: 'sold_count'
   },
   {
+    title: '仓储库存',
+    dataIndex: 'stock'
+  },
+  {
     title: '库存总量',
     dataIndex: 'stock_total'
   },
