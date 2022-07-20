@@ -4,12 +4,13 @@ import { axios } from '@/utils/request'
  * api接口列表
  */
 const api = {
-  list: '/market.coupon/list',
-  detail: '/market.coupon/detail',
-  receive: '/market.coupon/receive',
-  add: '/market.coupon/add',
-  edit: '/market.coupon/edit',
-  delete: '/market.coupon/delete'
+  list: '/vouchers/templates',
+  detail: '/vouchers/templates/{id}',
+  receive: '/vouchers',
+  add: '/vouchers/templates',
+  edit: '/vouchers/templates/{id}',
+  delete: '/vouchers/templates/{id}',
+  set_condition: '/vouchers/templates/{id}/conditions',
 }
 
 /**
@@ -26,9 +27,9 @@ export function list (params) {
 /**
  * 详情记录
  */
-export function detail (params) {
+export function detail (id, params) {
   return axios({
-    url: api.detail,
+    url: api.detail.replace('{id}', id),
     method: 'get',
     params
   })
@@ -61,10 +62,10 @@ export function add (data) {
  * 编辑记录
  * @param {*} data
  */
-export function edit (data) {
+export function edit (id, data) {
   return axios({
-    url: api.edit,
-    method: 'post',
+    url: api.edit.replace('{id}', id),
+    method: 'patch',
     data
   })
 }
@@ -73,10 +74,29 @@ export function edit (data) {
  * 删除记录
  * @param {*} data
  */
-export function deleted (data) {
+export function deleted (id, data) {
   return axios({
-    url: api.delete,
+    url: api.delete.replace('{id}', id),
+    method: 'delete',
+    data: data
+  })
+}
+
+/**
+ * 设置领取条件
+ * @param {*} data
+ */
+export function set_condition (id, data) {
+  return axios({
+    url: api.set_condition.replace('{id}', id),
     method: 'post',
+    data: data
+  })
+}
+export function remove_condition (id, data) {
+  return axios({
+    url: api.set_condition.replace('{id}', id),
+    method: 'delete',
     data: data
   })
 }

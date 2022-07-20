@@ -24,48 +24,48 @@
     </div>
     <s-table
       ref="table"
-      rowKey="coupon_id"
+      rowKey="id"
       :loading="isLoading"
       :columns="columns"
       :data="loadData"
       :pageSize="15"
     >
       <!-- 优惠券类型 -->
-      <template slot="coupon_type" slot-scope="text">
+      <template slot="type" slot-scope="text">
         <a-tag>{{ CouponTypeEnum[text].name }}</a-tag>
       </template>
       <!-- 最低消费金额 -->
-      <template slot="min_price" slot-scope="text">
+      <template slot="amount_limit" slot-scope="text">
         <p class="c-p">{{ text }}</p>
       </template>
       <!-- 优惠方式 -->
       <template slot="discount" slot-scope="item">
-        <template v-if="item.coupon_type == 10">
+        <template v-if="item.type == 'discount'">
           <span>立减</span>
-          <span class="c-p mlr-2">{{ item.reduce_price }}</span>
+          <span class="c-p mlr-2">{{ item.save_amount }}</span>
           <span>元</span>
         </template>
-        <template v-if="item.coupon_type == 20">
+        <template v-if="item.type == 'percent'">
           <span>打</span>
-          <span class="c-p mlr-2">{{ item.discount }}</span>
+          <span class="c-p mlr-2">{{ item.off_percent }}</span>
           <span>折</span>
         </template>
       </template>
       <!-- 有效期 -->
       <template slot="duetime" slot-scope="item">
-        <template v-if="item.expire_type == 10">
+        <template v-if="item.expire_type == ExpireTypeEnum.RECEIVE.value">
           <span>领取</span>
           <span class="c-p mlr-2">{{ item.expire_day }}</span>
           <span>天内有效</span>
         </template>
-        <template v-if="item.expire_type == 20">
+        <template v-if="item.expire_type == ExpireTypeEnum.FIXED_TIME.value">
           <span>{{ item.start_time }} ~ {{ item.end_time }}</span>
         </template>
       </template>
       <!-- 状态 -->
-      <template slot="status" slot-scope="text">
+      <!-- <template slot="status" slot-scope="text">
         <a-tag :color="text ? 'green' : ''">{{ text ? '显示' : '隐藏' }}</a-tag>
-      </template>
+      </template> -->
       <!-- 操作 -->
       <span class="actions" slot="action" slot-scope="item">
         <a v-if="$auth('/market/coupon/update')" @click="handleEdit(item)">编辑</a>
@@ -99,21 +99,21 @@ export default {
       columns: [
         {
           title: '优惠券ID',
-          dataIndex: 'coupon_id'
+          dataIndex: 'id'
         },
         {
           title: '优惠券名称',
-          dataIndex: 'name'
+          dataIndex: 'title'
         },
         {
           title: '优惠券类型',
-          dataIndex: 'coupon_type',
-          scopedSlots: { customRender: 'coupon_type' }
+          dataIndex: 'type',
+          scopedSlots: { customRender: 'type' }
         },
         {
           title: '最低消费金额 (元)',
-          dataIndex: 'min_price',
-          scopedSlots: { customRender: 'min_price' }
+          dataIndex: 'amount_limit',
+          scopedSlots: { customRender: 'amount_limit' }
         },
         {
           title: '优惠方式',
@@ -129,20 +129,20 @@ export default {
         // },
         {
           title: '已发放/领取数量',
-          dataIndex: 'receive_num'
+          dataIndex: 'gain_count'
         },
-        {
-          title: '状态',
-          dataIndex: 'status',
-          scopedSlots: { customRender: 'status' }
-        },
-        {
-          title: '排序',
-          dataIndex: 'sort'
-        },
+        // {
+        //   title: '状态',
+        //   dataIndex: 'status',
+        //   scopedSlots: { customRender: 'status' }
+        // },
+        // {
+        //   title: '排序',
+        //   dataIndex: 'sort'
+        // },
         {
           title: '添加时间',
-          dataIndex: 'create_time'
+          dataIndex: 'created_at'
         },
         {
           title: '操作',
@@ -154,7 +154,7 @@ export default {
       loadData: param => {
         return Api.list({ ...param, ...this.queryParam })
           .then(response => {
-            return response.data.list
+            return response
           })
       }
     }
@@ -171,7 +171,7 @@ export default {
 
     // 编辑记录
     handleEdit (item) {
-      this.$router.push({ path: './update', query: { couponId: item.coupon_id } })
+      this.$router.push({ path: './update', query: { couponId: item.id } })
     },
 
     /**
@@ -183,7 +183,7 @@ export default {
         title: '您确定要删除该记录吗?',
         content: '删除后不可恢复',
         onOk () {
-          return Api.deleted({ couponId: item.coupon_id })
+          return Api.deleted({ couponId: item.id })
             .then((result) => {
               app.$message.success(result.message, 1.5)
               app.handleRefresh()

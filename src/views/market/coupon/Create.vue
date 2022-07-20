@@ -6,19 +6,19 @@
         <a-form-item label="优惠券名称" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input
             placeholder="请输入优惠券名称"
-            v-decorator="['name', { rules: [{ required: true, min: 2, message: '请输入至少2个字符' }] }]"
+            v-decorator="['title', { rules: [{ required: true, min: 2, message: '请输入至少2个字符' }] }]"
           />
         </a-form-item>
         <a-form-item label="优惠券类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-radio-group
-            v-decorator="['coupon_type', { initialValue: 10, rules: [{ required: true }] }]"
+            v-decorator="['type', { initialValue: 'discount', rules: [{ required: true }] }]"
           >
-            <a-radio :value="10">满减券</a-radio>
-            <a-radio :value="20">折扣券</a-radio>
+            <a-radio value="discount">满减券</a-radio>
+            <a-radio value="percent">折扣券</a-radio>
           </a-radio-group>
         </a-form-item>
         <a-form-item
-          v-if="form.getFieldValue('coupon_type') == 10"
+          v-if="form.getFieldValue('type') == CouponTypeEnum.FULL_DISCOUNT.value"
           label="减免金额"
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
@@ -26,54 +26,67 @@
           <a-input-number
             :min="0.01"
             :precision="2"
-            v-decorator="['reduce_price', { rules: [{ required: true, message: '请输入减免金额' }] }]"
+            v-decorator="['save_amount', { rules: [{ required: true, message: '请输入减免金额' }] }]"
           />
           <span class="ml-5">元</span>
         </a-form-item>
         <a-form-item
-          v-if="form.getFieldValue('coupon_type') == 20"
+          v-if="form.getFieldValue('type') == CouponTypeEnum.DISCOUNT.value"
           label="折扣率"
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
         >
           <a-input-number
             :min="0"
-            :max="9.9"
-            :precision="1"
-            v-decorator="['discount', { initialValue: 9.9, rules: [{ required: true, message: '请输入折扣率' }] }]"
+            :max="1"
+            :precision="2"
+            :step="0.05"
+            v-decorator="['off_percent', { initialValue: 0, rules: [{ required: true, message: '请输入折扣率' }] }]"
           />
-          <span class="ml-5">%</span>
           <p class="form-item-help">
-            <small>折扣率范围 0-9.9，8代表打8折，0代表不折扣</small>
+            <small>折扣率范围 0-0.99，0.2代表打8折，0代表不折扣</small>
           </p>
         </a-form-item>
         <a-form-item label="最低消费金额" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input-number
             :min="0.01"
             :precision="2"
-            v-decorator="['min_price', { rules: [{ required: true, message: '请输入最低消费金额' }] }]"
+            v-decorator="['amount_limit', { rules: [{ required: true, message: '请输入最低消费金额' }] }]"
           />
           <span class="ml-5">元</span>
         </a-form-item>
         <a-form-item label="到期类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-radio-group
-            v-decorator="['expire_type', { initialValue: 10, rules: [{ required: true }] }]"
+            v-decorator="['expire_type', { initialValue: ExpireTypeEnum.RECEIVE.value, rules: [{ required: true }] }]"
           >
-            <a-radio :value="10">领取后生效</a-radio>
-            <a-radio :value="20">固定时间</a-radio>
+            <a-radio :value="ExpireTypeEnum.RECEIVE.value">领取后生效</a-radio>
+            <a-radio :value="ExpireTypeEnum.FIXED_TIME.value">固定生效时段</a-radio>
           </a-radio-group>
-          <a-form-item v-show="form.getFieldValue('expire_type') == 10" class="expire_type-10">
+          <a-form-item v-show="form.getFieldValue('expire_type') == ExpireTypeEnum.RECEIVE.value" class="expire_type-10">
             <InputNumberGroup
+              addonBefore="生效于"
+              addonAfter="天后"
+              :inputProps="{ min: 0, precision: 0 }"
+              v-decorator="['start_day', { initialValue: 0, rules: [{ required: true, message: '请输入自领取起几天后开始生效' }] }]"
+            />
+            <InputNumberGroup v-show="!expire_as_hour"
               addonBefore="有效期"
               addonAfter="天"
               :inputProps="{ min: 1, precision: 0 }"
-              v-decorator="['expire_day', { initialValue: 7, rules: [{ required: true, message: '请输入有效期天数' }] }]"
+              v-decorator="['expire_day', { initialValue: 7, rules: [{ required: true, message: '请输入自领取起有效天数' }] }]"
             />
+            <InputNumberGroup v-show="expire_as_hour"
+              addonBefore="有效期"
+              addonAfter="小时"
+              :inputProps="{ min: 1, precision: 0 }"
+              v-decorator="['expire_hour', { initialValue: 3, rules: [{ required: true, message: '请输入自领取起有效小时数' }] }]"
+            />
+            <a @click="expire_as_hour=!expire_as_hour">切换</a>
           </a-form-item>
-          <a-form-item v-show="form.getFieldValue('expire_type') == 20" class="expire_type-20">
+          <a-form-item v-show="form.getFieldValue('expire_type') == ExpireTypeEnum.FIXED_TIME.value" class="expire_type-20">
             <a-range-picker
-              format="YYYY-MM-DD"
-              v-decorator="['betweenTime', { initialValue: defaultDate, rules: [{ required: true, message: '请选择有效期范围' }] }]"
+              v-decorator="['betweenTime', { initialValue: defaultTime, rules: [{ required: true, message: '请选择有效期范围' }] }]"
+              show-time
             />
           </a-form-item>
         </a-form-item>
@@ -95,30 +108,15 @@
           <a-input-number
             :min="-1"
             :precision="0"
-            v-decorator="['total_num', { initialValue: -1, rules: [{ required: true, message: '请输入发放总数量' }] }]"
+            v-decorator="['max_gain', { initialValue: -1, rules: [{ required: true, message: '请输入发放总数量' }] }]"
           />
           <span class="ml-5">张</span>
           <p class="form-item-help">
             <small>发放的优惠券总数量，-1为不限制</small>
           </p>
         </a-form-item>
-        <a-form-item label="显示状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-radio-group v-decorator="['status', { initialValue: 1, rules: [{ required: true }] }]">
-            <a-radio :value="1">显示</a-radio>
-            <a-radio :value="0">隐藏</a-radio>
-          </a-radio-group>
-          <p class="form-item-help">
-            <small>如果设为隐藏将不会展示在用户端页面</small>
-          </p>
-        </a-form-item>
         <a-form-item label="优惠券描述" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-textarea :autoSize="{ minRows: 4 }" v-decorator="['describe']" />
-        </a-form-item>
-        <a-form-item label="排序" :labelCol="labelCol" :wrapperCol="wrapperCol" extra="数字越小越靠前">
-          <a-input-number
-            :min="0"
-            v-decorator="['sort', {initialValue: 100, rules:[{required: true, message: '请输入排序值'}]}]"
-          />
+          <a-textarea :autoSize="{ minRows: 4 }" v-decorator="['description']" />
         </a-form-item>
         <a-form-item class="mt-20" :wrapper-col="{ span: wrapperCol.span, offset: labelCol.span }">
           <a-button type="primary" html-type="submit" :loading="isBtnLoading">提交</a-button>
@@ -156,8 +154,10 @@ export default {
       form: this.$form.createForm(this),
       // 默认日期范围
       defaultDate: [moment(), moment()],
+      defaultTime: [moment('00:00:00', 'HH:mm:ss'), moment('23:59:59', 'HH:mm:ss')],
       // 适用范围：指定的商品
-      containGoodsList: []
+      containGoodsList: [],
+      expire_as_hour: false,
     }
   },
   created () {
@@ -181,10 +181,19 @@ export default {
     onFormSubmit (values) {
       this.isLoading = true
       this.isBtnLoading = true
-      Api.add({ form: values })
+      // 到期类型
+      if (values.expire_type == ExpireTypeEnum.RECEIVE.value) {
+        const expire = this.expire_as_hour ? values.expire_hour : values.expire_day
+        values.expires_from_gain = `+${expire} ${this.expire_as_hour?'hours':'days'}`
+        values.starts_from_gain = values.start_day ? `+${values.start_day} days` : null
+      } else {
+        values.starts_at = values.betweenTime[0]
+        values.expires_at = values.betweenTime[1]
+      }
+      Api.add(values)
         .then(result => {
           // 显示提示信息
-          this.$message.success(result.message, 1.5)
+          this.$message.success('已添加', 1.5)
           // 跳转到列表页
           setTimeout(() => {
             this.$router.push('./index')

@@ -5,6 +5,6 @@ import Enum from '../enum'
  * ExpireTypeEnum
  */
 export default new Enum([
-  { key: 'RECEIVE', name: '领取后', value: 10 },
-  { key: 'FIXED_TIME', name: '固定时间', value: 20 }
+  { key: 'RECEIVE', name: '领取后', value: 'from_gain' },
+  { key: 'FIXED_TIME', name: '固定时间', value: 'fixed_time' }
 ])

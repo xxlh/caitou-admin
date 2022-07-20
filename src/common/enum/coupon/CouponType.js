@@ -5,6 +5,6 @@ import Enum from '../enum'
  * CouponTypeEnum
  */
 export default new Enum([
-  { key: 'FULL_DISCOUNT', name: '满减券', value: 10 },
-  { key: 'DISCOUNT', name: '折扣券', value: 20 }
+  { key: 'FULL_DISCOUNT', name: '满减券', value: 'discount' },
+  { key: 'DISCOUNT', name: '折扣券', value: 'percent' }
 ])

@@ -2,13 +2,13 @@
   <div v-if="user" class="user-info clearfix">
     <div class="in-left">
       <a-tooltip>
-        <template slot="title">会员ID: {{ user.user_id }}</template>
+        <template slot="title">会员ID: {{ user.id }}</template>
         <img v-if="user.avatar_url" :src="user.avatar_url" alt="会员头像" />
         <img v-else src="~@/assets/img/default-avatar.png" alt="会员头像" />
       </a-tooltip>
     </div>
     <div class="in-right flex flex-dir-column flex-x-center">
-      <p class="user-name oneline-hide">{{ user.nick_name }}</p>
+      <p class="user-name oneline-hide">{{ user.nickname }}</p>
       <p class="user-platform">
         <platform-icon :name="user.platform" :showTips="true" />
       </p>

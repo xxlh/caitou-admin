@@ -5,7 +5,7 @@ import { axios } from '@/utils/request'
  */
 const api = {
   list: '/products',
-  listByIds: '/goods/listByIds',
+  listByIds: '/products',
   detail: '/products/',
   basic: '/goods/basic',
   add: '/products',
@@ -35,7 +35,7 @@ export function listByIds (goodsIds, params) {
   return axios({
     url: api.listByIds,
     method: 'get',
-    params: { goodsIds, ...params }
+    params: { ids: goodsIds, per_page: 99, ...params }
   })
 }
 

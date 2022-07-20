@@ -5,14 +5,21 @@
       <!-- 搜索板块 -->
       <a-row class="row-item-search">
         <a-form class="search-form" :form="searchForm" layout="inline" @submit="handleSearch">
-          <a-form-item label="优惠券名称">
-            <a-input v-decorator="['couponName']" placeholder="请输入优惠券名称" />
+          <a-form-item label="优惠券编号">
+            <a-input v-decorator="['code']" placeholder="请输入优惠券名称" />
           </a-form-item>
-          <a-form-item label="会员昵称">
-            <a-input v-decorator="['nickName']" placeholder="请输入会员昵称" />
+          <a-form-item label="会员ID">
+            <a-input v-decorator="['user_id']" placeholder="请输入会员ID" />
+          </a-form-item>
+          <a-form-item label="是否过期">
+            <a-select :default-value="null" v-decorator="['is_expired']" placeholder="筛选过期优惠券">
+              <a-select-option :value="null">全部</a-select-option>
+              <a-select-option :value="false">未过期</a-select-option>
+              <a-select-option :value="true">已过期</a-select-option>
+            </a-select>
           </a-form-item>
           <a-form-item label="领取时间">
-            <a-range-picker format="YYYY-MM-DD" v-decorator="['betweenTime']" />
+            <a-range-picker format="YYYY-MM-DD" v-decorator="['created_between']" />
           </a-form-item>
           <a-form-item class="search-btn">
             <a-button type="primary" icon="search" html-type="submit">搜索</a-button>
@@ -22,7 +29,7 @@
     </div>
     <s-table
       ref="table"
-      rowKey="user_coupon_id"
+      rowKey="id"
       :loading="isLoading"
       :columns="columns"
       :data="loadData"
@@ -33,7 +40,7 @@
         <UserItem :user="item" />
       </template>
       <!-- 优惠券类型 -->
-      <template slot="coupon_type" slot-scope="text">
+      <template slot="type" slot-scope="text">
         <a-tag>{{ CouponTypeEnum[text].name }}</a-tag>
       </template>
       <!-- 最低消费金额 -->
@@ -42,25 +49,25 @@
       </template>
       <!-- 优惠方式 -->
       <template slot="discount" slot-scope="item">
-        <template v-if="item.coupon_type == CouponTypeEnum.FULL_DISCOUNT.value">
+        <template v-if="item.type == CouponTypeEnum.FULL_DISCOUNT.value">
           <span>立减</span>
-          <span class="c-p mlr-2">{{ item.reduce_price }}</span>
+          <span class="c-p mlr-2">{{ item.metadata.save_amount }}</span>
           <span>元</span>
         </template>
-        <template v-if="item.coupon_type == CouponTypeEnum.DISCOUNT.value">
+        <template v-if="item.type == CouponTypeEnum.DISCOUNT.value">
           <span>打</span>
-          <span class="c-p mlr-2">{{ item.discount }}</span>
+          <span class="c-p mlr-2">{{ (1-item.metadata.off_percent)*10 }}</span>
           <span>折</span>
         </template>
       </template>
       <!-- 有效期 -->
       <template slot="duetime" slot-scope="item">
-        <template v-if="item.expire_type == 10">
+        <template v-if="item.expire_type == ExpireTypeEnum.RECEIVE.value">
           <span>领取</span>
           <span class="c-p mlr-2">{{ item.expire_day }}</span>
           <span>天内有效</span>
         </template>
-        <template v-if="item.expire_type == 20">
+        <template v-if="item.expire_type == ExpireTypeEnum.FIXED_TIME.value">
           <span>{{ item.start_time }} ~ {{ item.end_time }}</span>
         </template>
       </template>
@@ -93,7 +100,7 @@ export default {
       columns: [
         {
           title: 'ID',
-          dataIndex: 'user_coupon_id'
+          dataIndex: 'id'
         },
         {
           title: '会员信息',
@@ -101,17 +108,17 @@ export default {
           scopedSlots: { customRender: 'user' }
         },
         {
-          title: '优惠券名称',
-          dataIndex: 'name'
+          title: '优惠券码',
+          dataIndex: 'code'
         },
         {
           title: '优惠券类型',
-          dataIndex: 'coupon_type',
-          scopedSlots: { customRender: 'coupon_type' }
+          dataIndex: 'type',
+          scopedSlots: { customRender: 'type' }
         },
         {
           title: '最低消费金额 (元)',
-          dataIndex: 'min_price',
+          dataIndex: 'metadata.amount_limit',
           scopedSlots: { customRender: 'min_price' }
         },
         {
@@ -120,18 +127,19 @@ export default {
         },
         {
           title: '有效期',
-          scopedSlots: { customRender: 'duetime' }
+          dataIndex: 'expires_at',
+          // scopedSlots: { customRender: 'duetime' }
         },
         {
           title: '领取时间',
-          dataIndex: 'create_time'
+          dataIndex: 'created_at'
         }
       ],
       // 加载数据方法 必须为 Promise 对象
       loadData: param => {
         return Api.receive({ ...param, ...this.queryParam })
           .then(response => {
-            return response.data.list
+            return response
           })
       }
     }

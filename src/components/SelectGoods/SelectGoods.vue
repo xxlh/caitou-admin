@@ -4,7 +4,7 @@
     <a-table
       v-show="selectedItems.length"
       class="table-goodsList"
-      rowKey="goods_id"
+      rowKey="id"
       :columns="columns"
       :dataSource="selectedItems"
       :pagination="false"
@@ -13,10 +13,10 @@
       <template slot="item" slot-scope="item">
         <GoodsItem
           :data="{
-            image: item.goods_image,
+            image: item.image,
             imageAlt: '商品图片',
-            title: item.goods_name,
-            subtitle: `¥${item.goods_price_min}`
+            title: item.title,
+            subtitle: `¥${item.price_lowest}`
           }"
           :subTitleColor="true"
         />
@@ -45,7 +45,7 @@ import { GoodsItem } from '@/components/Table'
 const columns = [
   {
     title: '商品ID',
-    dataIndex: 'goods_id'
+    dataIndex: 'id'
   },
   {
     title: '商品信息',
@@ -113,12 +113,12 @@ export default {
       if (this.multiple || !selectedItems.length) {
         // 多选模式
         this.selectedItems = selectedItems
-        this.selectedGoodsIds = selectedItems.map(item => item.goods_id)
+        this.selectedGoodsIds = selectedItems.map(item => item.id)
       } else {
         // 单选模式
         const single = selectedItems[selectedItems.length - 1]
         this.selectedItems = [single]
-        this.selectedGoodsIds = [single.goods_id]
+        this.selectedGoodsIds = [single.id]
       }
       this.onChange()
     },
