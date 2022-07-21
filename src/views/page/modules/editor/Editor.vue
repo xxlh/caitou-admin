@@ -637,13 +637,6 @@
                   <a-radio-button value="choice">手动选择</a-radio-button>
                 </a-radio-group>
               </div>
-              <div v-if="curItem.params.source == 'auto'" class="block-title">
-                <span>滚动加载</span>
-                <a-radio-group buttonStyle="solid" v-model="curItem.params.loadmore">
-                  <a-radio-button :value="true">无限加载</a-radio-button>
-                  <a-radio-button :value="choice">仅展示{{curItem.params.auto.per_page}}件</a-radio-button>
-                </a-radio-group>
-              </div>
             </div>
             <!-- 手动选择 -->
             <div v-if="curItem.params.source === 'choice'" class="block-box">
@@ -673,6 +666,13 @@
                     <span>件</span>
                   </span>
                 </div>
+              </div>
+              <div class="block-item">
+                <span class="label">滚动加载</span>
+                <a-radio-group buttonStyle="solid" v-model="curItem.params.loadmore">
+                  <a-radio-button :value="true">无限加载</a-radio-button>
+                  <a-radio-button :value="false">仅展示{{curItem.params.auto.per_page}}件</a-radio-button>
+                </a-radio-group>
               </div>
             </div>
           </a-tab-pane>

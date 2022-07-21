@@ -185,6 +185,9 @@ export default {
       const { pageId, data, $message } = this
       const name = data.page.params.name
       const type = data.page.params.type
+      data.items.map(item => {
+        if (item.type == 'goods' && item.params.source == 'choice') item.params.loadmore = false
+      })
       Api.edit(pageId, { data, ...name?{name}:{}, ...type?{type}:{} })
         .then(result => {
           // 显示成功
