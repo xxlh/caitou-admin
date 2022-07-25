@@ -10,7 +10,7 @@
           <ul>
             <li>
               <span>下单时间</span>
-              <div class="tip">{{ record.create_time }}</div>
+              <div class="tip">{{ record.created_at }}</div>
             </li>
             <li>
               <span>付款</span>
@@ -43,6 +43,17 @@
           </ul>
         </div>
       </a-card>
+      <!-- 配送单进度步骤条 -->
+      <a-card v-if="deal" :bordered="false">
+        <a-steps :current="dealProgress">
+          <a-step title="仓储打包中" :description="`共 ${deal.packings.length} 家仓储在打包`" />
+          <a-step title="打包完成" :description="deal.packed_at" />
+          <a-step title="骑手到仓储点" :description="deal.arrived_at" />
+          <a-step title="配送中" :description="dealProgress >= 3 ? `于 ${deal.fetched_at} 取到所有货品` : ''" />
+          <a-step title="已送达" :description="deal.delivered_at" />
+          <a-step title="已评价" :description="deal.reviewed_at" />
+        </a-steps>
+      </a-card>
 
       <!-- 订单信息 -->
       <a-card class="mt-20" :bordered="false">
@@ -66,16 +77,30 @@
               >订单改价</a-button>
             </div>
             <div class="action-item" v-if="$auth('/order/list/all.deliver')">
-              <a-button
-                v-if="(
-                  record.paid_at
-                    // && record.delivery_type == DeliveryTypeEnum.EXPRESS.value
-                    && record.delivery_status == DeliveryStatusEnum.NOT_DELIVERED.value
-                    && !inArray(record.status, [OrderStatusEnum.CANCELLED.value, OrderStatusEnum.REFUNDING.value])
-                )"
-                type="primary"
-                @click="handleDelivery"
-              >发货</a-button>
+              <template v-if="deal">
+                <a-button
+                  v-if="(
+                    record.paid_at
+                      && [OrderStatusEnum.UNDELIVERED.value,OrderStatusEnum.UNRECEIVED.value].includes(record.status)
+                      // && !deal.delivery_man_id
+                      && !inArray(record.status, [OrderStatusEnum.CANCELLED.value, OrderStatusEnum.REFUNDING.value])
+                  )"
+                  :type="!deal.delivery_man_id ? 'primary' : 'default'"
+                  @click="handleDeliveryMan(record)"
+                >{{!deal.delivery_man_id ? '分配骑士' : '改派骑士'}}</a-button>
+              </template>
+              <template v-else>
+                <a-button
+                  v-if="(
+                    record.paid_at
+                      // && record.delivery_type == DeliveryTypeEnum.EXPRESS.value
+                      && record.delivery_status == DeliveryStatusEnum.NOT_DELIVERED.value
+                      && !inArray(record.status, [OrderStatusEnum.CANCELLED.value, OrderStatusEnum.REFUNDING.value])
+                  )"
+                  type="primary"
+                  @click="handleDelivery"
+                >发货</a-button>
+              </template>
             </div>
             <div class="action-item" v-if="$auth('/order/list/all.cancel')">
               <a-button
@@ -90,10 +115,10 @@
         <!-- 订单信息 -->
         <a-descriptions title="订单信息">
           <a-descriptions-item label="订单号">{{ record.no }}</a-descriptions-item>
-          <a-descriptions-item label="实付款金额">￥{{ record.total_amount }}</a-descriptions-item>
           <a-descriptions-item label="支付方式">
             <a-tag color="green">{{ PayTypeEnum[record.payment_method].name }}</a-tag>
           </a-descriptions-item>
+          <a-descriptions-item label="实付款金额">￥{{ record.total_amount }}</a-descriptions-item>
           <a-descriptions-item label="配送方式">
             <!-- <a-tag color="green">{{ DeliveryTypeEnum[record.delivery_type].name }}</a-tag> -->
           </a-descriptions-item>
@@ -112,6 +137,24 @@
           <a-descriptions-item label="买家留言">
             <strong v-if="record.remark">{{ record.remark }}</strong>
             <span v-else>--</span>
+          </a-descriptions-item>
+          <a-descriptions-item v-if="deal" label="仓储信息">
+            <a-tooltip v-for="packing in deal.packings" :key="packing.id" style="margin-right: 10px">
+              <template slot="title">仓储地址: {{ packing.address.address }}</template>
+              <a v-if="packing.store && packing.store.contact_phone" :href="`tel://${packing.store.contact_phone}`">
+                <span class="c-p"><a-icon type="phone" /> {{ packing.name }}</span>
+              </a>
+              <span v-else>{{ packing.name }}</span>
+            </a-tooltip>
+          </a-descriptions-item>
+          <a-descriptions-item v-if="deal" label="骑手信息">
+            <a-tooltip v-if="deal.man" :title="deal.man && deal.man.phone">
+              <a v-if="deal.man.phone" :href="`tel://${deal.man.phone}`">
+                <a-icon type="phone" /> 骑士-{{deal.man.name}}
+              </a>
+              <span v-else>骑士-{{deal.man.name}}</span>
+            </a-tooltip>
+            <span v-else>(尚未分配骑士)</span>
           </a-descriptions-item>
         </a-descriptions>
       </a-card>
@@ -156,6 +199,16 @@
             <span slot="count" slot-scope="text">x{{ text }}</span>
             <!-- 商品总价 -->
             <span slot="total_price" slot-scope="text, item">￥{{ item.price * item.count }}</span>
+              <template slot="store" slot-scope="text, item">
+              <a-tooltip v-if="packingByStoreId[ item.product_sku.store_id ]">
+                  <template slot="title">
+                    <div class="f-13">仓储电话：{{packingByStoreId[ item.product_sku.store_id ].store.contact_phone}}</div>
+                    <div class="f-13">骑士电话：{{deal.man.phone}}</div>
+                  </template>
+                  <span class="c-p">{{ packingByStoreId[ item.product_sku.store_id ].name }}</span>
+                  <a-tag :color="renderOrderStatusColor(packingByStoreId[ item.product_sku.store_id ].status)" style="margin-left: 5px">{{ OrderStatusEnum[ packingByStoreId[ item.product_sku.store_id ].status ].name }}</a-tag>
+              </a-tooltip>
+            </template>
           </a-table>
           <!-- 订单价格明细 -->
           <div class="order-price">
@@ -234,6 +287,7 @@
 
     </div>
     <DeliveryForm ref="DeliveryForm" @handleSubmit="handleRefresh" />
+    <DeliveryManForm ref="DeliveryManForm" @handleSubmit="handleRefresh" />
     <CancelForm ref="CancelForm" @handleSubmit="handleRefresh" />
     <PriceForm ref="PriceForm" @handleSubmit="handleRefresh" />
   </div>
@@ -243,7 +297,7 @@
 import { inArray } from '@/utils/util'
 import * as Api from '@/api/order'
 import { GoodsItem, UserItem } from '@/components/Table'
-import { DeliveryForm, CancelForm, PriceForm } from './modules'
+import { DeliveryForm, CancelForm, PriceForm, DeliveryManForm } from './modules'
 import {
   DeliveryStatusEnum,
   DeliveryTypeEnum,
@@ -286,6 +340,13 @@ const goodsColumns = [
     scopedSlots: { customRender: 'total_price' }
   }
 ]
+const goodsColumns_Packings = [
+  {
+    title: '仓储点',
+    dataIndex: 'store',
+    scopedSlots: { customRender: 'store' }
+  }
+]
 
 export default {
   name: 'Index',
@@ -293,6 +354,7 @@ export default {
     GoodsItem,
     UserItem,
     DeliveryForm,
+    DeliveryManForm,
     CancelForm,
     PriceForm
   },
@@ -314,10 +376,13 @@ export default {
       orderId: null,
       // 订单详情
       record: {},
+      deal: {},
       user: {},
       reviews: {},
+      packingByStoreId: {},
       // 订单步骤位置
       progress: 2,
+      dealProgress: 0,
       // 商品内容表头
       goodsColumns
     }
@@ -342,9 +407,9 @@ export default {
       this.isLoading = true
       Api.detail(orderId)
         .then(result => {
-          console.log(result);
           // 当前记录
           this.record = result.order
+          this.deal = result.delivery_deal
           this.user = result.user
           this.reviews = result.reviews
           // 初始化数据
@@ -359,15 +424,28 @@ export default {
     initData () {
       // 步骤条位置
       this.initProgress()
+      // 增加每个商品打包状态列
+      if (this.deal) this.goodsColumns.push(...goodsColumns_Packings)
+      // 仓储数据
+      if (this.deal) this.packingByStoreId = _(this.deal.packings).keyBy('store_id').value()
     },
 
     // 步骤条位置
     initProgress () {
-      const { record } = this
+      const { record, deal } = this
       this.progress = 2
       record.paid_at && (this.progress += 1)
-      record.delivery_status === DeliveryStatusEnum.NOT_DELIVERED.value && (this.progress += 1)
-      record.receipt_status === ReceiptStatusEnum.RECEIVED.value && (this.progress += 1)
+      record.ship_status === DeliveryStatusEnum.NOT_DELIVERED.value && (this.progress += 1)
+      record.ship_status === ReceiptStatusEnum.RECEIVED.value && (this.progress += 1)
+      // 配送单进度
+      if (deal) {
+        deal.status == 'packing' && (this.dealProgress = 0)
+        deal.status == 'packed' && (this.dealProgress = 1)
+        deal.status == 'arrived' && (this.dealProgress = 2)
+        deal.status == 'delivering' && (this.dealProgress = 3)
+        deal.status == 'delivered' && (this.dealProgress = 4)
+        deal.status == 'completed' && (this.dealProgress = 5)
+      }
     },
 
     // 渲染订单状态标签颜色
@@ -386,6 +464,10 @@ export default {
     handleDelivery () {
       const { record } = this
       this.$refs.DeliveryForm.show(record)
+    },
+    // 分配骑手
+    handleDeliveryMan (record) {
+      this.$refs.DeliveryManForm.show(record)
     },
 
     // 审核取消订单

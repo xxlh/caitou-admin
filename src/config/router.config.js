@@ -224,6 +224,11 @@ export const asyncRouterMap = [
             hidden: true
           },
           {
+            path: '/order/deal/index',
+            component: () => import(/* webpackChunkName: "order" */ '@/views/order/deal/Index'),
+            meta: { title: '配送订单', keepAlive: false, permission: ['/order/deal/index'] },
+          },
+          {
             path: '/order/tools',
             component: RouteView,
             meta: { title: '订单处理', keepAlive: false, permission: ['/order/tools'] },
