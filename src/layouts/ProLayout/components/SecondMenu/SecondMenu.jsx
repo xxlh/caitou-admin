@@ -61,6 +61,7 @@ export default {
         // 记录到显示的菜单列表
         menuList.push({
           title: item.meta.title,
+          target: item.meta.target,
           path: item.path,
           activePath: item.activePath,
           hidden: item.hidden,
@@ -122,7 +123,8 @@ export default {
       }
       return (
         <li class="menu-item">
-          {!menuItem.isHasChildren
+          {menuItem.target ? <a class={itemClass} href={menuItem.path} target={menuItem.target}><a-icon class="icon" type="link" />{renderTitle()}</a> :
+            !menuItem.isHasChildren
             ? <router-link class={itemClass} to={{ path: menuItem.path }}>
               {renderTitle()}
             </router-link>

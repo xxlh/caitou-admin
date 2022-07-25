@@ -42,10 +42,10 @@ const renderSubMenu = (h, item, i18nRender) => {
 const renderMenuItem = (h, item, i18nRender) => {
   const meta = Object.assign({}, item.meta)
   const target = meta.target || null
-  // const CustomTag = target && 'a' || 'router-link'
-  const CustomTag = 'router-link'
+  const CustomTag = target && 'a' || 'router-link'
+  // const CustomTag = 'router-link'
   const props = { to: { path: item.path } }
-  const attrs = { target }
+  const attrs = { target, ...target ? {href: item.path} : {} }
 
   // 这里屏蔽hideChildrenInMenu属性
   item.hideChildrenInMenu = true

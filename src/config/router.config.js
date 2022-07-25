@@ -517,6 +517,12 @@ export const asyncRouterMap = [
               }
             ]
           },
+          // 安卓客户端
+          {
+            path: 'http://upgrade.admin.caitou.ieexx.com/admin',
+            name: 'android',
+            meta: { title: '安卓发布', target: '_blank', icon: 'android', iconStyle: { fontSize: '17.2px', color: '#36b313' }, permission: ['/client/android'] },
+          },
         ]
       },
 
