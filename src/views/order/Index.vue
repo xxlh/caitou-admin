@@ -31,7 +31,7 @@
                 >{{ item.name }}</a-select-option>
               </a-select>
             </a-form-item> -->
-            <a-form-item label="支付方式">
+            <!-- <a-form-item label="支付方式">
               <a-select v-decorator="['payment_method', { initialValue: -1 }]">
                 <a-select-option :value="-1">全部</a-select-option>
                 <a-select-option
@@ -40,7 +40,7 @@
                   :value="item.value"
                 >{{ item.name }}</a-select-option>
               </a-select>
-            </a-form-item>
+            </a-form-item> -->
             <!-- <a-form-item label="配送方式">
               <a-select v-decorator="['deliveryType', { initialValue: -1 }]">
                 <a-select-option :value="-1">全部</a-select-option>
@@ -51,6 +51,9 @@
                 >{{ item.name }}</a-select-option>
               </a-select>
             </a-form-item> -->
+            <a-form-item label="优惠券ID">
+              <a-input placeholder="请输入优惠券ID" v-decorator="['voucher_template_id']" />
+            </a-form-item>
             <a-form-item label="下单时间">
               <a-range-picker format="YYYY-MM-DD" v-decorator="['created_between']" />
             </a-form-item>
