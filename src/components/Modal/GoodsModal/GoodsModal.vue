@@ -14,14 +14,14 @@
       <a-row class="row-item-search">
         <a-form class="search-form" :form="searchForm" layout="inline" @submit="handleSearch">
           <a-form-item label="商品名称">
-            <a-input v-decorator="['goodsName']" placeholder="请输入商品名称" />
+            <a-input v-decorator="['title']" placeholder="请输入商品名称" />
           </a-form-item>
           <a-form-item label="商品分类">
             <a-tree-select
               :treeData="categoryListTree"
               :dropdownStyle="{ maxHeight: '500px', overflow: 'auto' }"
               allowClear
-              v-decorator="['categoryId', {initialValue: 0}]"
+              v-decorator="['category_ids', {initialValue: 0}]"
             ></a-tree-select>
           </a-form-item>
           <a-form-item class="search-btn">
@@ -102,7 +102,9 @@ export default {
     // 最大选择的数量限制, multiple模式下有效
     maxNum: PropTypes.integer.def(100),
     // 默认选中的列表记录
-    defaultList: PropTypes.array.def([])
+    defaultList: PropTypes.array.def([]),
+    // 参数
+    params: [],
   },
   components: {
     STable,
@@ -124,7 +126,7 @@ export default {
       columns,
       // 加载数据方法 必须为 Promise 对象
       loadData: param => {
-        return GoodsApi.list({ ...param, ...this.queryParam, store_id: this.$store.getters.storeId })
+        return GoodsApi.list({ ...param, ...this.params, ...this.queryParam })
           .then(response => {
             return response
           })

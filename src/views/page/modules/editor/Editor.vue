@@ -641,11 +641,19 @@
             <!-- 手动选择 -->
             <div v-if="curItem.params.source === 'choice'" class="block-box">
               <div class="block-title">选择商品 ({{ curItem.data.length }})</div>
-              <SGoods v-model="curItem.data" />
+              <div class="block-item">
+                <span class="label">商品类型</span>
+                <a-select v-model="curItem.params.choice.types" mode="multiple" :options="goodsTypes" default-value="intra-city" style="width: 80%"></a-select>
+              </div>
+              <SGoods v-model="curItem.data" :params="{types: curItem.params.choice.types, store_id: $store.getters.storeId}" />
             </div>
             <!-- 自动获取 -->
             <div v-if="curItem.params.source === 'auto'" class="block-box">
               <div class="block-title">商品内容</div>
+              <div class="block-item">
+                <span class="label">商品类型</span>
+                <a-select v-model="curItem.params.auto.types" mode="multiple" :options="goodsTypes" default-value="intra-city" style="width: 80%"></a-select>
+              </div>
               <div class="block-item">
                 <span class="label">商品分类</span>
                 <SGoodsCate v-model="curItem.params.auto.category_id" />
@@ -942,15 +950,20 @@ export default {
       loadCategory: false,
       categoryIdToLoad: 0,
       navItemToLoadCat: null,
+      goodsTypes: [
+        {label: '实物商品', value: 'physical'},
+        {label: '虚拟商品', value: 'virtual'},
+        {label: '旅游商品', value: 'travel'},
+        {label: '核销商品', value: 'verification'},
+        {label: '同城配送', value: 'intra-city'},
+      ],
     }
   },
   watch: {
     'curItem.data': function() {
       if (/^(goods|article)$/.test(this.curItem.type) && this.curItem.data && this.curItem.data.length) {
-        this.curItem.params.choice = {
-          ids: this.curItem.data.map(d => d.id),
-          sku_ids: this.curItem.data.filter(d => d.sku_id).map(d => d.sku_id),
-        }
+        this.curItem.params.choice.ids = this.curItem.data.map(d => d.id);
+        this.curItem.params.choice.sku_ids = this.curItem.data.filter(d => d.sku_id).map(d => d.sku_id);
       }
     }
   },

@@ -32,6 +32,7 @@
       ref="GoodsModal"
       :maxNum="maxNum"
       :defaultList="selectedItems"
+      :params="params"
       @handleSubmit="handleSelectGoodsSubmit"
     />
   </div>
@@ -61,7 +62,9 @@ export default {
     // 最大选择的数量限制, multiple模式下有效
     maxNum: PropTypes.integer.def(100),
     // 选中的商品数据
-    value: PropTypes.array.def([])
+    value: PropTypes.array.def([]),
+    // 参数
+    params: [],
   },
   data () {
     return {
@@ -101,6 +104,7 @@ export default {
 
     // 过滤仅需要的数据
     filterItems (selectedItems) {
+      // Todo: 选择当前仓库的sku_id（需要把列表改造为展示sku或可选商品的sku，略复杂
       return selectedItems.map(itm => pick(itm, itemColumns))
     },
 
