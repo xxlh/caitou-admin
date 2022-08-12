@@ -15,6 +15,8 @@ const api = {
   saveSpec: '/products/{id}/spec',
   saveSku: '/products/{id}/sku',
   copySku: '/products/copy_sku',
+  schedulePrice: '/products/{id}/scheduled_price',
+  editSchedulePrice: '/products/{id}/scheduled_price/{schedule_id}',
 }
 
 /**
@@ -133,5 +135,38 @@ export function copySku (data) {
     url: api.copySku,
     method: 'post',
     data: data
+  })
+}
+
+/**
+ * 商品定时调价
+ * @param {*} data
+ */
+export function schedulePrice (goodsId, data) {
+  return axios({
+    url: api.schedulePrice.replace('{id}', goodsId),
+    method: 'post',
+    data
+  })
+}
+export function getScheduledPrice (goodsId, params) {
+  return axios({
+    url: api.schedulePrice.replace('{id}', goodsId),
+    method: 'get',
+    params
+  })
+}
+export function editScheduledPrice (goodsId, scheduleId, params) {
+  return axios({
+    url: api.editSchedulePrice.replace('{id}', goodsId).replace('{schedule_id}', scheduleId),
+    method: 'patch',
+    params
+  })
+}
+export function deleteScheduledPrice (goodsId, scheduleId, params) {
+  return axios({
+    url: api.editSchedulePrice.replace('{id}', goodsId).replace('{schedule_id}', scheduleId),
+    method: 'delete',
+    params
   })
 }

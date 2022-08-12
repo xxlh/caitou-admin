@@ -6,6 +6,7 @@
         <a-tabs :activeKey="tabKey" :tabBarStyle="{marginBottom: '30px'}" @change="handleTabs">
           <a-tab-pane :key="0" tab="基本信息"></a-tab-pane>
           <a-tab-pane :key="1" tab="规格/库存"></a-tab-pane>
+          <a-tab-pane :key="4" tab="定时调价"></a-tab-pane>
           <a-tab-pane :key="2" tab="商品详情"></a-tab-pane>
           <a-tab-pane :key="3" tab="更多设置"></a-tab-pane>
         </a-tabs>
@@ -187,6 +188,11 @@
             </a-form-item>
           </div>
 
+          <!-- 定时调价 -->
+          <div class="tab-pane" v-show="tabKey == 4">
+            <PriceSchedule :goodsId="goodsId" :skus="formData.skus" />
+          </div>
+
           <!-- 商品详情 -->
           <div class="tab-pane" v-show="tabKey == 2">
             <a-form-item label="商品详情" :labelCol="labelCol" :wrapperCol="{span: 16}">
@@ -357,6 +363,7 @@ import GoodsModel from '@/common/model/goods/Index'
 import MultiSpec from './modules/MultiSpec'
 import { isEmptyObject } from '@/utils/util'
 import ChannelEnum from '@/common/enum/file/Channel'
+import PriceSchedule from './modules/PriceSchedule'
 
 export default {
   components: {
@@ -364,8 +371,9 @@ export default {
     SelectVideo,
     Ueditor,
     InputNumberGroup,
-    MultiSpec
-  },
+    MultiSpec,
+    PriceSchedule
+},
   data () {
     return {
       // 默认的标签索引
