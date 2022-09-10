@@ -111,6 +111,17 @@
                 </a-radio-group>
               </div>
             </div>
+            <div class="block-box">
+              <div class="block-title">联动设置</div>
+              <div class="block-item">
+                <span class="label">联动导航栏改变背景色</span>
+                <span class="tips-wrap">渐变到白色</span>
+                <a-radio-group buttonStyle="solid" v-model="curItem.style.isSyncBgWithNav" :default-value="0">
+                  <a-radio-button :value="1">开启</a-radio-button>
+                  <a-radio-button :value="0">关闭</a-radio-button>
+                </a-radio-group>
+              </div>
+            </div>
           </a-tab-pane>
         </a-tabs>
       </div>
@@ -621,6 +632,17 @@
                 </div>
               </div>
             </div>
+            <div class="block-box">
+              <div class="block-title">联动设置</div>
+              <div class="block-item">
+                <span class="label">联动导航栏改变背景色</span>
+                <span class="tips-wrap">渐变到白色</span>
+                <a-radio-group buttonStyle="solid" v-model="curItem.style.isSyncBgWithNav" :default-value="0">
+                  <a-radio-button :value="1">开启</a-radio-button>
+                  <a-radio-button :value="0">关闭</a-radio-button>
+                </a-radio-group>
+              </div>
+            </div>
           </a-tab-pane>
         </a-tabs>
       </div>
@@ -816,6 +838,14 @@
                   >重置</span>
                   <colorPicker v-model="curItem.style.background" defaultColor="#fff" />
                 </div>
+              </div>
+              <div class="block-item">
+                <span class="label">联动导航栏改变背景色</span>
+                <span class="tips-wrap">渐变到白色</span>
+                <a-radio-group buttonStyle="solid" v-model="curItem.style.isSyncBgWithNav" :default-value="0">
+                  <a-radio-button :value="1">开启</a-radio-button>
+                  <a-radio-button :value="0">关闭</a-radio-button>
+                </a-radio-group>
               </div>
             </div>
           </a-tab-pane>

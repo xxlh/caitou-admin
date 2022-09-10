@@ -140,7 +140,7 @@
           </a-descriptions-item>
           <a-descriptions-item v-if="deal" label="仓储信息">
             <a-tooltip v-for="packing in deal.packings" :key="packing.id" style="margin-right: 10px">
-              <template slot="title">仓储地址: {{ packing.address.address }}</template>
+              <template slot="title">仓储地址: {{ packing.address.full_address }}</template>
               <a v-if="packing.store && packing.store.contact_phone" :href="`tel://${packing.store.contact_phone}`">
                 <span class="c-p"><a-icon type="phone" /> {{ packing.name }}</span>
               </a>

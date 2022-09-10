@@ -114,7 +114,7 @@
                     </td>
                     <td>
                       <a-tooltip>
-                        <template slot="title">仓储地址: {{ packing.address.address }}</template>
+                        <template slot="title">仓储地址: {{ packing.address.full_address }}</template>
                         <span style="margin-right: 5px">{{ packing.name }}</span>
                         <a-tag :color="renderOrderStatusColor(packing.status)">{{ OrderStatusEnum[packing.status].name }}</a-tag>
                       </a-tooltip>
@@ -131,7 +131,7 @@
                       </td>
                       <td :rowspan="item.items.length">
                         <a-tooltip>
-                          <template slot="title">送达地址: {{ item.address.address }}</template>
+                          <template slot="title">送达地址: {{ item.address.full_address }}</template>
                           <a v-if="item.address && item.address.contact_phone" :href="`tel://${item.address.contact_phone}`">
                             <span class="c-p"><a-icon type="phone" /> {{ item.address.contact_name }}</span>
                           </a>
