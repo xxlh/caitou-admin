@@ -124,7 +124,7 @@
                       </td>
                       <td :rowspan="item.items.length">
                         <UserItem v-if="item.user" :user="item.user" />
-                        <span v-else>{{item.user_nickname}}</span>
+                        <span v-else>{{item.user.nickname}}</span>
                         <template v-if="item.delivery_deal">
                           <br /><br />
                           <a

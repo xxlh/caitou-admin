@@ -61,12 +61,12 @@ const store = {
       title: '商品列表页',
       type: LINK_TYPE_PAGE,
       param: {
-        path: 'pages/tabBar/category/category',
+        path: 'pages/category/category-page',
         query: {}
       },
       form: [
         {
-          key: 'query.id',
+          key: 'query.category_id',
           lable: '分类ID',
           tips: '商品管理 -> 商品分类'
         },
@@ -195,7 +195,7 @@ const other = {
   data: [
     {
       id: '91th4ss',
-      title: '自定义页',
+      title: '落地页',
       type: LINK_TYPE_PAGE,
       param: {
         path: 'pages/landing-page/index',
@@ -241,6 +241,23 @@ const other = {
           lable: '文章ID',
           required: true,
           tips: '内容管理 -> 文章列表'
+        }
+      ]
+    },
+    {
+      id: 'pagelink',
+      title: '自定义页',
+      type: LINK_TYPE_PAGE,
+      param: {
+        path: '',
+        query: {}
+      },
+      form: [
+        {
+          key: 'path',
+          lable: '页面路径',
+          required: true,
+          tips: '如: pages/user/setting/setting'
         }
       ]
     },
