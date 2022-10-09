@@ -82,7 +82,7 @@ export default {
     // 格式化categoryIds
     goodsInfo.categorys = this.formatCategoryIds(this.formData.goodsCategories)
     // 判断单规格还是多规格
-    const currentStoreSkus = this.formData.skus.filter(sku => sku.store_id == store.getters.storeId || !store.getters.storeId)
+    const currentStoreSkus = this.formData.goods.type == 'intra-city' ? this.formData.skus.filter(sku => sku.store_id == store.getters.storeId || !store.getters.storeId) : this.formData.skus
     goodsInfo.spec_type = currentStoreSkus.length > 1 ? 20 : 10
     // 商品基本数据
     // const goodsFormData = _.pick(goodsInfo, [

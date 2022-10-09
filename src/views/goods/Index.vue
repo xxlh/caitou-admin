@@ -30,7 +30,16 @@
       <!-- 操作板块 -->
       <div class="row-item-tab clearfix">
         <div class="tab-list fl-l">
-          <a-radio-group :defaultValue="queryParam.listType" @change="handleTabs">
+          <a-radio-group v-model="queryParam.type" @change="handleType">
+            <a-radio-button value="intra-city">同城商品</a-radio-button>
+            <a-radio-button value="physical">跨地商品</a-radio-button>
+            <a-radio-button value="travel">旅游线路</a-radio-button>
+            <a-radio-button value="verification">核销卡券</a-radio-button>
+            <a-radio-button value="virtual">线下交易</a-radio-button>
+          </a-radio-group>
+        </div>
+        <div class="tab-list fl-l">
+          <a-radio-group :defaultValue="queryParam.listType" @change="handleStatus">
             <a-radio-button value="all">全部</a-radio-button>
             <a-radio-button value="on_sale">出售中</a-radio-button>
             <a-radio-button value="off_sale">已下架</a-radio-button>
@@ -38,12 +47,18 @@
           </a-radio-group>
         </div>
         <a-button
-          v-if="$auth('/goods/create')"
+          v-if="$auth('/goods/create') && queryParam.type == 'intra-city'"
           class="fl-l"
           type="primary"
           icon="plus"
           @click="handleAdd"
         >添加商品</a-button>
+        <a-tooltip v-else placement="right">
+          <template slot="title">
+            <span>非同城商品默认不会展示，需要在[页面设计]中配置对镜展示的商品类型</span>
+          </template>
+          <a-button type="dashed" shape="circle" icon="info" />
+        </a-tooltip>
         <div v-if="selectedRowKeys.length" class="button-group">
           <a-button-group class="ml-10">
             <a-button
@@ -250,7 +265,8 @@ export default {
       categoryListTree: [],
       // 查询参数
       queryParam: {
-        listType: 'all'
+        type: 'intra-city',
+        listType: 'all',
       },
       tabParams: {},
       // 正在加载
@@ -307,11 +323,16 @@ export default {
     },
 
     // 切换tab
-    handleTabs (e) {
+    handleType (e) {
+      this.queryParam.types = [e.target.value]
+      this.handleRefresh(true)
+    },
+    handleStatus (e) {
       this.queryParam.listType = e.target.value
       if (this.queryParam.listType == 'on_sale') this.tabParams = {on_sale: true}
       else if (this.queryParam.listType == 'off_sale') this.tabParams = {on_sale: false}
       else if (this.queryParam.listType == 'sold_out') this.tabParams = {stock: 0}
+      else {this.tabParams = {}}
       this.handleRefresh(true)
     },
 

@@ -665,7 +665,10 @@
               <div class="block-title">选择商品 ({{ curItem.data.length }})</div>
               <div class="block-item">
                 <span class="label">商品类型</span>
-                <a-select v-model="curItem.params.choice.types" mode="multiple" :options="goodsTypes" default-value="intra-city" style="width: 80%"></a-select>
+                <div class="flex-box">
+                  <a-select v-model="curItem.params.choice.types" mode="multiple" :options="goodsTypes" default-value="intra-city" style="width: 80%"></a-select>
+                  <div class="tips">同城配送 仅展示当地仓储商品</div>
+                </div>
               </div>
               <SGoods v-model="curItem.data" :params="{types: curItem.params.choice.types, store_id: $store.getters.storeId}" />
             </div>
