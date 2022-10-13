@@ -26,9 +26,9 @@
         </a-form-item>
         <a-form-item label="分类图片" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <SelectImage
-              :channel="channel"
-              :channel_id="record.id"
-              collection="category_image"
+            :channel="channel"
+            :channel_id="record.id"
+            collection="category_image"
             :defaultList="record.image ? [record.image] : []"
             v-decorator="['image_id']"
           />

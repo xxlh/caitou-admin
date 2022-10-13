@@ -5,6 +5,7 @@
     :visible="visible"
     :confirmLoading="confirmLoading"
     :maskClosable="false"
+    :destroyOnClose="true"
     @ok="handleSubmit"
     @cancel="handleCancel"
   >
@@ -36,6 +37,15 @@
         <a-form-item label="所属区域" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-select v-decorator="['delivery_area_id', {rules: [{required: false}]}]" :options="areas"></a-select>
         </a-form-item>
+        <a-form-item label="门面照片" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <SelectImage
+            :channel="channel"
+            :channel_id="record.id"
+            collection="store_image"
+            :defaultList="record.image ? [record.image] : []"
+            v-decorator="['image_id']"
+          />
+        </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>
@@ -45,13 +55,15 @@
 import pick from 'lodash.pick'
 import * as Api from '@/api/store/address'
 import * as AreaApi from '@/api/area'
-import { SelectRegion } from '@/components'
+import { SelectRegion, SelectImage } from '@/components'
 import SelectMapPoint from './SelectMapPoint'
+import ChannelEnum from '@/common/enum/file/Channel'
 
 export default {
   components: {
     SelectRegion,
     SelectMapPoint,
+    SelectImage,
   },
   data () {
     return {
@@ -76,6 +88,7 @@ export default {
       // 区域
       areas: [],
       province: '',
+      channel: ChannelEnum.STORE.value,
     }
   },
   methods: {
@@ -90,6 +103,10 @@ export default {
       this.record = record
       // 设置默认值
       this.setFieldsValue()
+      // 加载区域
+      AreaApi.list({province:record.province, per_page:100}).then(res => {
+        this.areas = res.data.map(a => ({value:a.id, label:a.name||`${a.province}_${a.id}`}))
+      })
     },
 
     /**
@@ -102,16 +119,11 @@ export default {
         record.city,
         record.district
       ]
+      this.$nextTick(() => {
+        setFieldsValue(pick(record, ['name', 'contact_name', 'contact_phone', 'cascader', 'address', 'delivery_area_id', 'image_id']))
+      })
       this.lng = record.longitude
       this.lat = record.latitude
-      this.$nextTick(() => {
-        // setFieldsValue(pick(record, ['name', 'contact_name', 'contact_phone', 'province', 'city', 'district', 'address', 'sort']))
-        setFieldsValue(record)
-      })
-      // 加载区域
-      AreaApi.list({province:record.province, per_page:100}).then(res => {
-        this.areas = res.data.map(a => ({value:a.id, label:a.name||`${a.province}_${a.id}`}))
-      })
       this.province = record.province
     },
 
