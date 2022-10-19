@@ -107,6 +107,19 @@
       <div class="actions" slot="action" slot-scope="text, item">
         <a v-if="$auth('/goods/update.edit')" @click="handleEdit(item)">编辑</a>
         <a v-if="$auth('/goods/update.delete')" v-action:delete @click="handleDelete([item.id])">删除</a>
+        <a-popover trigger="hover" @visibleChange="v => {
+          if (!v) return;
+          showQRCode(item)
+        }">
+          <template #title>
+            <a-typography-text code ellipsis style="width: 120px">pages/goods/goods?id={{item.id}}</a-typography-text>
+          </template>
+          <template #content>
+            <a-spin v-if="QRcode[item.id] && QRcode[item.id]=='loading'" />
+            <img v-else-if="QRcode[item.id]" :src="QRcode[item.id]" width="100" height="100" style="margin:auto; display:block" />
+          </template>
+          <a>链接</a>
+        </a-popover>
       </div>
     </s-table>
 
@@ -199,6 +212,7 @@
 
 <script>
 import * as GoodsApi from '@/api/goods'
+import * as WechatApi from '@/api/wechat'
 import { ContentHeader, STable } from '@/components'
 import CategoryModel from '@/common/model/Category'
 
@@ -219,7 +233,7 @@ const columns = [
     scopedSlots: { customRender: 'goods_title' }
   },
   {
-    title: '商品最低价格',
+    title: '最低价格',
     dataIndex: 'price_lowest',
   },
   {
@@ -295,6 +309,8 @@ export default {
             return response
           })
       },
+      // 二维码
+      QRcode: {},
     }
   },
   created () {
@@ -456,6 +472,18 @@ export default {
         .finally(result => {
           this.isSavingPicking = false
         })
+    },
+
+    /**
+     * 生成二维码预览
+     */
+    async showQRCode(item) {
+      if (this.QRcode[item.id]) return;
+      this.QRcode[item.id] = 'loading';
+      this.QRcode = {...this.QRcode};
+      let QRcodeData = await WechatApi.qrcode('pages/goods/goods?id=' + item.id);
+      this.QRcode = {...this.QRcode};
+      this.QRcode[item.id] = QRcodeData.base64;
     },
   }
 }

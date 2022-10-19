@@ -48,8 +48,21 @@
       </span> -->
       <!-- 操作 -->
       <span slot="action" slot-scope="text, item">
-        <a v-action:edit style="margin-right: 8px;" @click="handleEdit(item)">编辑</a>
-        <a v-action:delete @click="handleDelete(item)">删除</a>
+        <a v-action:edit @click="handleEdit(item)" style="margin-right: 8px;">编辑</a>
+        <a v-action:delete @click="handleDelete(item)" style="margin-right: 8px;">删除</a> 
+        <a-popover v-if="item.type == 'self-support'" trigger="hover" @visibleChange="v => {
+          if (!v) return;
+          showQRCode(item)
+        }">
+          <template #title>
+            <a-typography-text code ellipsis style="width: 120px">pages/ontheway/scan-store?id={{item.id}}</a-typography-text>
+          </template>
+          <template #content>
+            <a-spin v-if="QRcode[item.id] && QRcode[item.id]=='loading'" />
+            <img v-else-if="QRcode[item.id]" :src="QRcode[item.id]" width="100" height="100" style="margin:auto; display:block" />
+          </template>
+          <a @click="downloadImage(QRcode[item.id], `shop-${item.id}`)">下载二维码</a>
+        </a-popover>
       </span>
     </s-table>
     <AddForm ref="AddForm" @handleSubmit="handleRefresh" />
@@ -59,6 +72,7 @@
 
 <script>
 import * as Api from '@/api/store/address'
+import * as WechatApi from '@/api/wechat'
 import { STable } from '@/components'
 import { AddForm, EditForm } from './modules'
 import { SelectRegion } from '@/components'
@@ -122,7 +136,9 @@ export default {
           .then(response => {
             return response
           })
-      }
+      },
+      // 二维码
+      QRcode: {},
     }
   },
   created () {
@@ -185,6 +201,24 @@ export default {
       this.handleRefresh(true)
     },
 
+    /**
+     * 生成二维码预览
+     */
+    async showQRCode(item) {
+      if (this.QRcode[item.id]) return;
+      this.QRcode[item.id] = 'loading';
+      this.QRcode = {...this.QRcode};
+      let QRcodeData = await WechatApi.qrcode('pages/ontheway/scan-store?id=' + item.id);
+      this.QRcode = {...this.QRcode};
+      this.QRcode[item.id] = QRcodeData.base64;
+    },
+    downloadImage(imgUrl, fileName) {
+      if (!imgUrl || imgUrl == 'loading') return
+      const a = document.createElement('a')
+      a.href = imgUrl
+      a.setAttribute('download', fileName)
+      a.click()
+    }
   }
 }
 </script>
