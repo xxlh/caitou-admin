@@ -90,6 +90,31 @@
             />
           </a-form-item>
         </a-form-item>
+        <a-form-item label="限时领取" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-range-picker v-decorator="['gainBetween', { initialValue: ['',''] }]" :show-time="{defaultValue: defaultTime}" />
+        </a-form-item>
+        <a-form-item label="领取方式" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-radio-group v-model="gainMethod">
+            <a-radio value="manual">用户手动领取</a-radio>
+            <a-radio value="situation">场景自动获得</a-radio>
+          </a-radio-group>
+          <a-select v-show="gainMethod == 'situation'"
+            placeholder="请选择自动触发领取的场景"
+            v-decorator="['auto_gain_situation', { initialValue: 'after_launching' }]"
+            style="width: 150px"
+          >
+            <a-select-option value="after_launching">App启动时</a-select-option>
+            <a-select-option value="after_new_order">线上下单后</a-select-option>
+            <a-select-option value="after_new_ontheway">顺路单下单后</a-select-option>
+            <a-select-option value="after_registered">新用户</a-select-option>
+            <a-select-option value="after_registered_2_day">新用户次日</a-select-option>
+            <a-select-option value="after_registered_3_day">新用户第3天</a-select-option>
+            <a-select-option value="after_registered_4_day">新用户第4天</a-select-option>
+            <a-select-option value="after_registered_5_day">新用户第5天</a-select-option>
+            <a-select-option value="after_registered_6_day">新用户第6天</a-select-option>
+            <a-select-option value="after_registered_7_day">新用户第7天</a-select-option>
+          </a-select>
+        </a-form-item>
         <a-form-item label="券适用范围" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-radio-group
             v-decorator="['apply_range', { initialValue: 10, rules: [{ required: true }] }]"
@@ -155,6 +180,8 @@ export default {
       // 默认日期范围
       defaultDate: [moment(), moment()],
       defaultTime: [moment('00:00:00', 'HH:mm:ss'), moment('23:59:59', 'HH:mm:ss')],
+      // 默认选项
+      gainMethod: 'manual',
       // 适用范围：指定的商品
       containGoodsList: [],
       expire_as_hour: false,
@@ -190,6 +217,10 @@ export default {
         values.starts_at = values.betweenTime[0]
         values.expires_at = values.betweenTime[1]
       }
+      values.gain_from = values.gainBetween[0]
+      values.gain_to = values.gainBetween[1]
+      // 领取方式
+      if (this.gainMethod != 'situation') values.auto_gain_situation = null
       Api.add(values)
         .then(result => {
           // 显示提示信息

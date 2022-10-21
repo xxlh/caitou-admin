@@ -93,90 +93,65 @@
             />
           </a-form-item>
         </a-form-item>
-        <a-form-item label="领取条件" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-radio-group v-decorator="['condition_type']">
-            <a-radio value="">无条件限制</a-radio>
-            <a-radio value="manual">限定标签手动领取</a-radio>
-            <a-radio value="situation">限定场景自动获得</a-radio>
+        <a-form-item label="限时领取" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-range-picker v-decorator="['gainBetween', { initialValue: ['',''] }]" :show-time="{defaultValue: defaultTime}" />
+        </a-form-item>
+        <a-form-item label="领取方式" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-radio-group v-model="gainMethod">
+            <a-radio value="manual">用户手动领取</a-radio>
+            <a-radio value="situation">场景自动获得</a-radio>
           </a-radio-group>
-          <a-form-item v-show="form.getFieldValue('condition_type') == 'situation'">
-            <a-select
-              placeholder="请选择自动触发领取的场景"
-              v-decorator="['condition_situation.auto_trigger', { rules: [{required: form.getFieldValue('condition_type') == 'situation', message: '请至少选择1个触发场景'}]}]"
-              style="width: 150px"
-            >
-              <a-select-option value="after_launching">App启动时</a-select-option>
-            </a-select>
-            <a-select
-              mode="multiple"
-              placeholder="请选择可领取用户的标签"
-              allowClear
-              :dropdownStyle="{ maxHeight: '300px', overflow: 'auto' }"
-              :options="tagList"
-              :filter-option="false"
-              @search="searchTags"
-              @blur="blurTags"
-              v-decorator="['condition_situation.user_tag_ids', { rules: [{required: form.getFieldValue('condition_type') == 'situation', message: '请至少选择1个用户标签'}]}]"
-              style="width: 350px"
-            ></a-select>
-            <InputNumberGroup
-              addonBefore="每用户最多领取"
-              addonAfter="张"
-              :inputProps="{ min: -1, precision: 0 }"
-              v-decorator="['condition_situation.max_gain_per_user', { initialValue: 1}]"
-            />
-            <span class="ant-input-group-wrapper" style="width: auto">
-              <span class="ant-input-wrapper ant-input-group">
-                <span class="ant-input-group-addon">每</span>
-                <a-select
-                  placeholder="限制每xx时段领取一张"
-                  v-decorator="['condition_situation.limit_once_every']"
-                  style="width: 150px"
-                >
-                  <a-select-option value="day">天</a-select-option>
-                  <a-select-option value="week">周</a-select-option>
-                  <a-select-option value="month">月</a-select-option>
-                </a-select>
-                <span class="ant-input-group-addon">限领取一张</span>
-              </span>
+          <a-select v-show="gainMethod == 'situation'"
+            placeholder="请选择自动触发领取的场景"
+            v-decorator="['auto_gain_situation', { initialValue: 'after_launching' }]"
+            style="width: 150px"
+          >
+            <a-select-option value="after_launching">App启动时</a-select-option>
+            <a-select-option value="after_new_order">线上下单后</a-select-option>
+            <a-select-option value="after_new_ontheway">顺路单下单后</a-select-option>
+            <a-select-option value="after_registered">新用户</a-select-option>
+            <a-select-option value="after_registered_2_day">新用户次日</a-select-option>
+            <a-select-option value="after_registered_3_day">新用户第3天</a-select-option>
+            <a-select-option value="after_registered_4_day">新用户第4天</a-select-option>
+            <a-select-option value="after_registered_5_day">新用户第5天</a-select-option>
+            <a-select-option value="after_registered_6_day">新用户第6天</a-select-option>
+            <a-select-option value="after_registered_7_day">新用户第7天</a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="领取条件" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-select
+            mode="multiple"
+            placeholder="请选择可领取用户的标签"
+            allowClear
+            :dropdownStyle="{ maxHeight: '300px', overflow: 'auto' }"
+            :options="tagList"
+            :filter-option="false"
+            @search="searchTags"
+            @blur="blurTags"
+            v-decorator="['condition.user_tag_ids']"
+          ></a-select>
+          <InputNumberGroup
+            addonBefore="每用户最多领取"
+            addonAfter="张"
+            :inputProps="{ min: -1, precision: 0 }"
+            v-decorator="['max_gain_per_user', { initialValue: 3}]"
+          />
+          <span class="ant-input-group-wrapper" style="width: auto">
+            <span class="ant-input-wrapper ant-input-group">
+              <span class="ant-input-group-addon">每</span>
+              <a-select
+                placeholder="限制每xx时段领取一张"
+                v-decorator="['limit_once_every']"
+                style="width: 150px"
+              >
+                <a-select-option value="day">天</a-select-option>
+                <a-select-option value="week">周</a-select-option>
+                <a-select-option value="month">月</a-select-option>
+                <a-select-option :value="null">不限</a-select-option>
+              </a-select>
+              <span class="ant-input-group-addon">限领取一张</span>
             </span>
-            <a-range-picker v-decorator="['condition_situation.valid_between', { initialValue: ['',''] }]" :show-time="{defaultValue: defaultTime}" />
-          </a-form-item>
-          <a-form-item v-show="form.getFieldValue('condition_type') == 'manual'">
-            <a-select
-              mode="multiple"
-              placeholder="请选择可领取用户的标签"
-              allowClear
-              :dropdownStyle="{ maxHeight: '300px', overflow: 'auto' }"
-              :options="tagList"
-              :filter-option="false"
-              @search="searchTags"
-              @blur="blurTags"
-              v-decorator="['condition.user_tag_ids', { rules: [{required: form.getFieldValue('condition_type') == 'manual', message: '请至少选择1个用户标签'}]}]"
-            ></a-select>
-            <InputNumberGroup
-              addonBefore="每用户最多领取"
-              addonAfter="张"
-              :inputProps="{ min: -1, precision: 0 }"
-              v-decorator="['condition.max_gain_per_user', { initialValue: 1}]"
-            />
-            <span class="ant-input-group-wrapper" style="width: auto">
-              <span class="ant-input-wrapper ant-input-group">
-                <span class="ant-input-group-addon">每</span>
-                <a-select
-                  placeholder="限制每xx时段领取一张"
-                  v-decorator="['condition.limit_once_every']"
-                  style="width: 150px"
-                >
-                  <a-select-option value="day">天</a-select-option>
-                  <a-select-option value="week">周</a-select-option>
-                  <a-select-option value="month">月</a-select-option>
-                </a-select>
-                <span class="ant-input-group-addon">限领取一张</span>
-              </span>
-            </span>
-            <a-range-picker v-decorator="['condition.valid_between', { initialValue: ['',''] }]" :show-time="{defaultValue: defaultTime}" />
-          </a-form-item>
+          </span>
         </a-form-item>
         <a-form-item label="券适用范围" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-radio-group
@@ -291,6 +266,8 @@ export default {
       // 默认日期范围
       defaultDate: [moment(), moment()],
       defaultTime: [moment('00:00:00', 'HH:mm:ss'), moment('23:59:59', 'HH:mm:ss')],
+      // 默认选项
+      gainMethod: 'manual',
       // 优惠券ID
       couponId: null,
       // 当前记录
@@ -371,33 +348,27 @@ export default {
       !isEmpty(form.getFieldsValue()) && $nextTick(() => {
         // 表单数据
         const data = pick(record, [
-          'title', 'type', 'save_amount', 'off_percent', 'amount_limit',
-          'expire_type', 'expires_from_gain', 'apply_range', 'max_gain', 'description'
+          'title', 'type', 'save_amount', 'off_percent', 'amount_limit', 'auto_gain_situation',
+          'expire_type', 'expires_from_gain', 'apply_range', 'max_gain', 'max_gain_per_user', 'limit_once_every', 'description'
         ])
-        // 时间范围
-        data.betweenTime = this.getBetweenTime(record)
         // 到期类型
         this.expire_as_hour = data.expires_from_gain.indexOf('hour') != -1 ? true : false
         if (data.expires_from_gain && this.expire_as_hour) data.expire_hour = parseInt(record.expires_from_gain)
         else data.expire_day = parseInt(record.expires_from_gain) || 0
         data.start_day = parseInt(record.starts_from_gain) || 0
+        data.betweenTime = this.getBetweenTime(record.starts_at, record.expires_at)
+        // 限时领取
+        data.gainBetween = this.getBetweenTime(record.gain_from, record.gain_to)
+        // 领取方式
+        this.gainMethod = record.auto_gain_situation ? 'situation' : 'manual'
         // 条件领取
-        const conditions = record.conditions.filter(c => !c.auto_trigger)
-        data.condition = conditions.length ? conditions[0] : {}
-        data.condition.valid_between = [data.condition.valid_start, data.condition.valid_end]
-        data.condition.user_tag_ids = record.conditions.filter(c => !c.auto_trigger && c.condition_type == 'App\\Models\\Tag').map(c => c.condition_id)
-        // 场景领取
-        const situation_conditions = record.conditions.filter(c => c.auto_trigger)
-        data.condition_type = situation_conditions.length ? 'situation' : (conditions.length ? 'manual' : '')
-        data.condition_situation = {}
-        data.condition_situation = situation_conditions.length ? situation_conditions[0] : {}
-        data.condition_situation.valid_between = [data.condition_situation.valid_start, data.condition_situation.valid_end]
-        data.condition_situation.user_tag_ids = record.conditions.filter(c => c.auto_trigger == data.condition_situation.auto_trigger && c.condition_type == 'App\\Models\\Tag').map(c => c.condition_id)
+        data.condition = record.conditions.find(c => 'first') || {}
+        data.condition.user_tag_ids = record.conditions.filter(c => c.condition_type == 'App\\Models\\Tag').map(c => c.condition_id)
         // 指定分类
         data.apply_range = record.valid_entities.filter(e => e.is_excluded).length ? 30 : (record.valid_entities.length ? 20 : 10)
         data.categorys = record.valid_entities.filter(e => e.entity_type == 'Rinvex\\Categories\\Models\\Category' && !e.is_excluded).map(e => ({ value: e.entity_id }))
         data.exclude_categorys = record.valid_entities.filter(e => e.entity_type == 'Rinvex\\Categories\\Models\\Category' && e.is_excluded).map(e => ({ value: e.entity_id }))
-        // data.include_product_ids = record.valid_entities.filter(e => e.entity_type == 'App\\Models\\Product' && !e.is_excluded).map(e => e.entity_id)  // 通过getContainGoodsList方法替代
+        // data.include_product_ids = record.valid_entities.filter(e => e.entity_type == 'App\\Models\\Product' && !e.is_excluded).map(e => e.entity_id)  // 通过 getContainGoodsList 方法替代
         // form.getFieldDecorator('categorys')  // v-show替代v-if
         // form.getFieldDecorator('exclude_categorys')  // v-show替代v-if
         // form.getFieldDecorator('include_product_ids')
@@ -406,8 +377,8 @@ export default {
     },
 
     // 格式化时间范围
-    getBetweenTime (record) {
-      return [moment(new Date(record.starts_at)), moment(new Date(record.expires_at))]
+    getBetweenTime (start, end) {
+      return [moment(new Date(start)), moment(new Date(end))]
     },
 
     // 标签搜索
@@ -445,6 +416,10 @@ export default {
         values.starts_at = values.betweenTime[0]
         values.expires_at = values.betweenTime[1]
       }
+      values.gain_from = values.gainBetween[0]
+      values.gain_to = values.gainBetween[1]
+      // 领取方式
+      if (this.gainMethod != 'situation') values.auto_gain_situation = null
       // 指定分类
       if (values.apply_range == 30) values.exclude_category_ids = values.exclude_categorys ? values.exclude_categorys.map(item => item.value) : ''
       else if (values.apply_range == 20) {
@@ -473,22 +448,9 @@ export default {
           })
       };
       // 限定领取条件
-      if (values.condition_type) {
-        // const conditions = []
-        const condition_values = values.condition_type == 'situation' ? values.condition_situation : values.condition
-        // form_values.user_tag_ids.map(tag_id => {
-        //   conditions.push({
-        //     ...form_values,
-        //     condition_type: 'App\\Models\\Tag',
-        //     condition_id: tag_id,
-        //     valid_start: form_values.valid_between[0],
-        //     valid_end: form_values.valid_between[1],
-        //   })
-        // })
-        condition_values.valid_start = condition_values.valid_between[0]
-        condition_values.valid_end = condition_values.valid_between[1]
-        console.log(condition_values, values)
-        Api.set_condition(this.couponId, condition_values).then(callbackEditRequest)
+      console.log(values.condition, values)
+      if (values.condition?.user_tag_ids) {
+        Api.set_condition(this.couponId, values.condition).then(callbackEditRequest)
         .catch(e => {
           this.$message.error(e.msg, 3)
           this.isBtnLoading = false
