@@ -378,7 +378,7 @@ export default {
 
     // 格式化时间范围
     getBetweenTime (start, end) {
-      return [moment(new Date(start)), moment(new Date(end))]
+      return [start ? moment(new Date(start)) : null, end ? moment(new Date(end)) : null]
     },
 
     // 标签搜索
@@ -448,8 +448,7 @@ export default {
           })
       };
       // 限定领取条件
-      console.log(values.condition, values)
-      if (values.condition?.user_tag_ids) {
+      if (values.condition?.user_tag_ids?.length) {
         Api.set_condition(this.couponId, values.condition).then(callbackEditRequest)
         .catch(e => {
           this.$message.error(e.msg, 3)

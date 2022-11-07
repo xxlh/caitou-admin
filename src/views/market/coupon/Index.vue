@@ -111,7 +111,7 @@ export default {
           scopedSlots: { customRender: 'type' }
         },
         {
-          title: '最低消费金额 (元)',
+          title: '最低消费 (元)',
           dataIndex: 'amount_limit',
           scopedSlots: { customRender: 'amount_limit' }
         },
