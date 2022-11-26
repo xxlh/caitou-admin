@@ -116,6 +116,9 @@
             <a-select-option value="after_registered_5_day">新用户第5天</a-select-option>
             <a-select-option value="after_registered_6_day">新用户第6天</a-select-option>
             <a-select-option value="after_registered_7_day">新用户第7天</a-select-option>
+            <a-select-option value="after_first_referred">推荐首个新用户</a-select-option>
+            <a-select-option value="after_referred">推荐每个新用户</a-select-option>
+            <a-select-option value="after_referred_first_order">推荐注册完成下单</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item label="领取条件" :labelCol="labelCol" :wrapperCol="wrapperCol">

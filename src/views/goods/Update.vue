@@ -490,6 +490,8 @@ export default {
         // 整理商品分类ID集
         values.category_ids = values.categorys.map(item => item.value)
         delete values.categorys
+        values.store_id = this.$store.getters.storeId
+        values.image_ids = values.image_ids?.filter(img_id => img_id)
         // 提交到后端api
         this.onFormSubmit(values)
         return true
@@ -523,8 +525,6 @@ export default {
     onFormSubmit (values) {
       this.isLoading = true
       this.isBtnLoading = true
-      values.store_id = this.$store.getters.storeId
-      values.image_ids = values.image_ids?.filter(img_id => img_id)
       Promise.all([
         // CategoryApi.attach(this.goodsId, values.category_ids),
         values.specData ? GoodsApi.saveSku(this.goodsId, values.specData.skuList) : null,

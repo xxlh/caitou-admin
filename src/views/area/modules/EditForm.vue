@@ -19,6 +19,22 @@
             v-decorator="['cascader', {rules: [{required: true, message: '请选择省市区'}]}]"
           />
         </a-form-item>
+        <a-form-item label="筛选分类" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-radio-group v-decorator="['isFilter', {initialValue: categories.length ? 'filter' : 'all', rules: [{required: true}]}]">
+                <a-radio value="all">全部展示</a-radio>
+                <a-radio value="filter">部分展示</a-radio>
+              </a-radio-group>
+          <a-tree-select
+            v-show="form.getFieldValue('isFilter') == 'filter'"
+            placeholder="请选择商品分类"
+            :dropdownStyle="{ maxHeight: '500px', overflow: 'auto' }"
+            :treeData="categoryList"
+            treeCheckable
+            treeCheckStrictly
+            allowClear
+            v-decorator="['category_values']"
+          ></a-tree-select>
+        </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>
@@ -27,6 +43,7 @@
 <script>
 import * as Api from '@/api/area'
 import { SelectRegion } from '@/components'
+import CategoryModel from '@/common/model/Category'
 
 export default {
   components: {
@@ -48,6 +65,9 @@ export default {
       form: this.$form.createForm(this),
       // 当前记录
       record: {},
+      // 分类
+      categories: [],
+      categoryList: [],
     }
   },
   methods: {
@@ -55,11 +75,15 @@ export default {
     /**
      * 显示对话框
      */
-    edit (record) {
+    async edit (record) {
       // 显示窗口
       this.visible = true
       // 当前记录
       this.record = record
+      // 抓取分类筛选
+      this.categories = await Api.getCategories(record.id)
+      record.category_values = this.categories.map(c => { return { value: c.id } })
+      this.categoryList = await CategoryModel.getCategoryTreeSelect()
       // 设置默认值
       this.setFieldsValue()
     },
@@ -107,6 +131,10 @@ export default {
       this.confirmLoading = true
       const [province, city, district] = values.cascader
       delete values.cascader
+      if (values.isFilter == 'all') values.category_ids = []
+      else values.category_ids = values.category_values.map(item => item.value)
+      delete values.isFilter
+      delete values.category_values
       Api.edit(this.record.id, {...values, province, city, district})
         .then((result) => {
           // 显示成功

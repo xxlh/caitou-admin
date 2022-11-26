@@ -86,7 +86,7 @@ export const asyncRouterMap = [
             path: '/page',
             component: RouteView,
             redirect: '/page/index',
-            meta: { title: '页面展示', keepAlive: false, permission: ['/page'] },
+            meta: { title: '区域页面', keepAlive: false, permission: ['/page'] },
             children: [
               {
                 path: '/page/index',
