@@ -87,15 +87,15 @@ export default {
   },
   created () {
     // 获取分类列表
-    this.getCategoryList(true)
+    this.getCategoryList()
   },
   methods: {
 
     /**
      * 获取分类列表
      */
-    getCategoryList (bool) {
-      bool && (this.isLoading = true)
+    getCategoryList () {
+      (this.isLoading = true)
       Api.list()
         .then(result => {
           this.categoryList = result

@@ -43,6 +43,12 @@
             v-decorator="['slug', {rules: [{required: true, min: 2, message: '请输入至少2个字符'}]}]"
           />
         </a-form-item>
+        <a-form-item label="同城配送商品分类" :labelCol="labelCol" :wrapperCol="wrapperCol" extra="仅展示当前配送区域商品">
+          <a-radio-group v-decorator="['is_limit_area', { initialValue: $store.getters.storeId ? true : false, rules: [{ required: true }] }]">
+            <a-radio :value="true">是</a-radio>
+            <a-radio :value="false">否</a-radio>
+          </a-radio-group>
+        </a-form-item>
         <!-- <a-form-item label="状态" :labelCol="labelCol" :wrapperCol="wrapperCol" extra="用户端是否展示">
           <a-radio-group v-decorator="['status', { initialValue: 1, rules: [{ required: true }] }]">
             <a-radio :value="1">显示</a-radio>
@@ -118,7 +124,7 @@ export default {
       const { record, form: { setFieldsValue } } = this
       // 设置表单内容
       this.$nextTick(() => {
-        setFieldsValue(_.pick(record, ['name', 'parent_id', 'image_id', 'status', 'description', 'slug']))
+        setFieldsValue(_.pick(record, ['name', 'parent_id', 'image_id', 'status', 'description', 'slug', 'is_limit_area']))
       })
     },
 
