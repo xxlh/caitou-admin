@@ -22,7 +22,8 @@
       </span>
       <!-- 状态 -->
       <span slot="status" slot-scope="text, item">
-        <a-tag v-if="!text" color="green">待执行</a-tag>
+        <a-tag v-if="!text && new Date(item.adjust_at) < new Date()" color="red">执行失败</a-tag>
+        <a-tag v-else-if="!text" color="green">待执行</a-tag>
         <a-tag v-else-if="item.every" color="blue">已执行{{item.logs.length}}次</a-tag>
         <a-tag v-else>已调价</a-tag>
       </span>
@@ -57,7 +58,7 @@ export default {
   data () {
     return {
       // 查询参数
-      queryParam: {},
+      queryParam: {with_turn_back: true},
       cascader: [],
       // 正在加载
       isLoading: false,
