@@ -461,9 +461,9 @@ export const asyncRouterMap = [
                 hidden: true
               },
               {
-                path: '/market/assistance/receive/index',
-                component: () => import(/* webpackChunkName: "market" */ '@/views/market/assistance/Receive'),
-                meta: { title: '领券记录', keepAlive: false, permission: ['/market/assistance/receive/index'] }
+                path: '/market/assistance/log/index',
+                component: () => import(/* webpackChunkName: "market" */ '@/views/market/assistance/Log'),
+                meta: { title: '助力记录', keepAlive: false, permission: ['/market/assistance/log/index'] }
               }
             ]
           },

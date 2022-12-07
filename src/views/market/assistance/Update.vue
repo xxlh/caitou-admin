@@ -3,123 +3,147 @@
     <div class="card-title">{{ $route.meta.title }}</div>
     <a-spin :spinning="isLoading">
       <a-form :form="form" @submit="handleSubmit">
-        <a-form-item label="优惠券名称" :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <a-form-item label="助力标题" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input
-            placeholder="请输入优惠券名称"
+            placeholder="请输入助力标题"
             v-decorator="['name', { rules: [{ required: true, min: 2, message: '请输入至少2个字符' }] }]"
           />
         </a-form-item>
-        <a-form-item label="优惠券类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-radio-group
-            v-decorator="['coupon_type', { initialValue: 10, rules: [{ required: true }] }]"
-          >
-            <a-radio :value="10">满减券</a-radio>
-            <a-radio :value="20">折扣券</a-radio>
-          </a-radio-group>
-        </a-form-item>
-        <a-form-item
-          v-show="form.getFieldValue('coupon_type') == CouponTypeEnum.FULL_DISCOUNT.value"
-          label="减免金额"
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-        >
-          <a-input-number
-            :min="0.01"
-            :precision="2"
-            v-decorator="['reduce_price', { rules: [{ required: true, message: '请输入减免金额' }] }]"
+        <a-form-item label="助力图" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <SelectImage
+            :channel="channel"
+            :channel_id="assistId"
+            collection="assist_image"
+            :defaultList="record.image ? [record.image] : []"
+            v-decorator="['image_id']"
           />
-          <span class="ml-5">元</span>
-        </a-form-item>
-        <a-form-item
-          v-show="form.getFieldValue('coupon_type') == CouponTypeEnum.DISCOUNT.value"
-          label="折扣率"
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-        >
-          <a-input-number
-            :min="0"
-            :max="9.9"
-            :precision="1"
-            v-decorator="['discount', { initialValue: 9.9, rules: [{ required: true, message: '请输入折扣率' }] }]"
-          />
-          <span class="ml-5">%</span>
           <p class="form-item-help">
-            <small>折扣率范围 0-9.9，8代表打8折，0代表不折扣</small>
+            <small>建议200x200的奖励图</small>
           </p>
         </a-form-item>
-        <a-form-item label="最低消费金额" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input-number
-            :min="0.01"
-            :precision="2"
-            v-decorator="['min_price', { rules: [{ required: true, message: '请输入最低消费金额' }] }]"
-          />
-          <span class="ml-5">元</span>
+        <a-form-item
+          label="成功奖励"
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+        >
+          <p>
+            <a-select
+              placeholder="请选择奖励的优惠券"
+              allowClear
+              :options="couponList"
+              :filter-option="false"
+              v-decorator="['award_id', { rules: [{required: true}] }]"
+              :dropdownStyle="{ maxHeight: '300px', overflow: 'auto' }"
+              style="width: 200px"
+            ></a-select>
+          </p>
+          <p>
+            <span class="ml-5">同时奖励现金：</span>
+            <a-input-number
+              :min="0"
+              :precision="2"
+              v-decorator="['award_amount', { initialValue: 0 }]"
+            />
+            <span>元</span>
+          </p>
         </a-form-item>
-        <a-form-item label="到期类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-radio-group
-            v-decorator="['expire_type', { initialValue: 10, rules: [{ required: true }] }]"
-          >
-            <a-radio :value="10">领取后生效</a-radio>
-            <a-radio :value="20">固定时间</a-radio>
+        <a-form-item label="对助力者奖励" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-radio-group v-model="isAwardTeamate">
+            <a-radio :value="false">不奖励</a-radio>
+            <a-radio :value="true">奖励</a-radio>
           </a-radio-group>
-          <a-form-item v-show="form.getFieldValue('expire_type') == 10" class="expire_type-10">
-            <InputNumberGroup
-              addonBefore="有效期"
-              addonAfter="天"
-              :inputProps="{ min: 1, precision: 0 }"
-              v-decorator="['expire_day', { initialValue: 7, rules: [{ required: true, message: '请输入有效期天数' }] }]"
-            />
-          </a-form-item>
-          <a-form-item v-show="form.getFieldValue('expire_type') == 20" class="expire_type-20">
-            <a-range-picker
-              format="YYYY-MM-DD"
-              v-decorator="['betweenTime', { initialValue: defaultDate, rules: [{ required: true, message: '请选择有效期范围' }] }]"
-            />
-          </a-form-item>
         </a-form-item>
-        <a-form-item label="券适用范围" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-radio-group
-            v-decorator="['apply_range', { initialValue: 10, rules: [{ required: true }] }]"
-          >
-            <a-radio :value="10">全场通用</a-radio>
-            <a-radio :value="20">指定商品</a-radio>
-          </a-radio-group>
-          <a-form-item v-if="form.getFieldValue('apply_range') == 20">
-            <SelectGoods
-              :defaultList="containGoodsList"
-              v-decorator="['apply_range_config.applyGoodsIds', { rules: [{ required: true, message: '请选择指定的商品' }] }]"
+        <a-form-item
+          v-show="isAwardTeamate"
+          label="助力者奖励"
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+        >
+          <p>
+            <a-select
+              placeholder="请选择奖励的优惠券"
+              allowClear
+              :options="couponList"
+              :filter-option="false"
+              v-decorator="['award_teammate_id']"
+              :dropdownStyle="{ maxHeight: '300px', overflow: 'auto' }"
+              style="width: 200px"
+            ></a-select>
+          </p>
+          <p>
+            <span class="ml-5">同时奖励现金：</span>
+            <a-input-number
+              :min="0"
+              :precision="2"
+              v-decorator="['award_teammate_amount', { initialValue: 0 }]"
             />
-          </a-form-item>
+            <span>元</span>
+          </p>
+          <p class="form-item-help">
+            <small>每个帮忙助力用户在助力的同时获得奖励</small>
+          </p>
         </a-form-item>
-        <a-form-item label="发放总数量" :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <a-form-item label="需要助力数" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input-number
             :min="-1"
             :precision="0"
-            v-decorator="['total_num', { initialValue: -1, rules: [{ required: true, message: '请输入发放总数量' }] }]"
+            v-decorator="['needs', { initialValue: 2, rules: [{ required: true, message: '请输入成功助力的需要助力数' }] }]"
           />
-          <span class="ml-5">张</span>
-          <p class="form-item-help">
-            <small>发放的优惠券总数量，-1为不限制</small>
+          <span class="ml-5">位用户</span>
+          <p>
+            <a-radio-group v-decorator="['is_need_new']">
+              <a-radio :value="0">不限制</a-radio>
+              <a-radio :value="1">新用户</a-radio>
+            </a-radio-group>
           </p>
         </a-form-item>
-        <a-form-item label="显示状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-radio-group v-decorator="['status', { initialValue: 1, rules: [{ required: true }] }]">
-            <a-radio :value="1">显示</a-radio>
-            <a-radio :value="0">隐藏</a-radio>
+        <a-form-item label="限时助力" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input-number
+            :min="-1"
+            :precision="0"
+            v-decorator="['hour_limited', { initialValue: 3, rules: [{ required: true, message: '请输入助力限制的小时数' }] }]"
+          />
+          <span class="ml-5">小时</span>
+        </a-form-item>
+        <a-form-item label="限制同城" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-radio-group v-decorator="['is_city_limited']">
+            <a-radio :value="0">不限制</a-radio>
+            <a-radio :value="1">只允许同城可配送区用户助力</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item label="周期限制" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <span class="ant-input-group-wrapper" style="width: auto">
+            <span class="ant-input-wrapper ant-input-group">
+              <span class="ant-input-group-addon">每</span>
+              <a-select
+                placeholder="限制每xx时段领取一张"
+                v-decorator="['limit_once_every']"
+                style="width: 150px"
+              >
+                <a-select-option value="day">天</a-select-option>
+                <a-select-option value="week">周</a-select-option>
+                <a-select-option value="month">月</a-select-option>
+                <a-select-option :value="null">不限</a-select-option>
+              </a-select>
+              <span class="ant-input-group-addon">限领取一张</span>
+            </span>
+          </span>
+        </a-form-item>
+        <a-form-item label="是否启用" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-radio-group v-decorator="['is_active', { initialValue: 1, rules: [{ required: true }] }]">
+            <a-radio :value="1">启用</a-radio>
+            <a-radio :value="0">禁用</a-radio>
           </a-radio-group>
           <p class="form-item-help">
             <small>如果设为隐藏将不会展示在用户端页面</small>
           </p>
         </a-form-item>
-        <a-form-item label="优惠券描述" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-textarea :autoSize="{ minRows: 4 }" v-decorator="['describe']" />
-        </a-form-item>
-        <a-form-item label="排序" :labelCol="labelCol" :wrapperCol="wrapperCol" extra="数字越小越靠前">
+        <!-- <a-form-item label="排序" :labelCol="labelCol" :wrapperCol="wrapperCol" extra="数字越小越靠前">
           <a-input-number
             :min="0"
             v-decorator="['sort', {initialValue: 100, rules:[{required: true, message: '请输入排序值'}]}]"
           />
-        </a-form-item>
+        </a-form-item> -->
         <a-form-item class="mt-20" :wrapper-col="{ span: wrapperCol.span, offset: labelCol.span }">
           <a-button type="primary" html-type="submit" :loading="isBtnLoading">提交</a-button>
         </a-form-item>
@@ -131,16 +155,17 @@
 <script>
 import moment from 'moment'
 import { pick, get } from 'lodash'
-import * as Api from '@/api/market/coupon'
-import * as GoodsApi from '@/api/goods'
+import * as Api from '@/api/market/assistance'
+import * as CouponApi from '@/api/market/coupon'
 import { isEmpty } from '@/utils/util'
-import { InputNumberGroup, SelectGoods } from '@/components'
+import { InputNumberGroup, SelectImage } from '@/components'
 import { ApplyRangeEnum, CouponTypeEnum, ExpireTypeEnum } from '@/common/enum/coupon'
+import ChannelEnum from '@/common/enum/file/Channel'
 
 export default {
   components: {
-    SelectGoods,
-    InputNumberGroup
+    InputNumberGroup,
+    SelectImage,
   },
   data () {
     return {
@@ -148,6 +173,7 @@ export default {
       ApplyRangeEnum,
       CouponTypeEnum,
       ExpireTypeEnum,
+      channel: ChannelEnum.ASSIST.value,
       // 正在加载
       isLoading: false,
       isBtnLoading: false,
@@ -157,56 +183,40 @@ export default {
       wrapperCol: { span: 10 },
       // 当前表单元素
       form: this.$form.createForm(this),
-      // 默认日期范围
-      defaultDate: [moment(), moment()],
       // 优惠券ID
-      couponId: null,
+      assistId: null,
       // 当前记录
       record: {},
-      // 适用范围：指定的商品
-      containGoodsList: []
+      // 奖励的优惠券列表
+      couponList: [],
+      isAwardTeamate: false,
     }
   },
   async created () {
     // 记录优惠券ID
-    this.couponId = this.$route.query.couponId
+    this.assistId = parseInt(this.$route.query.id)
     // 获取当前记录
     await this.getDetail()
-    // 获取适用范围：指定的商品
-    await this.getContainGoodsList()
+    // 获取优惠券列表
+    const coupons = await CouponApi.list({per_page: 99})
+    this.couponList = coupons.data.map(t => ({label:`${t.id}. ${t.title}`, value:t.id}))
   },
   methods: {
 
     // 获取当前记录
     async getDetail () {
-      const { couponId } = this
+      const { assistId } = this
       this.isLoading = true
-      await Api.detail({ couponId })
+      await Api.detail(assistId)
         .then(result => {
           // 当前记录
-          this.record = result.data.detail
+          this.record = result
           // 设置表单默认值
           this.setFieldsValue()
         })
         .finally(() => {
           this.isLoading = false
         })
-    },
-
-    // 获取指定的商品列表
-    async getContainGoodsList () {
-      const { record } = this
-      const goodsIds = get(record, 'apply_range_config.applyGoodsIds')
-      if (goodsIds !== undefined && goodsIds.length) {
-        this.isLoading = true
-        await GoodsApi.listByIds(goodsIds)
-          .then(result => {
-            this.containGoodsList = result.data.list
-          })
-          .finally(result => {
-            this.isLoading = false
-          })
-      }
     },
 
     // 设置表单默认值
@@ -216,21 +226,12 @@ export default {
       !isEmpty(form.getFieldsValue()) && $nextTick(() => {
         // 表单数据
         const data = pick(record, [
-          'name', 'coupon_type', 'reduce_price', 'discount', 'min_price', 'status',
-          'expire_type', 'expire_day', 'apply_range', 'total_num', 'describe', 'sort'
+          'name', 'area_id', 'award_amount', 'award_id', 'award_type', 'award_teammate_amount', 'award_teammate_id', 'award_teammate_type',
+          'needs', 'is_need_new', 'hour_limited', 'is_city_limited', 'is_active', 'limit_once_every'
         ])
-        // 时间范围
-        data.betweenTime = this.getBetweenTime(record)
+        if (record.award_teammate_id || record.award_teammate_amount) this.isAwardTeamate = true
         form.setFieldsValue(data)
       })
-    },
-
-    // 格式化时间范围
-    getBetweenTime (record) {
-      if (record.expire_type === ExpireTypeEnum.FIXED_TIME.value) {
-        return [moment(new Date(record.start_time)), moment(new Date(record.end_time))]
-      }
-      return this.defaultDate
     },
 
     // 确认按钮
@@ -239,6 +240,9 @@ export default {
       // 表单验证
       const { form: { validateFields }, onFormSubmit } = this
       validateFields((errors, values) => {
+        if (!values.award_teammate_id) values.award_teammate_id = 0
+        if (!this.isAwardTeamate) values.award_teammate_id = 0
+        if (!this.isAwardTeamate) values.award_teammate_amount = null
         !errors && onFormSubmit(values)
       })
     },
@@ -249,10 +253,10 @@ export default {
     onFormSubmit (values) {
       this.isLoading = true
       this.isBtnLoading = true
-      Api.edit({ couponId: this.couponId, form: values })
+      Api.edit(this.assistId, values)
         .then(result => {
           // 显示提示信息
-          this.$message.success(result.message, 1.5)
+          this.$message.success('更新成功', 1.5)
           // 跳转到列表页
           setTimeout(() => {
             this.$router.push('./index')

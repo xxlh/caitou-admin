@@ -24,47 +24,40 @@
     </div>
     <s-table
       ref="table"
-      rowKey="coupon_id"
+      rowKey="id"
       :loading="isLoading"
       :columns="columns"
       :data="loadData"
       :pageSize="15"
     >
-      <!-- 优惠券类型 -->
-      <template slot="coupon_type" slot-scope="text">
-        <a-tag>{{ CouponTypeEnum[text].name }}</a-tag>
+      <!-- 奖励类型 -->
+      <template slot="award" slot-scope="text, item">
+        <a-tooltip v-if="(item.award_type=='App\\Models\\VoucherTemplate' && item.award)" :title="item.award.title">
+          <a-tag>赠送优惠券</a-tag>
+        </a-tooltip>
+        <a-tag v-if="item.award_amount">赠送金额￥{{item.award_amount}}</a-tag>
+        <template v-if="!item.award_amount && !item.award">无</template>
       </template>
-      <!-- 最低消费金额 -->
-      <template slot="min_price" slot-scope="text">
-        <p class="c-p">{{ text }}</p>
+      <template slot="award_teammate" slot-scope="text, item">
+        <a-tooltip v-if="item.award_teammate_type=='App\\Models\\VoucherTemplate' && item.award_teammate" :title="item.award_teammate.title">
+          <a-tag>赠送优惠券</a-tag>
+        </a-tooltip>
+        <a-tag v-else-if="item.award_teammate_amount">赠送金额￥{{item.award_teammate_amount}}</a-tag>
+        <template v-else>无</template>
       </template>
-      <!-- 优惠方式 -->
-      <template slot="discount" slot-scope="item">
-        <template v-if="item.coupon_type == 10">
-          <span>立减</span>
-          <span class="c-p mlr-2">{{ item.reduce_price }}</span>
-          <span>元</span>
-        </template>
-        <template v-if="item.coupon_type == 20">
-          <span>打</span>
-          <span class="c-p mlr-2">{{ item.discount }}</span>
-          <span>折</span>
-        </template>
+      <!-- 新人助力 -->
+      <template slot="is_need_new" slot-scope="text">
+        {{ text ? '是' : '否' }}
       </template>
-      <!-- 有效期 -->
-      <template slot="duetime" slot-scope="item">
-        <template v-if="item.expire_type == 10">
-          <span>领取</span>
-          <span class="c-p mlr-2">{{ item.expire_day }}</span>
-          <span>天内有效</span>
-        </template>
-        <template v-if="item.expire_type == 20">
-          <span>{{ item.start_time }} ~ {{ item.end_time }}</span>
-        </template>
+      <!-- 发起频率 -->
+      <template slot="limit_once_every" slot-scope="text">
+        <template v-if="text == 'day'">每天一次</template>
+        <template v-else-if="text == 'week'">每周一次</template>
+        <template v-else-if="text == 'month'">每月一次</template>
       </template>
       <!-- 状态 -->
-      <template slot="status" slot-scope="text">
-        <a-tag :color="text ? 'green' : ''">{{ text ? '显示' : '隐藏' }}</a-tag>
+      <template slot="is_active" slot-scope="text">
+        <a-tag :color="text ? 'green' : ''">{{ text ? '可用' : '禁用' }}</a-tag>
       </template>
       <!-- 操作 -->
       <span class="actions" slot="action" slot-scope="item">
@@ -98,51 +91,53 @@ export default {
       // 表头
       columns: [
         {
-          title: '优惠券ID',
-          dataIndex: 'coupon_id'
+          title: '助力模版ID',
+          dataIndex: 'id'
         },
         {
-          title: '优惠券名称',
+          title: '助力标题',
           dataIndex: 'name'
         },
         {
-          title: '优惠券类型',
-          dataIndex: 'coupon_type',
-          scopedSlots: { customRender: 'coupon_type' }
+          title: '奖励',
+          dataIndex: 'award_amount',
+          scopedSlots: { customRender: 'award' }
         },
         {
-          title: '最低消费金额 (元)',
-          dataIndex: 'min_price',
-          scopedSlots: { customRender: 'min_price' }
+          title: '助力者奖励',
+          dataIndex: 'award_teammate_amount',
+          scopedSlots: { customRender: 'award_teammate' }
         },
         {
-          title: '优惠方式',
-          scopedSlots: { customRender: 'discount' }
+          title: '需要助力数',
+          dataIndex: 'needs',
         },
-        // {
-        //   title: '有效期',
-        //   scopedSlots: { customRender: 'duetime' }
-        // },
+        {
+          title: '是否新人助力',
+          dataIndex: 'is_need_new',
+          scopedSlots: { customRender: 'is_need_new' }
+        },
+        {
+          title: '用户发起频率',
+          dataIndex: 'limit_once_every',
+          scopedSlots: { customRender: 'limit_once_every' }
+        },
         // {
         //   title: '发放总数量',
         //   dataIndex: 'total_num'
         // },
         {
-          title: '已发放/领取数量',
-          dataIndex: 'receive_num'
+          title: '已助力次数',
+          dataIndex: 'success_count'
         },
         {
           title: '状态',
-          dataIndex: 'status',
-          scopedSlots: { customRender: 'status' }
-        },
-        {
-          title: '排序',
-          dataIndex: 'sort'
+          dataIndex: 'is_active',
+          scopedSlots: { customRender: 'is_active' }
         },
         {
           title: '添加时间',
-          dataIndex: 'create_time'
+          dataIndex: 'created_at'
         },
         {
           title: '操作',
@@ -154,7 +149,7 @@ export default {
       loadData: param => {
         return Api.list({ ...param, ...this.queryParam })
           .then(response => {
-            return response.data.list
+            return response
           })
       }
     }
@@ -171,7 +166,7 @@ export default {
 
     // 编辑记录
     handleEdit (item) {
-      this.$router.push({ path: './update', query: { couponId: item.coupon_id } })
+      this.$router.push({ path: './update', query: { id: item.id } })
     },
 
     /**
@@ -183,7 +178,7 @@ export default {
         title: '您确定要删除该记录吗?',
         content: '删除后不可恢复',
         onOk () {
-          return Api.deleted({ couponId: item.coupon_id })
+          return Api.deleted( item.id )
             .then((result) => {
               app.$message.success(result.message, 1.5)
               app.handleRefresh()
