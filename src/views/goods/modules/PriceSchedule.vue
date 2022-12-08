@@ -23,9 +23,17 @@
       <!-- 状态 -->
       <span slot="status" slot-scope="text, item">
         <a-tag v-if="!text && new Date(item.adjust_at) < new Date()" color="red">执行失败</a-tag>
-        <a-tag v-else-if="!text" color="green">待执行</a-tag>
-        <a-tag v-else-if="item.every" color="blue">已执行{{item.logs.length}}次</a-tag>
-        <a-tag v-else>已调价</a-tag>
+        <a-tag v-else-if="!text">待执行</a-tag>
+        <a-tag v-else-if="item.every" color="blue">已执行{{item.logs ? item.logs.length : 'n'}}次</a-tag>
+        <a-tag v-else color="green">已调价</a-tag>
+      </span>
+      <!-- 价格回改 -->
+      <span slot="turn_back" slot-scope="text, item">
+        <a-tag v-if="!text">否</a-tag>
+        <a-tag v-else-if="!text.done_at && new Date(text.adjust_at) < new Date()" color="red">回改失败</a-tag>
+        <a-tag v-else-if="!text.done_at">待回改</a-tag>
+        <a-tag v-else-if="(text.every && item.product_sku.price != text.target_price)" color="blue">待回改</a-tag>
+        <a-tag v-else color="green">已回改</a-tag>
       </span>
       <!-- 操作 -->
       <span slot="action" slot-scope="text, item">
@@ -91,6 +99,11 @@ export default {
           scopedSlots: { customRender: 'status' }
         },
         {
+          title: '价格回改',
+          dataIndex: 'turn_back',
+          scopedSlots: { customRender: 'turn_back' }
+        },
+        {
           title: '操作',
           dataIndex: 'action',
           width: '180px',
@@ -136,7 +149,7 @@ export default {
         title: '您确定要删除该记录吗?',
         content: '删除后不可恢复',
         onOk () {
-          return Api.deleteScheduledPrice(this.goodsId, item.id)
+          return Api.deleteScheduledPrice(app.goodsId, item.id)
             .then((result) => {
               app.$message.success('已删除', 1.5)
               app.handleRefresh()
