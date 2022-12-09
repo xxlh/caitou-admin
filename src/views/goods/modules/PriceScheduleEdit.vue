@@ -16,6 +16,18 @@
         <a-form-item label="调整价格" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-select v-decorator="['target_dates', {rules: [{required: true, message: '请选择对应团期'}]}]" mode="multiple" :options="targetDatesOption" v-show="targetDatesOption.length" style="width:200px" />
           <a-input-number :min="0.01" :precision="2" v-decorator="['target_price', {rules: [{required: true, message: '请输入目标调整的价格'}]}]" /> 元
+          <p v-if="form.getFieldValue('sku_id')" class="form-item-help">
+            <small v-if="!targetDatesOption.length">当前价格：{{skus.find(sku => sku.id = form.getFieldValue('sku_id')).price}}</small>
+            <small v-else-if="form.getFieldValue('target_dates') && form.getFieldValue('target_dates').length == 1">当前价格：{{skus.find(sku => sku.id = form.getFieldValue('sku_id')).daily_price[ form.getFieldValue('target_dates')[0] ].price}}</small>
+          </p>
+        </a-form-item>
+        <a-form-item label="调整库存" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-switch v-model="isChangeStock" />
+          <a-input-number v-show="isChangeStock" :min="0" v-decorator="['target_stock']" />
+          <p v-if="form.getFieldValue('sku_id')" class="form-item-help">
+            <small v-if="!targetDatesOption.length">当前库存：{{skus.find(sku => sku.id = form.getFieldValue('sku_id')).stock}}</small>
+            <small v-else-if="form.getFieldValue('target_dates') && form.getFieldValue('target_dates').length == 1">当前库存：{{skus.find(sku => sku.id = form.getFieldValue('sku_id')).daily_price[ form.getFieldValue('target_dates')[0] ].stock}}</small>
+          </p>
         </a-form-item>
         <a-form-item label="模板" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-radio-group v-model="quickOption" button-style="solid" @change="changeQuickOption">
@@ -27,7 +39,7 @@
             <a-radio-button value="">自定义</a-radio-button>
           </a-radio-group>
         </a-form-item>
-        <a-form-item label="限时" v-show="quickOption" :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <a-form-item label="限时" v-if="quickOption" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input-number :min="1" v-decorator="['turn_back_minutes', {initialValue: 60, rules: [{required: !!quickOption, message: '请输入限时分钟数'}]}]" /> 分钟
         </a-form-item>
         <a-form-item label="触发日期" v-show="quickOption" :labelCol="labelCol" :wrapperCol="wrapperCol">
@@ -49,6 +61,10 @@
               <a-select-option value="yearly">年</a-select-option>
             </a-select> 触发
           </span>
+        </a-form-item>
+        <a-form-item label="价格库存回改" v-if="!quickOption" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-switch v-model="isTurnBack" />
+          <span v-show="isTurnBack"><a-input-number :min="1" v-decorator="['turn_back_minutes', {initialValue: 60, rules: [{required: !!quickOption, message: '请输入限时分钟数'}]}]" /> 分钟后</span>
         </a-form-item>
       </a-form>
     </a-spin>
@@ -87,7 +103,9 @@ export default {
       record: {},
       selectedSkuId: 0,
       isEditing: false,
+      isChangeStock: false,
       isRepeat: false,
+      isTurnBack: false,
       quickOption: '',
       adjust_date: moment(),
       locale,
@@ -173,8 +191,10 @@ export default {
       // 表单验证
       const { form: { validateFields } } = this
       validateFields((errors, values) => {
+        if (!this.isChangeStock) values.target_stock = null
         if (values.adjust_at.local) values.adjust_at = values.adjust_at.local().format()
         values.turn_back_seconds = values.turn_back_minutes * 60
+        if (!this.quickOption && !this.isTurnBack) values.turn_back_seconds = null
         // 提交到后端api
         !errors && this.onFormSubmit(values)
       })
@@ -187,6 +207,7 @@ export default {
       this.visible = false
       this.form.resetFields()
       this.isEditing = false
+      this.isChangeStock = false
       this.isRepeat = false
       this.quickOption = ''
     },
