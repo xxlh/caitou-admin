@@ -24,32 +24,30 @@
     </div>
     <s-table
       ref="table"
-      rowKey="seckill_id"
+      rowKey="id"
       :loading="isLoading"
       :columns="columns"
       :data="loadData"
       :pageSize="15"
     >
-  
-      <!-- 商品价格 -->
-      <!-- <template slot="goods_price_min" slot-scope="item">
-        <span class="c-p mlr-2">{{ item.goods_price_min }}</span>
-        <span>元</span>
-      </template> -->
+      <!-- 秒杀价格 -->
+      <template slot="target_price" slot-scope="text, item">
+          <span>¥{{ item.product_sku.price }} -> </span>
+          <span class="c-p mlr-2">¥{{ text }}</span>
+      </template>
       
       <template slot="duetime" slot-scope="item">
-         <template>
-          <span>{{ item.start_time }} ~ {{ item.end_time }}</span>
-        </template>
+          <span>{{ item.adjust_at }}</span>
+          <span v-if="item.turn_back"> ~ {{ moment(item.turn_back.adjust_at).format('HH:mm:ss') }}</span>
       </template>
-      
-      <!-- 秒杀价格 -->
-      <template slot="seckil_price" slot-scope="item">
-          <span class="c-p mlr-2">{{ item.seckill_price_array.seckill_price_min }}~{{ item.seckill_price_array.seckill_price_max }}</span>
-          <span>元</span>
+      <template slot="repeat" slot-scope="item">
+         <template v-if="item.every">
+          <span>每 {{item.every}} {{item.repeat}}</span>
+        </template>
+        <a-tag v-else>否</a-tag>
       </template>
       <!-- 状态 -->
-      <template slot="status" slot-scope="text">
+      <template slot="is_show" slot-scope="text">
         <a-tag :color="text ? 'green' : ''">{{ text ? '显示' : '隐藏' }}</a-tag>
       </template>
       <!-- 操作 -->
@@ -58,23 +56,28 @@
         <a v-action:delete @click="handleDelete(item)">删除</a>
       </span>
     </s-table>
+    <PriceScheduleEdit ref="EditForm" @handleSubmit="handleRefresh" />
   </a-card>
 </template>
 
 <script>
 import * as Api from '@/api/market/seckill'
+import * as GoodsApi from '@/api/goods'
 import { STable } from '@/components'
 import { ApplyRangeEnum, SeckillTypeEnum, ExpireTypeEnum } from '@/common/enum/seckill'
+import PriceScheduleEdit from '../../goods/modules/PriceScheduleEdit'
+import moment from 'moment'
 
 export default {
   name: 'Index',
   components: {
-    STable
+    STable,
+    PriceScheduleEdit,
   },
   data () {
     return {
       // 查询参数
-      queryParam: {},
+      queryParam: {with_turn_back: 'only', valid: true},
       // 枚举类
       ApplyRangeEnum,
       SeckillTypeEnum,
@@ -85,33 +88,29 @@ export default {
       columns: [
         {
           title: '秒杀ID',
-          dataIndex: 'seckill_id'
+          dataIndex: 'id'
         },
         {
           title: '商品名称',
-          dataIndex: 'goods_name'
+          dataIndex: 'product.title'
+        },
+        {
+          title: '秒杀价格',
+          dataIndex: 'target_price',
+          scopedSlots: { customRender: 'target_price' }
         },
         {
           title: '秒杀时间范围',
           scopedSlots: { customRender: 'duetime' }
         },
-       
         {
-          title: '秒杀价格',
-          scopedSlots: { customRender: 'seckil_price' }
+          title: '自动重复',
+          scopedSlots: { customRender: 'repeat' }
         },
         {
           title: '状态',
-          dataIndex: 'status',
-          scopedSlots: { customRender: 'status' }
-        },
-        {
-          title: '排序',
-          dataIndex: 'sort'
-        },
-        {
-          title: '添加时间',
-          dataIndex: 'create_time'
+          dataIndex: 'is_show',
+          scopedSlots: { customRender: 'is_show' }
         },
         {
           title: '操作',
@@ -123,7 +122,7 @@ export default {
       loadData: param => {
         return Api.list({ ...param, ...this.queryParam })
           .then(response => {
-            return response.data.list
+            return response
           })
       }
     }
@@ -132,15 +131,16 @@ export default {
 
   },
   methods: {
-
+    moment,
     // 新增记录
     handleAdd () {
-      this.$router.push('./create')
+      this.$refs.EditForm.create()
     },
 
     // 编辑记录
     handleEdit (item) {
-      this.$router.push({ path: './update', query: { seckillId: item.seckill_id } })
+      this.$refs.EditForm.edit(item)
+      // this.$router.push({ path: './update', query: { seckillId: item.id } })
     },
 
     /**
@@ -152,9 +152,9 @@ export default {
         title: '您确定要删除该记录吗?',
         content: '删除后不可恢复',
         onOk () {
-          return Api.deleted({ seckillId: item.seckill_id })
+          return GoodsApi.deleteScheduledPrice(item.product_id, item.id)
             .then((result) => {
-              app.$message.success(result.message, 1.5)
+              app.$message.success('已删除', 1.5)
               app.handleRefresh()
             })
             .finally(result => {

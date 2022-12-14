@@ -10,23 +10,26 @@
   >
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
+        <a-form-item label="选择商品" v-show="!goodsId" :labelCol="labelCol" :wrapperCol="wrapperCol">
+           <SelectGoods v-decorator="['product_id', { rules: [{ required: true, message: '请选择指定的商品' }] }]" :multiple="false" :disabled="isEditing" :defaultList="containGoodsList" @change="selectGoods" />
+        </a-form-item>
         <a-form-item label="选择规格" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-select v-decorator="['sku_id', {rules: [{required: true, message: '请选择目标规格'}]}]" :options="skusOption" :disabled="isEditing" @change="selectSku" />
         </a-form-item>
         <a-form-item label="调整价格" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-select v-decorator="['target_dates', {rules: [{required: true, message: '请选择对应团期'}]}]" mode="multiple" :options="targetDatesOption" v-show="targetDatesOption.length" style="width:200px" />
+          <a-select v-decorator="['target_dates', {rules: [{required: targetDatesOption.length > 0, message: '请选择对应团期'}]}]" mode="multiple" :options="targetDatesOption" v-show="targetDatesOption.length" style="width:200px" />
           <a-input-number :min="0.01" :precision="2" v-decorator="['target_price', {rules: [{required: true, message: '请输入目标调整的价格'}]}]" /> 元
-          <p v-if="form.getFieldValue('sku_id')" class="form-item-help">
-            <small v-if="!targetDatesOption.length">当前价格：{{skus.find(sku => sku.id = form.getFieldValue('sku_id')).price}}</small>
-            <small v-else-if="form.getFieldValue('target_dates') && form.getFieldValue('target_dates').length == 1">当前价格：{{skus.find(sku => sku.id = form.getFieldValue('sku_id')).daily_price[ form.getFieldValue('target_dates')[0] ].price}}</small>
+          <p v-if="form.getFieldValue('sku_id') && skus.length" class="form-item-help">
+            <small v-if="!targetDatesOption.length">当前价格：{{skus.find(sku => sku.id == form.getFieldValue('sku_id')).price}}</small>
+            <small v-else-if="form.getFieldValue('target_dates') && form.getFieldValue('target_dates').length == 1">当前价格：{{skus.find(sku => sku.id == form.getFieldValue('sku_id')).daily_price[ form.getFieldValue('target_dates')[0] ].price}}</small>
           </p>
         </a-form-item>
         <a-form-item label="调整库存" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-switch v-model="isChangeStock" />
           <a-input-number v-show="isChangeStock" :min="0" v-decorator="['target_stock']" />
-          <p v-if="form.getFieldValue('sku_id')" class="form-item-help">
-            <small v-if="!targetDatesOption.length">当前库存：{{skus.find(sku => sku.id = form.getFieldValue('sku_id')).stock}}</small>
-            <small v-else-if="form.getFieldValue('target_dates') && form.getFieldValue('target_dates').length == 1">当前库存：{{skus.find(sku => sku.id = form.getFieldValue('sku_id')).daily_price[ form.getFieldValue('target_dates')[0] ].stock}}</small>
+          <p v-if="form.getFieldValue('sku_id') && skus.length" class="form-item-help">
+            <small v-if="!targetDatesOption.length">当前库存：{{skus.find(sku => sku.id == form.getFieldValue('sku_id')).stock}}</small>
+            <small v-else-if="form.getFieldValue('target_dates') && form.getFieldValue('target_dates').length == 1">当前库存：{{skus.find(sku => sku.id == form.getFieldValue('sku_id')).daily_price[ form.getFieldValue('target_dates')[0] ].stock}}</small>
           </p>
         </a-form-item>
         <a-form-item label="模板" :labelCol="labelCol" :wrapperCol="wrapperCol">
@@ -38,9 +41,6 @@
             <a-radio-button value="every_1_daily_at_0">每天0点场</a-radio-button>
             <a-radio-button value="">自定义</a-radio-button>
           </a-radio-group>
-        </a-form-item>
-        <a-form-item label="限时" v-if="quickOption" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input-number :min="1" v-decorator="['turn_back_minutes', {initialValue: 60, rules: [{required: !!quickOption, message: '请输入限时分钟数'}]}]" /> 分钟
         </a-form-item>
         <a-form-item label="触发日期" v-show="quickOption" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-date-picker v-model="adjust_date" @change="changeQuickOption" :allowClear="false" />
@@ -62,9 +62,9 @@
             </a-select> 触发
           </span>
         </a-form-item>
-        <a-form-item label="价格库存回改" v-if="!quickOption" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-switch v-model="isTurnBack" />
-          <span v-show="isTurnBack"><a-input-number :min="1" v-decorator="['turn_back_minutes', {initialValue: 60, rules: [{required: !!quickOption, message: '请输入限时分钟数'}]}]" /> 分钟后</span>
+        <a-form-item :label="quickOption ? '限时' : '价格库存回改'" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-switch v-model="isTurnBack" v-show="!quickOption" />
+          <span v-show="isTurnBack || quickOption"><a-input-number :min="1" v-decorator="['turn_back_minutes', {initialValue: 60, rules: [{required: !!quickOption, message: '请输入限时分钟数'}]}]" /> {{quickOption ? '分钟' : '分钟后'}}</span>
         </a-form-item>
       </a-form>
     </a-spin>
@@ -74,19 +74,23 @@
 <script>
 import PropTypes from 'ant-design-vue/es/_util/vue-types'
 import * as Api from '@/api/goods'
-import _ from 'lodash'
+import { SelectGoods } from '@/components'
+import _, { pick, get } from 'lodash'
 import moment from 'moment'
 import locale from 'ant-design-vue/es/date-picker/locale/zh_CN';
 
 export default {
   components: {
+    SelectGoods,
   },
   props: {
     goodsId: null,
-    skus: PropTypes.array.def([]),
+    goodsSkus: PropTypes.array.def([]),
   },
   data () {
     return {
+      gId: this.goodsId,
+      skus: this.goodsSkus,
       // 对话框标题
       title: '调价修改',
       // 标签布局属性
@@ -99,6 +103,8 @@ export default {
       confirmLoading: false,
       // 当前表单元素
       form: this.$form.createForm(this),
+      // 适用范围：指定的商品
+      containGoodsList: [],
       // 当前记录
       record: {},
       selectedSkuId: 0,
@@ -128,7 +134,7 @@ export default {
       // 显示窗口
       this.visible = true
     },
-    edit (record) {
+    async edit (record) {
       this.isEditing = true
       // 显示窗口
       this.visible = true
@@ -136,6 +142,30 @@ export default {
       this.record = record
       // 设置默认值
       this.setFieldsValue()
+      // 抓取skus
+      if (!this.gId) this.gId = record.product_id
+      if (!this.skus?.length) {
+        const res = await Api.detail(this.gId)
+        this.skus = this.$store.getters.storeId ? res.skus.filter(sku => sku.store_id == this.$store.getters.storeId) : res.skus
+      }
+      // 商品信息
+      if (!this.goodsId) await this.getContainGoodsList()
+    },
+
+    // 获取指定的商品列表
+    async getContainGoodsList () {
+      const { record } = this
+      const goodsIds = [record.product_id]
+      if (goodsIds !== undefined && goodsIds.length) {
+        this.isLoading = true
+        await Api.listByIds(goodsIds, {store_id: this.$store.getters.storeId})
+          .then(result => {
+            this.containGoodsList = result.data
+          })
+          .finally(result => {
+            this.isLoading = false
+          })
+      }
     },
 
     /**
@@ -143,15 +173,16 @@ export default {
      */
     setFieldsValue () {
       const { record, form: { setFieldsValue } } = this
-      record.sku_id = record.product_sku_id
       this.$nextTick(() => {
-        // setFieldsValue(pick(record, ['name', 'contact_name', 'contact_phone', 'province', 'city', 'district', 'address', 'sort']))
+        let data = pick(record, ['product_id', 'target_dates', 'target_price', 'target_stock', 'repeat', 'every', 'adjust_at'])
+        data.sku_id = record.product_sku_id
         if (record.turn_back) {
-          record.turn_back_minutes = moment(record.turn_back.adjust_at).diff(record.adjust_at, 'minutes')
+          this.isTurnBack = true
+          data.turn_back_minutes = moment(record.turn_back.adjust_at).diff(record.adjust_at, 'minutes')
           this.quickOption = 'every_' + record.every + '_' + record.repeat + '_at_' + moment(record.adjust_at).hour()
           this.adjust_date = moment(record.adjust_at)
         }
-        setFieldsValue(record)
+        setFieldsValue(data)
       })
       if (record.every && record.repeat) this.isRepeat = true
       this.selectedSkuId = record.product_sku_id
@@ -162,6 +193,13 @@ export default {
      */
     selectSku (value) {
       this.selectedSkuId = value
+    },
+    async selectGoods (selectId) {
+      this.gId = selectId
+      const res = await Api.detail(this.gId)
+      this.skus = this.$store.getters.storeId ? res.skus.filter(sku => sku.store_id == this.$store.getters.storeId) : res.skus
+      this.selectedSkuId = 0
+      this.form.setFieldsValue({sku_id: null})
     },
 
     /**
@@ -174,11 +212,11 @@ export default {
       adjust_at.minute(0)
       adjust_at.second(0)
       if (!this.quickOption) return
-      else if (this.quickOption == 'every6') adjust_at.hour(6)
-      else if (this.quickOption == 'every9') adjust_at.hour(9)
-      else if (this.quickOption == 'every12') adjust_at.hour(12)
-      else if (this.quickOption == 'every16') adjust_at.hour(16)
-      else if (this.quickOption == 'every0') adjust_at.hour(0)
+      else if (this.quickOption == 'every_1_daily_at_6') adjust_at.hour(6)
+      else if (this.quickOption == 'every_1_daily_at_9') adjust_at.hour(9)
+      else if (this.quickOption == 'every_1_daily_at_12') adjust_at.hour(12)
+      else if (this.quickOption == 'every_1_daily_at_16') adjust_at.hour(16)
+      else if (this.quickOption == 'every_1_daily_at_0') adjust_at.hour(0)
       this.isRepeat = true
       this.form.setFieldsValue({every, repeat, adjust_at})
     },
@@ -229,7 +267,7 @@ export default {
         .finally(() => {
           this.confirmLoading = false
         })
-      else Api.schedulePrice(this.goodsId, {...values})
+      else Api.schedulePrice(this.gId, {...values})
         .then((result) => {
           // 显示成功
           this.$message.success('已新增', 1.5)

@@ -7,7 +7,6 @@ import SelectImage from '@/components/SelectImage'
 import SelectVideo from '@/components/SelectVideo'
 import SelectGoods from '@/components/SelectGoods'
 import SelectGoodsSku from '@/components/SelectGoodsSku'
-import SelectGoodsEdit from '@/components/SelectGoodsEdit'
 import SelectRegion from '@/components/SelectRegion'
 import Getpoint from '@/components/Getpoint'
 import Ueditor from '@/components/Ueditor'
@@ -22,7 +21,6 @@ export {
   SelectVideo,
   SelectGoods,
   SelectGoodsSku,
-  SelectGoodsEdit,
   SelectRegion,
   Getpoint,
   Ueditor,

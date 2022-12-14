@@ -41,7 +41,7 @@
         <a v-action:delete @click="handleDelete(item)">删除</a>
       </span>
     </s-table>
-    <PriceScheduleEdit ref="EditForm" :goodsId="goodsId" :skus="storeSkus" @handleSubmit="handleRefresh" />
+    <PriceScheduleEdit ref="EditForm" :goodsId="goodsId" :goodsSkus="storeSkus" @handleSubmit="handleRefresh" />
   </a-card>
 </template>
 
@@ -57,7 +57,7 @@ export default {
   components: {
     STable,
     SelectRegion,
-    PriceScheduleEdit
+    PriceScheduleEdit,
 },
   props: {
     goodsId: null,

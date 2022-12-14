@@ -6,7 +6,7 @@ import { axios } from '@/utils/request'
 const api = {
   list: '/products',
   listByIds: '/products',
-  detail: '/products/',
+  detail: '/products/{id}',
   basic: '/goods/basic',
   add: '/products',
   edit: '/products/{id}',
@@ -44,9 +44,9 @@ export function listByIds (goodsIds, params) {
 /**
  * 商品详情(详细信息)
  */
-export function detail (params) {
+export function detail (id, params) {
   return axios({
-    url: api.detail + params.goodsId,
+    url: api.detail.replace('{id}', id),
     method: 'get',
     params
   })

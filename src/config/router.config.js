@@ -349,22 +349,10 @@ export const asyncRouterMap = [
               {
                 path: '/market/seckill/index',
                 component: () => import(/* webpackChunkName: "market" */ '@/views/market/seckill/Index'),
-                meta: { title: '秒杀', keepAlive: false, permission: ['/market/seckill/index'] },
+                meta: { title: '限时秒杀', keepAlive: false, permission: ['/market/seckill/index'] },
                 // 访问其他页面时激活该菜单(router-link-active)
                 activePath: ['/market/seckill/create', '/market/seckill/update']
               },
-              {
-                path: '/market/seckill/create',
-                component: () => import(/* webpackChunkName: "market" */ '@/views/market/seckill/Create'),
-                meta: { title: '创建秒杀', keepAlive: false, permission: ['/market/seckill/create'] },
-                hidden: true
-              },
-              {
-                path: '/market/seckill/update',
-                component: () => import(/* webpackChunkName: "market" */ '@/views/market/seckill/Update'),
-                meta: { title: '编辑秒杀', keepAlive: false, permission: ['/market/seckill/update'] },
-                hidden: true
-              }
             ]
           },
           {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-button @click="handleSelectGoods">选择商品</a-button>
+    <a-button v-if="!disabled" @click="handleSelectGoods">选择商品</a-button>
     <a-table
       v-show="selectedItems.length"
       class="table-goodsList"
@@ -22,7 +22,7 @@
         />
       </template>
       <!-- 操作项 -->
-      <span slot="action" slot-scope="text, item, index">
+      <span v-if="!disabled" slot="action" slot-scope="text, item, index">
         <a v-action:delete @click="handleDeleteItem(index)">删除</a>
       </span>
     </a-table>
@@ -80,7 +80,9 @@ export default {
     // 最大选择的数量限制, multiple模式下有效
     maxNum: PropTypes.integer.def(100),
     // 默认选中的商品
-    defaultList: PropTypes.array.def([])
+    defaultList: PropTypes.array.def([]),
+    // 只读模式
+    disabled: PropTypes.bool.def(false),
   },
   data () {
     return {

@@ -64,7 +64,7 @@ export default {
   getGoodsDetail (goodsId = null) {
     if (!goodsId) return false
     return new Promise((resolve, reject) => {
-      GoodsApi.detail({ goodsId })
+      GoodsApi.detail(goodsId)
         .then(result => {
           this.formData.goods = result.product
           this.formData.goodsCategories = result.product.categories

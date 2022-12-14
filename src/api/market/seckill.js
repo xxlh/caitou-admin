@@ -4,12 +4,12 @@ import { axios } from '@/utils/request'
  * api接口列表
  */
 const api = {
-  list: '/market.seckill/list',
+  list: '/scheduled_prices',
   detail: '/market.seckill/detail',
   receive: '/market.seckill/receive',
   add: '/market.seckill/add',
   edit: '/market.seckill/edit',
-  delete: '/market.seckill/delete'
+  delete: '/scheduled_prices/{id}'
 }
 
 /**
@@ -73,10 +73,9 @@ export function edit (data) {
  * 删除记录
  * @param {*} data
  */
-export function deleted (data) {
+export function deleted (id) {
   return axios({
-    url: api.delete,
-    method: 'post',
-    data: data
+    url: api.delete.replace('{id}', id),
+    method: 'delete',
   })
 }
