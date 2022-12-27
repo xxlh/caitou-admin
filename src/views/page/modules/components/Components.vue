@@ -78,6 +78,11 @@ const components = [
         icon: Icon.goods
       },
       {
+        name: '限时抢购',
+        type: 'timeLimited',
+        icon: Icon.goods
+      },
+      {
         name: '在线客服',
         type: 'service',
         icon: Icon.service

@@ -255,21 +255,21 @@
                       <div class="goods-item_desc">
                         <!-- 商品卖点 -->
                         <div
-                          v-if="item.style.show.includes('selling_point')"
+                          v-if="item.style.show.includes('highlight')"
                           class="desc-selling_point oneline-hide"
                         >
-                          <span>{{ dataItm.selling_point }}</span>
+                          <span>{{ dataItm.highlight }}</span>
                         </div>
                         <!-- 商品销量 -->
                         <div
-                          v-if="item.style.show.includes('sold_count')"
+                          v-if="item.style.show.includes('sold_total')"
                           class="desc-goods_sales oneline-hide"
                         >
-                          <span>已售{{ dataItm.sold_count }}件</span>
+                          <span>已售{{ dataItm.sold_total }}件</span>
                         </div>
                         <!-- 商品价格 -->
                         <div class="desc_footer">
-                          <span v-if="item.style.show.includes('price_lowest')" class="price_x">
+                          <span v-if="item.style.show.includes('price')" class="price_x">
                             <span class="small-unit">¥</span>
                             <span>{{ dataItm.price_lowest }}</span>
                           </span>
@@ -289,16 +289,16 @@
                   </div>
                   <div class="detail">
                     <p
-                      v-if="item.style.show.includes('goodsName')"
+                      v-if="item.style.show.includes('title')"
                       class="goods-name twolist-hidden"
                     >{{ dataItm.title }}</p>
                     <p class="detail-price">
-                      <span v-if="item.style.show.includes('goodsPrice')" class="goods-price">
+                      <span v-if="item.style.show.includes('price')" class="goods-price">
                         <span class="small-unit">¥</span>
                         <span>{{ dataItm.price_lowest }}</span>
                       </span>
                       <span
-                        v-if="item.style.show.includes('linePrice') && dataItm.retail_price > 0"
+                        v-if="item.style.show.includes('retail_price') && dataItm.retail_price > 0"
                         class="line-price"
                       >
                         <span class="small-unit">¥</span>
@@ -309,6 +309,99 @@
                 </template>
               </li>
             </ul>
+          </div>
+
+          <!-- 限时抢购 -->
+          <div
+            v-else-if="item.type == 'timeLimited'"
+            class="diy-goods"
+            :style="{ background: item.style.background }"
+          >
+            <a-tabs>
+              <a-tab-pane v-for="(dataList,date) in item.data" :key="date" :tab="date">
+                <ul
+                  class="goods-list clearfix"
+                  :class="['display__' + item.style.display, 'column__' + item.style.column]"
+                >
+                  <li
+                    class="goods-item"
+                    v-for="(dataItm, dataIdx) in dataList"
+                    :key="`${index}_${dataIdx}`"
+                  >
+                    <!-- 单列商品 -->
+                    <template v-if="item.style.column == 1">
+                      <div class="flex">
+                        <!-- 商品图片 -->
+                        <div class="goods-item_left">
+                          <img :src="dataItm.image" />
+                        </div>
+                        <div class="goods-item_right">
+                          <!-- 商品名称 -->
+                          <div
+                            v-if="item.style.show.includes('title')"
+                            class="goods-item_title twolist-hidden"
+                          >
+                            <span>{{ dataItm.title }}</span>
+                          </div>
+                          <div class="goods-item_desc">
+                            <!-- 商品卖点 -->
+                            <div
+                              v-if="item.style.show.includes('highlight')"
+                              class="desc-selling_point oneline-hide"
+                            >
+                              <span>{{ dataItm.highlight }}</span>
+                            </div>
+                            <!-- 商品销量 -->
+                            <div
+                              v-if="item.style.show.includes('sold_total')"
+                              class="desc-goods_sales oneline-hide"
+                            >
+                              <span>已售{{ dataItm.sold_total }}件</span>
+                            </div>
+                            <!-- 商品价格 -->
+                            <div class="desc_footer">
+                              <span v-if="item.style.show.includes('price')" class="price_x">
+                                <span class="small-unit">¥</span>
+                                <span>{{ dataItm.price_lowest }}</span>
+                              </span>
+                              <span
+                                class="price_y"
+                                v-if="item.style.show.includes('retail_price') && dataItm.retail_price > 0"
+                              >¥{{ dataItm.retail_price }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                    <!-- 两列三列 -->
+                    <template v-else>
+                      <div class="goods-image">
+                        <img :src="dataItm.image" />
+                      </div>
+                      <div class="detail">
+                        <p
+                          v-if="item.style.show.includes('title')"
+                          class="goods-name twolist-hidden"
+                        >{{ dataItm.title }}</p>
+                        <p class="detail-price">
+                          <span v-if="item.style.show.includes('price')" class="goods-price">
+                            <span class="small-unit">¥</span>
+                            <span>{{ dataItm.price_lowest }}</span>
+                          </span>
+                          <span
+                            v-if="item.style.show.includes('retail_price') && dataItm.retail_price > 0"
+                            class="line-price"
+                          >
+                            <span class="small-unit">¥</span>
+                            <span>{{ dataItm.retail_price }}</span>
+                          </span>
+                        </p>
+                      </div>
+                    </template>
+                  </li>
+                </ul>
+              </a-tab-pane>
+            </a-tabs>
           </div>
 
           <!-- 辅助空白 -->

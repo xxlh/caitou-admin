@@ -38,6 +38,7 @@
             <a-radio-button value="every_1_daily_at_9">每天9点场</a-radio-button>
             <a-radio-button value="every_1_daily_at_12">每天12点场</a-radio-button>
             <a-radio-button value="every_1_daily_at_16">每天16点场</a-radio-button>
+            <a-radio-button value="every_1_daily_at_20">每天20点场</a-radio-button>
             <a-radio-button value="every_1_daily_at_0">每天0点场</a-radio-button>
             <a-radio-button value="">自定义</a-radio-button>
           </a-radio-group>
@@ -195,6 +196,7 @@ export default {
       this.selectedSkuId = value
     },
     async selectGoods (selectId) {
+      if (this.isEditing) return
       this.gId = selectId
       const res = await Api.detail(this.gId)
       this.skus = this.$store.getters.storeId ? res.skus.filter(sku => sku.store_id == this.$store.getters.storeId) : res.skus
@@ -216,7 +218,9 @@ export default {
       else if (this.quickOption == 'every_1_daily_at_9') adjust_at.hour(9)
       else if (this.quickOption == 'every_1_daily_at_12') adjust_at.hour(12)
       else if (this.quickOption == 'every_1_daily_at_16') adjust_at.hour(16)
+      else if (this.quickOption == 'every_1_daily_at_20') adjust_at.hour(20)
       else if (this.quickOption == 'every_1_daily_at_0') adjust_at.hour(0)
+      else this.quickOption = ''
       this.isRepeat = true
       this.form.setFieldsValue({every, repeat, adjust_at})
     },
@@ -242,6 +246,8 @@ export default {
      * 关闭对话框事件
      */
     handleCancel () {
+      this.gId = null
+      this.skus = []
       this.visible = false
       this.form.resetFields()
       this.isEditing = false
