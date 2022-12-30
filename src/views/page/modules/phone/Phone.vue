@@ -404,6 +404,45 @@
             </a-tabs>
           </div>
 
+          <!-- 商品预览 -->
+          <div
+            v-else-if="item.type == 'goodsPreview'"
+            class="diy-goods-preview"
+            :style="{ background: item.style.background }"
+          >
+            <div class="preview-title" :style="{backgroundImage: item.style.titleBackgroundGradient ? `linear-gradient(to bottom, ${item.style.titleBackground}, ${item.style.background})` : item.style.titleBackground}">
+              <div>
+                <img v-if="item.params.titleImage" :src="item.params.titleImage" />
+                <h3 v-else :style="{color: item.style.titleColor}">{{ item.params.title }}</h3>
+              </div>
+              <span v-if="item.params.moreText">{{ item.params.moreText }} ></span>
+            </div>
+            <ul class="goods-list clearfix">
+              <li class="goods-item" v-for="(dataItm, dataIdx) in item.data" :key="`${index}_${dataIdx}`">
+                <div class="goods-image">
+                  <img :src="dataItm.image" />
+                </div>
+                <div class="detail">
+                  <p
+                    v-if="item.style.show.includes('title')"
+                    class="goods-name twolist-hidden"
+                  >{{ dataItm.title }}</p>
+                  <p v-if="item.style.show.includes('price')" class="goods-price">
+                    <span class="small-unit">¥</span>
+                    <span>{{ dataItm.price_lowest }}</span>
+                  </p>
+                  <p
+                    v-if="item.style.show.includes('retail_price') && dataItm.retail_price > 0"
+                    class="retail-price"
+                  >
+                    <span class="small-unit">¥</span>
+                    <span>{{ dataItm.retail_price }}</span>
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
           <!-- 辅助空白 -->
           <div
             v-else-if="item.type == 'blank'"

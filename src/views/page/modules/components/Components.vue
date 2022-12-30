@@ -83,6 +83,11 @@ const components = [
         icon: Icon.goods
       },
       {
+        name: '商品预览',
+        type: 'goodsPreview',
+        icon: Icon.image
+      },
+      {
         name: '在线客服',
         type: 'service',
         icon: Icon.service

@@ -822,9 +822,154 @@
                   </a-checkbox-group>
                 </div>
               </div>
+              <div class="block-item">
+                <span class="label">价格颜色</span>
+                <div class="item-colorPicker">
+                  <span
+                    class="rest-color"
+                    @click="onEditorResetColor(curItem.style, 'priceColor', '#000')"
+                  >重置</span>
+                  <colorPicker v-model="curItem.style.priceColor" defaultColor="#000" />
+                </div>
+              </div>
+              <div class="block-item">
+                <span class="label">加购按钮</span>
+                <div>
+                  <a-radio-group buttonStyle="solid" v-model="curItem.style.joinButton">
+                    <a-radio-button value="cart">购物车</a-radio-button>
+                    <a-radio-button value="add">加减图标</a-radio-button>
+                    <a-radio-button value="立即抢">按钮自定义</a-radio-button>
+                  </a-radio-group>
+                  <a-input v-show="curItem.style.joinButton != 'cart' && curItem.style.joinButton != 'add'" v-model="curItem.style.joinButton" />
+                </div>
+              </div>
             </div>
             <div class="block-box">
               <div class="block-title">组件样式</div>
+              <div class="block-item">
+                <span class="label">背景颜色</span>
+                <div class="item-colorPicker">
+                  <span
+                    class="rest-color"
+                    @click="onEditorResetColor(curItem.style, 'background', '#fff')"
+                  >重置</span>
+                  <colorPicker v-model="curItem.style.background" defaultColor="#fff" />
+                </div>
+              </div>
+            </div>
+          </a-tab-pane>
+        </a-tabs>
+      </div>
+
+      <!-- 商品预览 -->
+      <div v-if="curItem.type == 'goodsPreview'" class="editor-content">
+        <a-tabs>
+          <a-tab-pane key="1" tab="内容设置">
+            <div class="block-box">
+              <div class="block-title">
+                <span>商品来源</span>
+                <a-radio-group buttonStyle="solid" v-model="curItem.params.source">
+                  <a-radio-button value="timeLimited">限时抢购</a-radio-button>
+                  <a-radio-button value="auto">自动获取</a-radio-button>
+                  <a-radio-button value="choice">手动选择</a-radio-button>
+                </a-radio-group>
+              </div>
+              <div class="block-item">
+                <div class="tips" v-if="curItem.params.source == 'timeLimited'">仅展示最近的一个限时抢购列表数据</div>
+              </div>
+            </div>
+            <!-- 手动选择 -->
+            <div v-if="curItem.params.source === 'choice'" class="block-box">
+              <div class="block-title">选择商品 ({{ curItem.data.length }})</div>
+              <div class="block-item">
+                <span class="label">商品类型</span>
+                <div class="flex-box">
+                  <a-select v-model="curItem.params.choice.types" mode="multiple" :options="goodsTypes" default-value="intra-city" style="width: 80%"></a-select>
+                  <div class="tips">同城配送 仅展示当地仓储商品</div>
+                </div>
+              </div>
+              <SGoods v-model="curItem.data" :params="{types: curItem.params.choice.types, store_id: $store.getters.storeId}" />
+            </div>
+            <!-- 自动获取 -->
+            <div v-if="curItem.params.source === 'auto'" class="block-box">
+              <div class="block-title">商品内容</div>
+              <div class="block-item">
+                <span class="label">商品类型</span>
+                <a-select v-model="curItem.params.auto.types" mode="multiple" :options="goodsTypes" default-value="intra-city" style="width: 80%"></a-select>
+              </div>
+              <div class="block-item">
+                <span class="label">商品分类</span>
+                <SGoodsCate v-model="curItem.params.auto.category_id" />
+              </div>
+              <div class="block-item">
+                <span class="label">商品排序</span>
+                <a-radio-group buttonStyle="solid" v-model="curItem.params.auto.sort">
+                  <a-radio-button value="">默认</a-radio-button>
+                  <a-radio-button value="sales_desc">销量</a-radio-button>
+                  <a-radio-button value="price_asc">价格</a-radio-button>
+                </a-radio-group>
+              </div>
+              <div class="block-item">
+                <span class="label">显示数量</span>
+                <div class="block-item-right">
+                  <a-input-number v-model="curItem.params.auto.per_page" :min="1" :max="4" />
+                  <span class="unit-text">
+                    <span>件</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </a-tab-pane>
+          <a-tab-pane key="2" tab="样式设置">
+            <div class="block-box">
+              <div class="block-title">内容样式</div>
+              <div class="block-item">
+                <span class="label">标题挂件</span>
+                <div class="item-checkbox" :style="{ width: '180px' }">
+                  <a-checkbox-group v-model="curItem.style.titleShow">
+                    <a-checkbox value="titleImage">标题图</a-checkbox>
+                    <a-checkbox value="countdown" v-show="curItem.params.source == 'timeLimited'">下场倒计时</a-checkbox>
+                  </a-checkbox-group>
+                  <SImage v-show="curItem.style.titleShow.find(v => v == 'titleImage')" v-model="curItem.style.titleImage" :channel="channel" :channel_id="pageId" collection="title" tips="建议尺寸：100×100" />
+                </div>
+              </div>
+              <div class="block-item">
+                <span class="label">显示内容</span>
+                <div class="item-checkbox" :style="{ width: '180px' }">
+                  <a-checkbox-group v-model="curItem.style.show">
+                    <a-checkbox value="title">商品名称</a-checkbox>
+                    <a-checkbox value="price">商品价格</a-checkbox>
+                    <a-checkbox value="retail_price">划线价格(含永辉比价)</a-checkbox>
+                  </a-checkbox-group>
+                </div>
+              </div>
+            </div>
+            <div class="block-box">
+              <div class="block-title">组件样式</div>
+              <div class="block-item">
+                <span class="label">标题字颜</span>
+                <div class="item-colorPicker">
+                  <span
+                    class="rest-color"
+                    @click="onEditorResetColor(curItem.style, 'titleColor', '#fff')"
+                  >重置</span>
+                  <colorPicker v-model="curItem.style.titleColor" defaultColor="#fff" />
+                </div>
+              </div>
+              <div class="block-item">
+                <span class="label">标题背景</span>
+                <a-radio-group buttonStyle="solid" v-model="curItem.style.titleBackgroundGradient">
+                  <a-radio-button :value="false">纯色</a-radio-button>
+                  <a-radio-button :value="true">渐变</a-radio-button>
+                </a-radio-group>
+                <div class="item-colorPicker">
+                  <span
+                    class="rest-color"
+                    @click="onEditorResetColor(curItem.style, 'titleBackground', '#fff')"
+                  >重置</span>
+                  <colorPicker v-model="curItem.style.titleBackground" defaultColor="#fff" />
+                </div>
+              </div>
               <div class="block-item">
                 <span class="label">背景颜色</span>
                 <div class="item-colorPicker">
