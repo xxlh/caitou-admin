@@ -265,6 +265,7 @@ import {
   ReceiptStatusEnum
 } from '@/common/enum/order'
 import { DeliveryForm, CancelForm, DeliveryManForm } from './modules'
+import store from '@/store'
 
 // 表格字段
 const columns = [
@@ -338,7 +339,9 @@ export default {
       // 当前表单元素
       searchForm: this.$form.createForm(this),
       // 查询参数
-      queryParam: {},
+      queryParam: {
+        area_id: store.getters.areaId,
+      },
       searchParams: {},
       // 正在加载
       isLoading: false,

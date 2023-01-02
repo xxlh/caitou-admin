@@ -92,7 +92,7 @@ export default {
       // 查询参数
       queryParam: {
         name: '',
-        area_id: store.getters.areaId
+        area_id: store.getters.areaId,
       },
       // 枚举类
       PageTypeEnum,

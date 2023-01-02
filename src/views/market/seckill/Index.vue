@@ -66,6 +66,7 @@ import * as GoodsApi from '@/api/goods'
 import { STable } from '@/components'
 import { ApplyRangeEnum, SeckillTypeEnum, ExpireTypeEnum } from '@/common/enum/seckill'
 import PriceScheduleEdit from '../../goods/modules/PriceScheduleEdit'
+import store from '@/store'
 import moment from 'moment'
 
 export default {
@@ -77,7 +78,11 @@ export default {
   data () {
     return {
       // 查询参数
-      queryParam: {with_turn_back: 'only', valid: true},
+      queryParam: {
+        with_turn_back: 'only',
+        valid: true,
+        area_id: store.getters.areaId,
+      },
       // 枚举类
       ApplyRangeEnum,
       SeckillTypeEnum,

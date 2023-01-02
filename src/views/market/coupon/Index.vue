@@ -79,6 +79,7 @@
 import * as Api from '@/api/market/coupon'
 import { STable } from '@/components'
 import { ApplyRangeEnum, CouponTypeEnum, ExpireTypeEnum } from '@/common/enum/coupon'
+import store from '@/store'
 
 export default {
   name: 'Index',
@@ -88,7 +89,9 @@ export default {
   data () {
     return {
       // 查询参数
-      queryParam: {},
+      queryParam: {
+        area_id: store.getters.areaId,
+      },
       // 枚举类
       ApplyRangeEnum,
       CouponTypeEnum,

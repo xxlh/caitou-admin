@@ -867,6 +867,23 @@
           <a-tab-pane key="1" tab="内容设置">
             <div class="block-box">
               <div class="block-title">
+                <span>基本设置</span>
+              </div>
+              <div class="block-item">
+                <span class="label">标题文本</span>
+                <a-input v-model="curItem.params.title" />
+              </div>
+              <div class="block-item">
+                <span class="label">更多文本</span>
+                <a-input v-model="curItem.params.moreText" />
+              </div>
+              <div class="block-item">
+                <span class="label">跳转链接</span>
+                <SLink v-model="curItem.params.link" />
+              </div>
+            </div>
+            <div class="block-box">
+              <div class="block-title">
                 <span>商品来源</span>
                 <a-radio-group buttonStyle="solid" v-model="curItem.params.source">
                   <a-radio-button value="timeLimited">限时抢购</a-radio-button>
