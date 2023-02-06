@@ -33,6 +33,16 @@
                 <div class="tips">用户端转发时显示的标题</div>
               </div>
             </div>
+            <div class="block-item">
+              <span class="label">页面背景色</span>
+              <div class="item-colorPicker">
+                <span
+                  class="rest-color"
+                  @click="onEditorResetColor(data.page.style, 'backgroundColor', '#f6f6f6')"
+                >重置</span>
+                <colorPicker v-model="data.page.style.backgroundColor" defaultColor="#f6f6f6" />
+              </div>
+            </div>
           </div>
         </a-tab-pane>
         <a-tab-pane key="2" tab="标题栏设置">
@@ -739,6 +749,27 @@
                   </a-checkbox-group>
                 </div>
               </div>
+              <div class="block-item">
+                <span class="label">价格颜色</span>
+                <div class="item-colorPicker">
+                  <span
+                    class="rest-color"
+                    @click="onEditorResetColor(curItem.style, 'priceColor', 'red')"
+                  >重置</span>
+                  <colorPicker v-model="curItem.style.priceColor" defaultColor="red" />
+                </div>
+              </div>
+              <div class="block-item">
+                <span class="label">加购按钮</span>
+                <div>
+                  <a-radio-group buttonStyle="solid" v-model="curItem.style.joinButton">
+                    <a-radio-button value="cart">购物车</a-radio-button>
+                    <a-radio-button value="add">加减图标</a-radio-button>
+                    <a-radio-button value="立即抢">按钮自定义</a-radio-button>
+                  </a-radio-group>
+                  <a-input v-show="curItem.style.joinButton != 'cart' && curItem.style.joinButton != 'add'" v-model="curItem.style.joinButton" />
+                </div>
+              </div>
             </div>
             <div class="block-box">
               <div class="block-title">组件样式</div>
@@ -827,9 +858,9 @@
                 <div class="item-colorPicker">
                   <span
                     class="rest-color"
-                    @click="onEditorResetColor(curItem.style, 'priceColor', '#000')"
+                    @click="onEditorResetColor(curItem.style, 'priceColor', 'red')"
                   >重置</span>
-                  <colorPicker v-model="curItem.style.priceColor" defaultColor="#000" />
+                  <colorPicker v-model="curItem.style.priceColor" defaultColor="red" />
                 </div>
               </div>
               <div class="block-item">
@@ -1082,9 +1113,9 @@
                 <div class="item-colorPicker">
                   <span
                     class="rest-color"
-                    @click="onEditorResetColor(curItem.style, 'background', '#fff')"
+                    @click="onEditorResetColor(curItem.style, 'background', '#f6f6f6')"
                   >重置</span>
-                  <colorPicker v-model="curItem.style.background" defaultColor="#fff" />
+                  <colorPicker v-model="curItem.style.background" defaultColor="#f6f6f6" />
                 </div>
               </div>
               <div class="block-item">

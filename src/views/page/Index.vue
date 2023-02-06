@@ -36,7 +36,7 @@
           v-action:setHome
           v-if="item.type == PageTypeEnum.HOME.value && !item.is_default"
           @click="handleSetDefault(item)"
-        >设为默认页</a>
+        >设为全局默认</a>
         <a
           v-action:delete
           v-if="item.type != PageTypeEnum.HOME.value"

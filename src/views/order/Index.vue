@@ -384,7 +384,9 @@ export default {
     init () {
       this.dataType = this.getDataType()
       this.searchForm.resetFields()
-      this.queryParam = {}
+      this.queryParam = {
+        area_id: store.getters.areaId,
+      }
       this.handleRefresh(true)
     },
 
