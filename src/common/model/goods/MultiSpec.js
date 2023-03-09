@@ -25,9 +25,9 @@ const defaultColumns = [
   },
   {
     title: '永辉价格',
-    dataIndex: 'yonghui_price',
+    dataIndex: 'yh_price',
     width: 80,
-    scopedSlots: { customRender: 'yonghui_price' }
+    scopedSlots: { customRender: 'yh_price' }
   },
   {
     title: '成本价格',
@@ -64,7 +64,7 @@ const defaultSkuItemData = {
   own_spec: [],
   price: '',
   retail_price: '',
-  yonghui_price: '',
+  yh_price: '',
   cost_price: '',
   stock: '',
   weight: '',

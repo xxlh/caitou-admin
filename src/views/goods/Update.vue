@@ -59,9 +59,9 @@
                 v-decorator="['image_ids', { rules: [{ required: true, message: '请至少上传1张商品图片' }] }]"
               />
             </a-form-item>
-            <!-- <a-form-item label="商品编码" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-form-item label="商品编码" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-input placeholder="请输入商品编码" v-decorator="['no']" />
-            </a-form-item> -->
+            </a-form-item>
             <a-form-item label="运费模板" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-select
                 style="width: 300px"
@@ -81,6 +81,31 @@
                 >新增模板</router-link>
                 <a href="javascript:;" @click="onReloadDeliveryList">刷新</a>
               </div>
+            </a-form-item>
+            <a-form-item label="配送所需" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <a-radio-group
+                v-decorator="['delivery_taking', {initialValue: ''}]"
+                @change="onForceUpdate()"
+              >
+                <a-radio value="">半小时内</a-radio>
+                <a-radio value="hours">小时数</a-radio>
+                <a-radio value="days">天数</a-radio>
+              </a-radio-group>
+              <InputNumberGroup v-show="form.getFieldValue('delivery_taking') == 'hours'"
+                addonBefore="下单"
+                addonAfter="天后配送"
+                :inputProps="{ min: 1, precision: 0 }"
+                v-decorator="['delivery_hours_taking', {initialValue: 1}]"
+              />
+              <InputNumberGroup v-show="form.getFieldValue('delivery_taking') == 'days'"
+                addonBefore="下单"
+                addonAfter="小时后配送"
+                :inputProps="{ min: 1, precision: 0 }"
+                v-decorator="['delivery_days_taking', {initialValue: 3}]"
+              />
+            </a-form-item>
+            <a-form-item label="最晚配送" :labelCol="labelCol" :wrapperCol="wrapperCol" extra="超过最晚配送时间后，商品自动下架">
+              <a-date-picker v-decorator="['delivery_latest']" :show-time="{defaultValue: endOfToday}" valueFormat="YYYY-MM-DD HH:mm:ss" />
             </a-form-item>
             <a-form-item label="商品状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-radio-group
@@ -140,7 +165,7 @@
                 :wrapperCol="wrapperCol"
                 extra="永辉价仅用于商品页展示"
               >
-                <a-input-number :min="0" :precision="2" v-decorator="['yonghui_price']" />
+                <a-input-number :min="0" :precision="2" v-decorator="['yh_price']" />
                 <span class="ml-10">元</span>
               </a-form-item>
               <a-form-item
@@ -238,7 +263,7 @@
               :wrapperCol="wrapperCol"
               extra="一句话简述，例如：此款商品美观大方 性价比较高 不容错过"
             >
-              <a-input placeholder="请输入商品卖点" v-decorator="['selling_point']" />
+              <a-input placeholder="请输入商品卖点" v-decorator="['highlight']" />
             </a-form-item>
             <a-form-item label="服务与承诺" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-select
@@ -364,6 +389,7 @@ import MultiSpec from './modules/MultiSpec'
 import { isEmptyObject } from '@/utils/util'
 import ChannelEnum from '@/common/enum/file/Channel'
 import PriceSchedule from './modules/PriceSchedule'
+import moment from 'moment'
 
 export default {
   components: {
@@ -391,7 +417,8 @@ export default {
       goodsId: null,
       channel: ChannelEnum.PRODUCT.value,
       // 表单数据
-      formData: GoodsModel.formData
+      formData: GoodsModel.formData,
+      endOfToday: moment('23:59:59', 'HH:mm:ss'),
     }
   },
   created () {
@@ -492,6 +519,9 @@ export default {
         delete values.categorys
         values.store_id = this.$store.getters.storeId
         values.image_ids = values.image_ids?.filter(img_id => img_id)
+        // 配送时间限制
+        if (values.delivery_taking != 'days') values.delivery_days_taking = null
+        if (values.delivery_taking != 'hours') values.delivery_hours_taking = null
         // 提交到后端api
         this.onFormSubmit(values)
         return true

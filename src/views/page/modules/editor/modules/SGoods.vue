@@ -45,7 +45,7 @@ import { pick } from 'lodash'
 import { GoodsModal } from '@/components/Modal'
 
 // 仅需要的字段
-const itemColumns = ['id', 'title', 'image', 'price_lowest', 'retail_price', 'selling_point', 'sold_count']
+const itemColumns = ['id', 'title', 'image', 'price_lowest', 'retail_price', 'highlight', 'sold_count']
 
 // 图片选择器组件
 export default {

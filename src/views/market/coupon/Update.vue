@@ -90,11 +90,12 @@
                 hideDisabledOptions: true,
                 defaultValue: defaultTime,
               }"
+              valueFormat="YYYY-MM-DD HH:mm:ss"
             />
           </a-form-item>
         </a-form-item>
         <a-form-item label="限时领取" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-range-picker v-decorator="['gainBetween', { initialValue: ['',''] }]" :show-time="{defaultValue: defaultTime}" />
+            <a-range-picker v-decorator="['gainBetween', { initialValue: ['',''] }]" :show-time="{defaultValue: defaultTime}" valueFormat="YYYY-MM-DD HH:mm:ss" />
         </a-form-item>
         <a-form-item label="领取方式" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-radio-group v-model="gainMethod">

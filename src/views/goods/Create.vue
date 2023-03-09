@@ -135,7 +135,7 @@
                 :wrapperCol="wrapperCol"
                 extra="永辉价仅用于商品页展示"
               >
-                <a-input-number :min="0" :precision="2" v-decorator="['yonghui_price']" />
+                <a-input-number :min="0" :precision="2" v-decorator="['yh_price']" />
                 <span class="ml-10">元</span>
               </a-form-item>
               <a-form-item
@@ -216,7 +216,7 @@
               :wrapperCol="wrapperCol"
               extra="一句话简述，例如：此款商品美观大方 性价比较高 不容错过"
             >
-              <a-input placeholder="请输入商品卖点" v-decorator="['selling_point']" />
+              <a-input placeholder="请输入商品卖点" v-decorator="['highlight']" />
             </a-form-item>
             <a-form-item label="服务与承诺" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-select

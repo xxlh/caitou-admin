@@ -90,7 +90,7 @@
           :precision="2"
         />
         <a-input-number
-          v-model="multiSpecData.skuBatchForm.yonghui_price"
+          v-model="multiSpecData.skuBatchForm.yh_price"
           placeholder="永辉价格"
           :min="0"
           :precision="2"
@@ -145,8 +145,8 @@
           <a-input-number v-model="item.retail_price" size="small" :min="0" :precision="2" />
         </template>
         <!-- 永辉价格 -->
-        <template slot="yonghui_price" slot-scope="text, item">
-          <a-input-number v-model="item.yonghui_price" size="small" :min="0" :precision="2" />
+        <template slot="yh_price" slot-scope="text, item">
+          <a-input-number v-model="item.yh_price" size="small" :min="0" :precision="2" />
         </template>
         <!-- 成本价格 -->
         <template slot="cost_price" slot-scope="text, item">

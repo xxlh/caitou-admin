@@ -79,22 +79,24 @@ export default {
   getFieldsValue () {
     // 商品详情信息
     const goodsInfo = this.formData.goods
+    // 商品基本数据
+    const goodsFormData = _.pick(goodsInfo, [
+      'title', 'type', 'delivery_id', 'delivery_hours_taking', 'delivery_days_taking', 'delivery_latest', 'on_sale',
+      'description', 'highlight', 'serviceIds', 'sold_inital', 'is_points_gift',
+      'is_points_discount', 'is_enable_grade', 'is_alone_grade'
+    ])
     // 格式化categoryIds
-    goodsInfo.categorys = this.formatCategoryIds(this.formData.goodsCategories)
+    goodsFormData.categorys = this.formatCategoryIds(this.formData.goodsCategories)
     // 判断单规格还是多规格
     const currentStoreSkus = this.formData.goods.type == 'intra-city' ? this.formData.skus.filter(sku => sku.store_id == store.getters.storeId || !store.getters.storeId) : this.formData.skus
-    goodsInfo.spec_type = currentStoreSkus.length > 1 ? 20 : 10
-    // 商品基本数据
-    // const goodsFormData = _.pick(goodsInfo, [
-    //   'goods_name', 'categorys', 'goods_no', 'delivery_type', 'sort',
-    //   'delivery_id', 'status', 'spec_type', 'deduct_stock_type', 'content',
-    //   'selling_point', 'serviceIds', 'sold_inital', 'is_points_gift',
-    //   'is_points_discount', 'is_enable_grade', 'is_alone_grade'
-    // ])
+    goodsFormData.spec_type = currentStoreSkus.length > 1 ? 20 : 10
     // 单规格数据
-    const skuOne = _.pick(currentStoreSkus[0], ['price', 'retail_price', 'yonghui_price', 'cost_price', 'stock', 'weight', 'no', 'daily_price', 'timing_price'])
+    const skuOne = _.pick(currentStoreSkus[0], ['price', 'retail_price', 'yh_price', 'cost_price', 'stock', 'weight', 'no'])
+    // 配送时限
+    if (goodsFormData.delivery_hours_taking) goodsFormData.delivery_taking = 'hours'
+    if (goodsFormData.delivery_days_taking) goodsFormData.delivery_taking = 'days'
     return {
-      ...goodsInfo,
+      ...goodsFormData,
       ...skuOne
     }
   },
