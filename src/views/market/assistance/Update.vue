@@ -27,7 +27,8 @@
           :wrapperCol="wrapperCol"
         >
           <p>
-            <a-select
+            <SelectVoucher v-decorator="['award_id', { rules: [{required: true}] }]" :multiple="false" :defaultList="award_vouchers" />
+            <!-- <a-select
               placeholder="请选择奖励的优惠券"
               allowClear
               :options="couponList"
@@ -35,7 +36,7 @@
               v-decorator="['award_id', { rules: [{required: true}] }]"
               :dropdownStyle="{ maxHeight: '300px', overflow: 'auto' }"
               style="width: 200px"
-            ></a-select>
+            ></a-select> -->
           </p>
           <p>
             <span class="ml-5">同时奖励现金：</span>
@@ -60,7 +61,8 @@
           :wrapperCol="wrapperCol"
         >
           <p>
-            <a-select
+            <SelectVoucher v-decorator="['award_teammate_id']" :multiple="false" :defaultList="award_teammate_vouchers" />
+            <!-- <a-select
               placeholder="请选择奖励的优惠券"
               allowClear
               :options="couponList"
@@ -68,7 +70,7 @@
               v-decorator="['award_teammate_id']"
               :dropdownStyle="{ maxHeight: '300px', overflow: 'auto' }"
               style="width: 200px"
-            ></a-select>
+            ></a-select> -->
           </p>
           <p>
             <span class="ml-5">同时奖励现金：</span>
@@ -158,7 +160,7 @@ import { pick, get } from 'lodash'
 import * as Api from '@/api/market/assistance'
 import * as CouponApi from '@/api/market/coupon'
 import { isEmpty } from '@/utils/util'
-import { InputNumberGroup, SelectImage } from '@/components'
+import { InputNumberGroup, SelectImage, SelectVoucher } from '@/components'
 import { ApplyRangeEnum, CouponTypeEnum, ExpireTypeEnum } from '@/common/enum/coupon'
 import ChannelEnum from '@/common/enum/file/Channel'
 
@@ -166,6 +168,7 @@ export default {
   components: {
     InputNumberGroup,
     SelectImage,
+    SelectVoucher,
   },
   data () {
     return {
@@ -188,7 +191,8 @@ export default {
       // 当前记录
       record: {},
       // 奖励的优惠券列表
-      couponList: [],
+      award_vouchers: [],
+      award_teammate_vouchers: [],
       isAwardTeamate: false,
     }
   },
@@ -198,8 +202,10 @@ export default {
     // 获取当前记录
     await this.getDetail()
     // 获取优惠券列表
-    const coupons = await CouponApi.list({per_page: 99})
-    this.couponList = coupons.data.map(t => ({label:`${t.id}. ${t.title}`, value:t.id}))
+    const award = await CouponApi.detail(this.record.award_id)
+    if (award) this.award_vouchers.push(award)
+    const award_teammate = await CouponApi.detail(this.record.award_teammate_id)
+    if (award_teammate) this.award_teammate_vouchers.push(award_teammate)
   },
   methods: {
 

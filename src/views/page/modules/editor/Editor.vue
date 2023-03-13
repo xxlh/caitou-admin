@@ -155,9 +155,9 @@
             <div class="item-colorPicker">
               <span
                 class="rest-color"
-                @click="onEditorResetColor(curItem.style, 'background', '#fff')"
+                @click="onEditorResetColor(curItem.style, 'background', '#f6f6f6')"
               >重置</span>
-              <colorPicker v-model="curItem.style.background" defaultColor="#fff" />
+              <colorPicker v-model="curItem.style.background" defaultColor="#f6f6f6" />
             </div>
           </div>
         </div>
@@ -210,9 +210,9 @@
             <div class="item-colorPicker">
               <span
                 class="rest-color"
-                @click="onEditorResetColor(curItem.style, 'background', '#fff')"
+                @click="onEditorResetColor(curItem.style, 'background', '#f6f6f6')"
               >重置</span>
-              <colorPicker v-model="curItem.style.background" defaultColor="#fff" />
+              <colorPicker v-model="curItem.style.background" defaultColor="#f6f6f6" />
             </div>
           </div>
         </div>
@@ -257,9 +257,9 @@
                 <div class="item-colorPicker">
                   <span
                     class="rest-color"
-                    @click="onEditorResetColor(curItem.style, 'background', '#fff')"
+                    @click="onEditorResetColor(curItem.style, 'background', '#f6f6f6')"
                   >重置</span>
-                  <colorPicker v-model="curItem.style.background" defaultColor="#fff" />
+                  <colorPicker v-model="curItem.style.background" defaultColor="#f6f6f6" />
                 </div>
               </div>
             </div>
@@ -303,9 +303,9 @@
                 <div class="item-colorPicker">
                   <span
                     class="rest-color"
-                    @click="onEditorResetColor(curItem.style, 'background', '#fff')"
+                    @click="onEditorResetColor(curItem.style, 'background', '#f6f6f6')"
                   >重置</span>
-                  <colorPicker v-model="curItem.style.background" defaultColor="#fff" />
+                  <colorPicker v-model="curItem.style.background" defaultColor="#f6f6f6" />
                 </div>
               </div>
             </div>
@@ -543,9 +543,9 @@
                 <div class="item-colorPicker">
                   <span
                     class="rest-color"
-                    @click="onEditorResetColor(curItem.style, 'background', '#fff')"
+                    @click="onEditorResetColor(curItem.style, 'background', '#f6f6f6')"
                   >重置</span>
-                  <colorPicker v-model="curItem.style.background" defaultColor="#fff" />
+                  <colorPicker v-model="curItem.style.background" defaultColor="#f6f6f6" />
                 </div>
               </div>
             </div>
@@ -626,9 +626,9 @@
                 <div class="item-colorPicker">
                   <span
                     class="rest-color"
-                    @click="onEditorResetColor(curItem.style, 'btnColor', '#fff')"
+                    @click="onEditorResetColor(curItem.style, 'btnColor', '#f6f6f6')"
                   >重置</span>
-                  <colorPicker v-model="curItem.style.btnColor" defaultColor="#fff" />
+                  <colorPicker v-model="curItem.style.btnColor" defaultColor="#f6f6f6" />
                 </div>
               </div>
               <div class="block-item">
@@ -778,9 +778,9 @@
                 <div class="item-colorPicker">
                   <span
                     class="rest-color"
-                    @click="onEditorResetColor(curItem.style, 'background', '#fff')"
+                    @click="onEditorResetColor(curItem.style, 'background', '#f6f6f6')"
                   >重置</span>
-                  <colorPicker v-model="curItem.style.background" defaultColor="#fff" />
+                  <colorPicker v-model="curItem.style.background" defaultColor="#f6f6f6" />
                 </div>
               </div>
             </div>
@@ -882,9 +882,9 @@
                 <div class="item-colorPicker">
                   <span
                     class="rest-color"
-                    @click="onEditorResetColor(curItem.style, 'background', '#fff')"
+                    @click="onEditorResetColor(curItem.style, 'background', '#f6f6f6')"
                   >重置</span>
-                  <colorPicker v-model="curItem.style.background" defaultColor="#fff" />
+                  <colorPicker v-model="curItem.style.background" defaultColor="#f6f6f6" />
                 </div>
               </div>
             </div>
@@ -999,9 +999,9 @@
                 <div class="item-colorPicker">
                   <span
                     class="rest-color"
-                    @click="onEditorResetColor(curItem.style, 'titleColor', '#fff')"
+                    @click="onEditorResetColor(curItem.style, 'titleColor', '#f6f6f6')"
                   >重置</span>
-                  <colorPicker v-model="curItem.style.titleColor" defaultColor="#fff" />
+                  <colorPicker v-model="curItem.style.titleColor" defaultColor="#f6f6f6" />
                 </div>
               </div>
               <div class="block-item">
@@ -1023,9 +1023,9 @@
                 <div class="item-colorPicker">
                   <span
                     class="rest-color"
-                    @click="onEditorResetColor(curItem.style, 'background', '#fff')"
+                    @click="onEditorResetColor(curItem.style, 'background', '#f6f6f6')"
                   >重置</span>
-                  <colorPicker v-model="curItem.style.background" defaultColor="#fff" />
+                  <colorPicker v-model="curItem.style.background" defaultColor="#f6f6f6" />
                 </div>
               </div>
             </div>
@@ -1206,9 +1206,45 @@
                 <div class="item-colorPicker">
                   <span
                     class="rest-color"
-                    @click="onEditorResetColor(curItem.style, 'background', '#fff')"
+                    @click="onEditorResetColor(curItem.style, 'background', '#f6f6f6')"
                   >重置</span>
-                  <colorPicker v-model="curItem.style.background" defaultColor="#fff" />
+                  <colorPicker v-model="curItem.style.background" defaultColor="#f6f6f6" />
+                </div>
+              </div>
+            </div>
+          </a-tab-pane>
+        </a-tabs>
+      </div>
+
+      <!-- 优惠券 -->
+      <div v-if="curItem.type == 'voucher'" class="editor-content">
+        <a-tabs>
+          <a-tab-pane key="1" tab="内容设置">
+            <div class="sub-title">选择优惠券</div>
+            <SVoucher v-model="curItem.data" :params="{store_id: $store.getters.storeId}" :multiple="false" />
+          </a-tab-pane>
+          <a-tab-pane key="2" tab="样式设置">
+            <div class="block-box">
+              <div class="block-title">组件样式</div>
+              <div class="block-item">
+                <span class="label">背景颜色</span>
+                <div class="item-colorPicker">
+                  <span
+                    class="rest-color"
+                    @click="onEditorResetColor(curItem.style, 'background', '#f6f6f6')"
+                  >重置</span>
+                  <colorPicker v-model="curItem.style.background" defaultColor="#f6f6f6" />
+                </div>
+              </div>
+              <div class="block-title">组件样式</div>
+              <div class="block-item">
+                <span class="label">价格字色</span>
+                <div class="item-colorPicker">
+                  <span
+                    class="rest-color"
+                    @click="onEditorResetColor(curItem.style, 'priceColor', 'red')"
+                  >重置</span>
+                  <colorPicker v-model="curItem.style.priceColor" defaultColor="red" />
                 </div>
               </div>
             </div>
@@ -1225,7 +1261,7 @@ import vcolorpicker from 'vcolorpicker'
 import PropTypes from 'ant-design-vue/es/_util/vue-types'
 import draggable from 'vuedraggable'
 import { Ueditor } from '@/components'
-import { SImage, SArticleCate, SGoods, SGoodsCate, SLink } from './modules'
+import { SImage, SArticleCate, SGoods, SVoucher, SGoodsCate, SLink } from './modules'
 import ChannelEnum from '@/common/enum/file/Channel'
 import * as CatApi from '@/api/category'
 import { linkList } from '@/common/model/Links'
@@ -1251,7 +1287,8 @@ export default {
     SArticleCate,
     SGoods,
     SGoodsCate,
-    SLink
+    SLink,
+    SVoucher,
   },
   data () {
     return {

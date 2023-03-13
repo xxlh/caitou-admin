@@ -88,6 +88,11 @@ const components = [
         icon: Icon.image
       },
       {
+        name: '优惠券',
+        type: 'voucher',
+        icon: Icon.market
+      },
+      {
         name: '在线客服',
         type: 'service',
         icon: Icon.service

@@ -222,6 +222,15 @@
             </ul>
           </div>
 
+          <!-- 优惠券 -->
+          <div
+            v-else-if="item.type == 'voucher'"
+            class="diy-voucher"
+            :style="{ padding: `5px 1vw`, background: item.style.background }"
+          >
+            <Voucher :data="item.data" :itemStyle="item.style" />
+          </div>
+
           <!-- 商品组 -->
           <div
             v-else-if="item.type == 'goods'"
@@ -500,6 +509,7 @@ import PropTypes from 'ant-design-vue/es/_util/vue-types'
 import draggable from 'vuedraggable'
 import { inArray } from '@/utils/util'
 import * as Icon from './icon'
+import Voucher from './modules/Voucher'
 
 // 禁止拖拽的组件
 const undragList = ['service']
@@ -512,7 +522,8 @@ export default {
     selectedIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).def(0)
   },
   components: {
-    draggable
+    draggable,
+    Voucher,
   },
   data () {
     return {

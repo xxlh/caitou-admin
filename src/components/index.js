@@ -8,6 +8,7 @@ import SelectVideo from '@/components/SelectVideo'
 import SelectGoods from '@/components/SelectGoods'
 import SelectGoodsSku from '@/components/SelectGoodsSku'
 import SelectRegion from '@/components/SelectRegion'
+import SelectVoucher from '@/components/SelectVoucher'
 import Getpoint from '@/components/Getpoint'
 import Ueditor from '@/components/Ueditor'
 import InputNumberGroup from '@/components/InputNumberGroup'
@@ -22,6 +23,7 @@ export {
   SelectGoods,
   SelectGoodsSku,
   SelectRegion,
+  SelectVoucher,
   Getpoint,
   Ueditor,
   InputNumberGroup,

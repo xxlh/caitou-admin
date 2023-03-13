@@ -11,5 +11,6 @@ import service from '@/assets/icons/page/components/service.svg?inline'
 import guide from '@/assets/icons/page/components/guide.svg?inline'
 import richText from '@/assets/icons/page/components/richText.svg?inline'
 import blank from '@/assets/icons/page/components/blank.svg?inline'
+import market from '@/assets/icons/market.svg?inline'
 
-export { image, banner, article, navBar, notice, search, video, window, goods, service, guide, richText, blank }
+export { image, banner, article, navBar, notice, search, video, window, goods, service, guide, richText, blank, market }
