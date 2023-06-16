@@ -237,7 +237,7 @@ export default {
       userExpendRanking: [],
       ordersDaily: [],
       // 日期筛选
-      dateValue: [moment().subtract(30, 'd'), moment()],
+      dateValue: [],
       // 排行榜字段
       goodsRankingColumns,
       userRankingColumns
@@ -271,15 +271,22 @@ export default {
     getPeriodData () {
       this.isLoading = true
       const { dateValue } = this
-      const date_between = [
+      const date_between = dateValue.length ? [
         dateValue[0].format('YYYY-MM-DD'),
         dateValue[1].format('YYYY-MM-DD')
-      ]
+      ] : [moment().subtract(30, 'd').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')]
       Api.orders_daily({date_between}).then(result => {
         this.ordersDaily = result.data
-        this.periodData.orderTotal = _(this.ordersDaily).sumBy('order_count')
-        this.periodData.orderItemTotal = _(this.ordersDaily).sumBy('order_item_count')
-        this.periodData.orderTotalPrice = _(this.ordersDaily).sumBy('turnover')
+        if (this.dateValue.length) {
+          this.periodData.orderTotal = _(this.ordersDaily).sumBy('order_count')
+          this.periodData.orderItemTotal = _(this.ordersDaily).sumBy('order_item_count')
+          this.periodData.orderTotalPrice = _(this.ordersDaily).sumBy('turnover')
+        } else {
+          this.periodData.orderTotal = this.statistics.orderTotal
+          this.periodData.orderItemTotal = this.statistics.orderItemTotal
+          this.periodData.orderTotalPrice = this.statistics.orderTotalPrice
+
+        }
         this.$nextTick(() => {
           this.myEcharts()
         })
