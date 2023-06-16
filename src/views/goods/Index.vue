@@ -313,6 +313,18 @@ export default {
       QRcode: {},
     }
   },
+  watch: {
+    'queryParam.listType': {
+      immediate: true,
+      handler (val){
+        if (this.queryParam.listType == 'on_sale') this.tabParams = {on_sale: true}
+        else if (this.queryParam.listType == 'off_sale') this.tabParams = {on_sale: false}
+        else if (this.queryParam.listType == 'sold_out') this.tabParams = {stock: 0}
+        else {this.tabParams = {}}
+        this.handleRefresh(true)
+      }
+    }
+  },
   created () {
     // 默认的查询参数
     if (this.$route.query.listType) {
@@ -345,11 +357,6 @@ export default {
     },
     handleStatus (e) {
       this.queryParam.listType = e.target.value
-      if (this.queryParam.listType == 'on_sale') this.tabParams = {on_sale: true}
-      else if (this.queryParam.listType == 'off_sale') this.tabParams = {on_sale: false}
-      else if (this.queryParam.listType == 'sold_out') this.tabParams = {stock: 0}
-      else {this.tabParams = {}}
-      this.handleRefresh(true)
     },
 
     // 确认搜索

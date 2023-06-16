@@ -4,7 +4,7 @@
       <!-- 实时概况 -->
       <a-card class="overview" :bordered="false">
         <div class="card-title">
-          <span>实时概况</span>
+          <span>今日概况</span>
         </div>
         <a-row :gutter="32">
           <a-col class :span="6">
@@ -125,7 +125,7 @@
         <a-row :gutter="32">
           <a-col :span="6">
             <div class="item">
-              <router-link to="/order/list/delivery">
+              <router-link to="/order/list/undelivered">
                 <p class="name">待发货订单(笔)</p>
                 <p class="value">{{ data.pending.deliverOrderTotal }}</p>
               </router-link>
@@ -141,7 +141,7 @@
           </a-col>
           <a-col :span="6">
             <div class="item">
-              <router-link to="/order/list/pay">
+              <router-link to="/order/list/unpaid">
                 <p class="name">待付款订单(笔)</p>
                 <p class="value">{{ data.pending.paidOrderTotal }}</p>
               </router-link>
@@ -196,8 +196,10 @@
 <script>
 import echarts from 'echarts'
 import 'echarts/theme/fresh-cut'
-import * as Api from '@/api/home'
+import * as Api from '@/api/statistics/data'
 import * as Icons from './modules/icon'
+import moment from 'moment'
+import _ from 'lodash'
 
 // 常用功能
 const functions = [
@@ -249,19 +251,19 @@ const data = {
   overview: {
     orderTotalPrice: {
       tday: '0.00',
-      ytd: '0.00'
+      yday: '0.00'
     },
     orderTotal: {
       tday: '0',
-      ytd: '0'
+      yday: '0'
     },
     newUserTotal: {
       tday: '0',
-      ytd: '0'
+      yday: '0'
     },
     consumeUserTotal: {
       tday: '0',
-      ytd: '0'
+      yday: '0'
     }
   },
   statistics: {
@@ -276,11 +278,6 @@ const data = {
     paidOrderTotal: 0,
     soldoutGoodsTotal: 0
   },
-  tradeTrend: {
-    date: [],
-    orderTotal: [],
-    orderTotalPrice: []
-  }
 }
 
 export default {
@@ -292,7 +289,8 @@ export default {
       // 正在提交
       isLoading: false,
       // 首页数据
-      data
+      data,
+      ordersDaily: [],
     }
   },
   created () {
@@ -304,12 +302,15 @@ export default {
     // 获取首页数据
     getData () {
       this.isLoading = true
-      Api.data()
+      Api.overall({...{}, ...{store_id: this.$store.getters.storeId}})
         .then(result => {
-          this.data = result.data.data
+          this.data = result
           // 渲染走势图
-          this.$nextTick(() => {
-            this.myEcharts()
+          Api.orders_daily({date_between: [moment().subtract(30, 'd').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')]}).then(result => {
+            this.ordersDaily = result.data
+            this.$nextTick(() => {
+              this.myEcharts()
+            })
           })
         })
         .finally(() => {
@@ -353,7 +354,7 @@ export default {
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: data.tradeTrend.date
+          data: _(this.ordersDaily).map('date').value()
         },
         yAxis: {
           type: 'value'
@@ -362,12 +363,12 @@ export default {
           {
             name: '成交额',
             type: 'line',
-            data: data.tradeTrend.orderTotalPrice
+            data: _(this.ordersDaily).map('turnover').value()
           },
           {
             name: '成交量',
-            type: 'line',
-            data: data.tradeTrend.orderTotal
+            type: 'bar',
+            data: _(this.ordersDaily).map('order_count').value()
           }
         ]
       }

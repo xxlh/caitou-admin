@@ -4,8 +4,8 @@ import { axios } from '@/utils/request'
  * api接口列表
  */
 const api = {
-  list: '/user/list',
-  detail: '/user/detail',
+  list: '/users',
+  detail: '/users/{id}',
   recharge: '/user/recharge',
   grade: '/user/grade',
   delete: '/user/delete'
@@ -25,9 +25,9 @@ export function list (params) {
 /**
  * 详情记录
  */
-export function detail (params) {
+export function detail (id, params) {
   return axios({
-    url: api.detail,
+    url: api.detail.replace('{id}', id),
     method: 'get',
     params
   })

@@ -13,7 +13,7 @@
     <div class="content">
       <div class="detail">
         <div class="title">{{voucher.title}}</div>
-        <div class="description">{{ voucher.description }}</div>
+        <div class="description">领取后 {{ voucher.expire_type == 'from_gain' ? moment(voucher.expires_at_from_gain).fromNow() : moment(voucher.expires_at).fromNow() }} 失效</div>
       </div>
       <div class="button" v-if="!isGained">立即领取</div>
       <div class="button gained" v-else>已领取</div>
@@ -26,6 +26,9 @@
 <script>
 import PropTypes from 'ant-design-vue/es/_util/vue-types'
 import { axios } from '@/utils/request'
+import moment from 'moment'
+import momentLocale from 'moment/dist/locale/zh-cn';
+moment.updateLocale('zh-cn', momentLocale);
 
 // 图片选择器组件
 export default {
@@ -55,6 +58,7 @@ export default {
     this.isGained = this.voucher.is_gain
   },
   methods: {
+    moment,
     async gain(id) {
       if (!id) return
       try {

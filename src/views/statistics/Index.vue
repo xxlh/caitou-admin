@@ -27,7 +27,7 @@
               </div>
               <div class="col-right">
                 <p class="name">销售额 (元)</p>
-                <p class="value">{{ data.overview.orderTotalPrice }}</p>
+                <p class="value">{{ periodData.orderTotalPrice }}</p>
               </div>
             </div>
           </a-col>
@@ -40,7 +40,7 @@
               </div>
               <div class="col-right">
                 <p class="name">支付订单数 (笔)</p>
-                <p class="value">{{ data.overview.orderTotal }}</p>
+                <p class="value">{{ periodData.orderTotal }}</p>
               </div>
             </div>
           </a-col>
@@ -52,8 +52,8 @@
                 </div>
               </div>
               <div class="col-right">
-                <p class="name">商品数量 (件)</p>
-                <p class="value">{{ data.overview.goodsTotal }}</p>
+                <p class="name">销售商品数量 (件)</p>
+                <p class="value">{{ periodData.orderItemTotal }}</p>
               </div>
             </div>
           </a-col>
@@ -68,7 +68,7 @@
               </div>
               <div class="col-right">
                 <p class="name">会员数量</p>
-                <p class="value">{{ data.overview.userTotal }}</p>
+                <p class="value">{{ statistics.userTotal }}</p>
               </div>
             </div>
           </a-col>
@@ -81,7 +81,7 @@
               </div>
               <div class="col-right">
                 <p class="name">消费人数</p>
-                <p class="value">{{ data.overview.consumeUsers }}</p>
+                <p class="value">{{ periodData.consumeUserTotal }}</p>
               </div>
             </div>
           </a-col>
@@ -94,7 +94,7 @@
               </div>
               <div class="col-right">
                 <p class="name">用户充值总额 (元)</p>
-                <p class="value">{{ data.overview.rechargeTotalMoney }}</p>
+                <p class="value">{{ periodData.rechargeTotalMoney }}</p>
               </div>
             </div>
           </a-col>
@@ -118,13 +118,13 @@
               <span>商品销售榜</span>
             </div>
             <a-table
-              rowKey="goods_id"
+              rowKey="id"
               :columns="goodsRankingColumns"
-              :dataSource="data.goodsRanking"
+              :dataSource="goodsRanking"
               :pagination="false"
             >
               <template slot="index" slot-scope="text, item, index">
-                <div v-if="index < 3 && item.total_sales_num > 0" class="ranking-img">
+                <div v-if="index < 3 && item.sold_count > 0" class="ranking-img">
                   <img :src="`static/img/statistics/ranking/0${ index + 1 }.png`" alt />
                 </div>
                 <span v-else>{{ index + 1 }}</span>
@@ -141,13 +141,13 @@
               <span>用户消费榜</span>
             </div>
             <a-table
-              rowKey="user_id"
+              rowKey="id"
               :columns="userRankingColumns"
-              :dataSource="data.userExpendRanking"
+              :dataSource="userExpendRanking"
               :pagination="false"
             >
               <template slot="index" slot-scope="text, item, index">
-                <div v-if="index < 3 && item.expend_money > 0" class="ranking-img">
+                <div v-if="index < 3 && item.cumulative_consumption > 0" class="ranking-img">
                   <img :src="`static/img/statistics/ranking/0${ index + 1 }.png`" alt />
                 </div>
                 <span v-else>{{ index + 1 }}</span>
@@ -164,9 +164,12 @@
 import echarts from 'echarts'
 import 'echarts/theme/fresh-cut'
 import * as Api from '@/api/statistics/data'
+import * as GoodsApi from '@/api/goods'
+import * as UsersApi from '@/api/user'
 import * as Icons from './modules/icon'
 import { getDateByDay } from '@/utils/util'
 import moment from 'moment'
+import _ from 'lodash'
 
 // 商品销售榜 (table字段)
 const goodsRankingColumns = [
@@ -178,18 +181,18 @@ const goodsRankingColumns = [
   },
   {
     title: '商品名称',
-    dataIndex: 'goods_name',
+    dataIndex: 'title',
     scopedSlots: { customRender: 'goods_name' }
   },
   {
     title: '销量 (件)',
     align: 'center',
-    dataIndex: 'total_sales_num'
+    dataIndex: 'sold_count'
   },
   {
-    title: '销售额 (元)',
+    title: '售价 (元)',
     align: 'center',
-    dataIndex: 'sales_volume'
+    dataIndex: 'price_lowest'
   }
 ]
 
@@ -203,34 +206,16 @@ const userRankingColumns = [
   },
   {
     title: '会员昵称',
-    dataIndex: 'nick_name',
-    scopedSlots: { customRender: 'nick_name' }
+    dataIndex: 'nickname',
+    scopedSlots: { customRender: 'nickname' }
   },
   {
     title: '实际消费金额 (元)',
     align: 'center',
-    dataIndex: 'expend_money'
+    dataIndex: 'cumulative_consumption'
   }
 ]
 
-// 默认数据
-const data = {
-  overview: {
-    userTotal: '0',
-    consumeUsers: '0',
-    orderTotal: '0',
-    orderTotalPrice: '0.00',
-    goodsTotal: '0',
-    rechargeTotalMoney: '0'
-  },
-  tradeTrend: {
-    date: [],
-    orderTotal: [],
-    orderTotalPrice: []
-  },
-  goodsRanking: [],
-  userExpendRanking: []
-}
 
 export default {
   name: 'Index',
@@ -240,9 +225,19 @@ export default {
       // 正在提交
       isLoading: false,
       // 页面数据
-      data,
+      statistics: {},
+      periodData: {
+        consumeUserTotal: 0,
+        orderTotal: 0,
+        orderItemTotal: 0,
+        orderTotalPrice: 0,
+        rechargeTotalMoney: 0
+      },
+      goodsRanking: [],
+      userExpendRanking: [],
+      ordersDaily: [],
       // 日期筛选
-      dateValue: [],
+      dateValue: [moment().subtract(30, 'd'), moment()],
       // 排行榜字段
       goodsRankingColumns,
       userRankingColumns
@@ -257,7 +252,7 @@ export default {
     // 监听事件：日期选择器
     onPickerChange () {
       // 获取数据概况
-      this.getSurvey()
+      this.getPeriodData()
     },
 
     // 事件: 快捷选择日期
@@ -269,37 +264,47 @@ export default {
         this.dateValue = [moment(getDateByDay(-days)), moment(getDateByDay(0))]
       }
       // 获取数据概况
-      this.getSurvey()
+      this.getPeriodData()
     },
 
     // 获取数据概况
-    getSurvey () {
+    getPeriodData () {
       this.isLoading = true
       const { dateValue } = this
-      const data = { startDate: null, endDate: null }
-      if (dateValue.length) {
-        data.startDate = dateValue[0].format('YYYY-MM-DD')
-        data.endDate = dateValue[1].format('YYYY-MM-DD')
-      }
-      Api.survey(data)
-        .then(result => {
-          this.data.overview = result.data
+      const date_between = [
+        dateValue[0].format('YYYY-MM-DD'),
+        dateValue[1].format('YYYY-MM-DD')
+      ]
+      Api.orders_daily({date_between}).then(result => {
+        this.ordersDaily = result.data
+        this.periodData.orderTotal = _(this.ordersDaily).sumBy('order_count')
+        this.periodData.orderItemTotal = _(this.ordersDaily).sumBy('order_item_count')
+        this.periodData.orderTotalPrice = _(this.ordersDaily).sumBy('turnover')
+        this.$nextTick(() => {
+          this.myEcharts()
         })
-        .finally(() => {
-          this.isLoading = false
-        })
+      })
+      .finally(() => {
+        this.isLoading = false
+      })
     },
 
     // 获取页面数据
     getData () {
       this.isLoading = true
-      Api.data()
+      Api.total()
         .then(result => {
-          this.data = result.data.data
-          // 渲染走势图
-          this.$nextTick(() => {
-            this.myEcharts()
+          this.statistics = result
+          // 商品销量榜
+          GoodsApi.list({sort: 'sold_count_desc', per_page: 5}).then(result => {
+            this.goodsRanking = result.data
           })
+          // 商品销量榜
+          UsersApi.list({account_sort: 'cumulative_consumption_desc', per_page: 5}).then(result => {
+            this.userExpendRanking = result.data
+          })
+          // 渲染走势图
+          this.getPeriodData()
         })
         .finally(() => {
           this.isLoading = false
@@ -332,7 +337,7 @@ export default {
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: data.tradeTrend.date
+          data: _(this.ordersDaily).map('date').value()
         },
         yAxis: {
           type: 'value'
@@ -341,12 +346,12 @@ export default {
           {
             name: '成交额',
             type: 'line',
-            data: data.tradeTrend.orderTotalPrice
+            data: _(this.ordersDaily).map('turnover').value()
           },
           {
             name: '成交量',
-            type: 'line',
-            data: data.tradeTrend.orderTotal
+            type: 'bar',
+            data: _(this.ordersDaily).map('order_count').value()
           }
         ]
       }
