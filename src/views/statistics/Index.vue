@@ -299,7 +299,7 @@ export default {
     // 获取页面数据
     getData () {
       this.isLoading = true
-      Api.total()
+      Api.total({store_id: this.$store.getters.storeId})
         .then(result => {
           this.statistics = result
           // 商品销量榜

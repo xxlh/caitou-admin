@@ -12,30 +12,13 @@
       <a-form :form="form">
         <a-form-item label="管理员姓名" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input
-            v-decorator="['real_name', {rules: [{required: true, min: 2, message: '请输入至少2个字符'}]}]"
+            v-decorator="['name', {rules: [{required: true, min: 2, message: '请输入至少2个字符'}]}]"
           />
         </a-form-item>
         <a-form-item label="用户名" :labelCol="labelCol" :wrapperCol="wrapperCol" extra="后台登录用户名">
           <a-input
-            v-decorator="['user_name', {rules: [{required: true, min: 4, message: '请输入至少4个字符'}]}]"
+            v-decorator="['username', {rules: [{required: true, min: 3, message: '请输入至少3个字符'}]}]"
           />
-        </a-form-item>
-        <a-form-item
-          v-if="!record.rol.rolee.is_super"
-          label="所属角色"
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          extra="后台管理员角色"
-        >
-          <a-tree-select
-            treeCheckable
-            treeCheckStrictly
-            treeDefaultExpandAll
-            allowClear
-            :treeData="roleListTreeData"
-            :dropdownStyle="{ maxHeight: '500px', overflow: 'auto' }"
-            v-decorator="['roles', {rules: [{required: true, message: '请至少选择一个角色'}]}]"
-          ></a-tree-select>
         </a-form-item>
         <a-form-item label="用户密码" :labelCol="labelCol" :wrapperCol="wrapperCol" extra="后台登录密码">
           <a-input
@@ -52,10 +35,14 @@
             ]}]"
           />
         </a-form-item>
-        <a-form-item label="排序" :labelCol="labelCol" :wrapperCol="wrapperCol" extra="数字越小越靠前">
-          <a-input-number
-            :min="0"
-            v-decorator="['sort', {initialValue: 100, rules: [{required: true, message: '请输入至少1个数字'}]}]"
+        <a-form-item label="手机" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input
+            v-decorator="['phone']"
+          />
+        </a-form-item>
+        <a-form-item label="邮箱" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input
+            v-decorator="['email']"
           />
         </a-form-item>
       </a-form>
@@ -69,11 +56,6 @@ import * as UserApi from '@/api/store/user'
 
 export default {
   props: {
-    // 角色列表
-    roleList: {
-      type: Array,
-      required: true
-    }
   },
   data () {
     return {
@@ -94,8 +76,6 @@ export default {
       // 当前表单元素
       form: this.$form.createForm(this),
 
-      // 角色列表 树状结构
-      roleListTreeData: [],
       // 当前记录
       record: {}
     }
@@ -111,8 +91,6 @@ export default {
       this.visible = true
       // 当前管理员记录
       this.record = record
-      // 获取角色列表
-      !record.role['is_super'] && this.getRoleList()
       // 设置默认值
       this.setFieldsValue()
     },
@@ -121,65 +99,11 @@ export default {
      * 设置默认值
      */
     setFieldsValue () {
-      const { form: { setFieldsValue }, getCheckedRoleKeys } = this
+      const { form: { setFieldsValue } } = this
       this.$nextTick(() => {
-        const data = _.pick(this.record, ['user_name', 'real_name', 'sort'])
-        data.roles = getCheckedRoleKeys()
+        const data = _.pick(this.record, ['username', 'name', 'phone', 'email'])
         setFieldsValue(data)
       })
-    },
-
-    /**
-     * 获取角色列表
-     */
-    getRoleList () {
-      const { roleList } = this
-      // 格式化角色列表
-      const selectList = this.formatTreeData(roleList)
-      this.roleListTreeData = selectList
-    },
-
-    /**
-     * 设置默认选中的角色
-     */
-    getCheckedRoleKeys () {
-      const { roleList, record } = this
-      const getCheckedKeys = (list) => {
-        let keysArr = []
-        list.forEach(item => {
-          if (record['roleIds'].includes(item['role_id'])) {
-            keysArr.push({
-              label: item['role_name'],
-              value: item['role_id']
-            })
-          }
-          if (item.children && item.children.length) {
-            const childrenArr = getCheckedKeys(item.children)
-            childrenArr.length && (keysArr = keysArr.concat(childrenArr))
-          }
-        })
-        return keysArr
-      }
-      return getCheckedKeys(roleList)
-    },
-
-    /**
-     * 格式化角色列表
-     */
-    formatTreeData (list) {
-      const data = []
-      list.forEach(item => {
-        const netItem = {
-          title: item.role_name,
-          key: item.role_id,
-          value: item.role_id
-        }
-        if (item.children && item.children.length) {
-          netItem['children'] = this.formatTreeData(item['children'])
-        }
-        data.push(netItem)
-      })
-      return data
     },
 
     /**
@@ -223,10 +147,10 @@ export default {
     */
     onFormSubmit (values) {
       this.confirmLoading = true
-      UserApi.edit({ userId: this.record['store_user_id'], form: values })
+      UserApi.edit(this.record['id'], values)
         .then((result) => {
           // 显示成功
-          this.$message.success(result.message, 1.5)
+          this.$message.success('编辑成功', 1.5)
           // 关闭对话框事件
           this.handleCancel()
           // 通知父端组件提交完成了

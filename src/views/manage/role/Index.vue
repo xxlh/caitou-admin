@@ -6,7 +6,7 @@
     </div>
     <a-table
       v-if="!isLoading"
-      rowKey="role_id"
+      rowKey="id"
       :columns="columns"
       :dataSource="roleList"
       :defaultExpandAllRows="true"
@@ -62,19 +62,15 @@ export default {
       columns: [
         {
           title: '角色ID',
-          dataIndex: 'role_id'
+          dataIndex: 'id'
         },
         {
           title: '角色名称',
-          dataIndex: 'role_name'
-        },
-        {
-          title: '排序',
-          dataIndex: 'sort'
+          dataIndex: 'name'
         },
         {
           title: '添加时间',
-          dataIndex: 'create_time'
+          dataIndex: 'created_at'
         },
         {
           title: '操作',
@@ -100,7 +96,7 @@ export default {
       this.isLoading = true
       Api.list()
         .then(result => {
-          this.roleList = result.data.list
+          this.roleList = result.data
         })
         .finally(result => {
           this.isLoading = false
@@ -150,7 +146,7 @@ export default {
         title: '您确定要删除该记录吗?',
         content: '删除后不可恢复',
         onOk () {
-          return Api.deleted({ roleId: record['role_id'] })
+          return Api.deleted({ roleId: record['id'] })
             .then(result => {
               self.$message.success(result.message, 1.5)
               self.handleRefresh()

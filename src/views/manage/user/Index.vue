@@ -18,25 +18,34 @@
     </div>
     <s-table
       ref="table"
-      rowKey="store_user_id"
+      rowKey="id"
       :loading="isLoading"
       :columns="columns"
       :data="loadData"
       :pageSize="15"
     >
-      <div slot="user_name" slot-scope="text, item">
+      <div slot="username" slot-scope="text, item">
         <span style="margin-right: 6px">{{ text }}</span>
-        <a-tag v-if="item.role.is_super" color="green">超级管理员</a-tag>
+        <a-tag v-if="item.role && item.role.name == '超级管理员'" color="green">超级管理员</a-tag>
+      </div>
+      <div slot="roles" slot-scope="text, item">
+        <a-tag v-for="(role,index) in text" :key="index" :color="role.name == '超级管理员' ? 'green' : ''">
+          {{role.name}} 
+          <span v-if="role.name == '仓储管理员' && storeListById[role.store_id]"> ({{storeListById[role.store_id].name}})</span>
+          <span v-if="role.name == '区域管理员' && areaListById[role.store_id]"> ({{areaListById[role.store_id].name}})</span>
+        </a-tag>
       </div>
       <div class="actions" slot="action" slot-scope="text, item">
         <a v-action:edit @click="handleEdit(item)">编辑</a>
-        <template v-if="!item.role.is_super">
+        <template v-if="!item.role || item.role.name != '超级管理员'">
+          <a v-action:edit @click="handleAssign(item)">分配角色</a>
           <a v-action:delete @click="handleDelete(item)">删除</a>
         </template>
       </div>
     </s-table>
-    <AddForm ref="AddForm" :roleList="roleList" @handleSubmit="handleRefresh" />
-    <EditForm ref="EditForm" :roleList="roleList" @handleSubmit="handleRefresh" />
+    <AddForm ref="AddForm" @handleSubmit="handleRefresh" />
+    <EditForm ref="EditForm" @handleSubmit="handleRefresh" />
+    <AssignForm ref="AssignForm" :roleList="roleList" :storeList="storeList" :areaList="areaList" @handleSubmit="handleRefresh" />
   </a-card>
 </template>
 
@@ -46,18 +55,28 @@ import * as RoleApi from '@/api/store/role'
 import { STable } from '@/components'
 import AddForm from './modules/AddForm'
 import EditForm from './modules/EditForm'
+import AssignForm from './modules/AssignForm'
+import * as StoreApi from '@/api/store/address'
+import * as AreaApi from '@/api/area'
+import _ from 'lodash'
 
 export default {
   name: 'Index',
   components: {
     STable,
     AddForm,
-    EditForm
+    EditForm,
+    AssignForm,
   },
   data () {
     return {
       // 角色列表
       roleList: [],
+      // 仓储列表
+      storeList: [],
+      storeListById: [],
+      areaList: [],
+      areaListById: [],
       // 查询参数
       queryParam: {},
       // 正在加载
@@ -66,24 +85,25 @@ export default {
       columns: [
         {
           title: '管理员ID',
-          dataIndex: 'store_user_id'
+          dataIndex: 'id'
         },
         {
           title: '用户名',
-          dataIndex: 'user_name',
-          scopedSlots: { customRender: 'user_name' }
+          dataIndex: 'username',
+          scopedSlots: { customRender: 'username' }
         },
         {
           title: '姓名',
-          dataIndex: 'real_name'
+          dataIndex: 'name'
         },
         {
-          title: '排序',
-          dataIndex: 'sort'
+          title: '角色',
+          dataIndex: 'roles',
+          scopedSlots: { customRender: 'roles' }
         },
         {
           title: '添加时间',
-          dataIndex: 'create_time'
+          dataIndex: 'created_at'
         },
         {
           title: '操作',
@@ -96,7 +116,7 @@ export default {
       loadData: param => {
         return Api.list({ ...param, ...this.queryParam })
           .then(response => {
-            return response.data.list
+            return response
           })
       }
     }
@@ -104,6 +124,8 @@ export default {
   created () {
     // 获取角色列表
     this.getRoleList()
+    this.getStoreList()
+    this.getAreaList()
   },
   methods: {
 
@@ -120,6 +142,9 @@ export default {
     handleEdit (item) {
       this.$refs.EditForm.edit(item)
     },
+    handleAssign (item) {
+      this.$refs.AssignForm.edit(item)
+    },
 
     /**
      * 获取角色列表
@@ -128,11 +153,22 @@ export default {
       this.isLoading = true
       RoleApi.list()
         .then(result => {
-          this.roleList = result.data.list
+          this.roleList = result.data
         })
         .finally(() => {
           this.isLoading = false
         })
+    },
+    /**
+     * 获取仓储列表
+     */
+    async getStoreList () {
+      this.storeList = (await StoreApi.list()).data
+      this.storeListById = _(this.storeList).keyBy('id').value();
+    },
+    async getAreaList () {
+      this.areaList = (await AreaApi.list()).data
+      this.areaListById = _(this.areaList).keyBy('id').value();
     },
 
     /**
@@ -144,7 +180,7 @@ export default {
         title: '您确定要删除该记录吗?',
         content: '删除后不可恢复',
         onOk () {
-          return Api.deleted({ userId: item['store_user_id'] })
+          return Api.deleted({ userId: item['id'] })
             .then((result) => {
               app.$message.success(result.message, 1.5)
               app.handleRefresh()

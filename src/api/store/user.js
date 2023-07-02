@@ -5,11 +5,12 @@ import { axios } from '@/utils/request'
  */
 const api = {
   info: '/auth/info',
-  list: '/store.user/list',
-  add: '/store.user/add',
-  edit: '/store.user/edit',
-  delete: '/store.user/delete',
-  renew: '/store.user/renew'
+  list: '/members',
+  add: '/members',
+  edit: '/members/{id}',
+  delete: '/members/{id}',
+  assign: '/members/{id}/assign_role',
+  renew: '/members/renew'
 }
 
 /**
@@ -62,9 +63,16 @@ export function add (data) {
  * 编辑记录
  * @param {*} data
  */
-export function edit (data) {
+export function edit (id, data) {
   return axios({
-    url: api.edit,
+    url: api.edit.replace('{id}', id),
+    method: 'patch',
+    data
+  })
+}
+export function assign (id, data) {
+  return axios({
+    url: api.assign.replace('{id}', id),
     method: 'post',
     data
   })
@@ -74,10 +82,10 @@ export function edit (data) {
  * 删除记录
  * @param {*} data
  */
-export function deleted (data) {
+export function deleted (id, data) {
   return axios({
-    url: api.delete,
-    method: 'post',
+    url: api.delete.replace('{id}', id),
+    method: 'delete',
     data: data
   })
 }

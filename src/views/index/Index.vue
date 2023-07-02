@@ -302,7 +302,7 @@ export default {
     // 获取首页数据
     getData () {
       this.isLoading = true
-      Api.overall({...{}, ...{store_id: this.$store.getters.storeId}})
+      Api.overall({store_id: this.$store.getters.storeId})
         .then(result => {
           this.data = result
           // 渲染走势图

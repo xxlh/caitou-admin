@@ -18,7 +18,7 @@ const action = Vue.directive('action', {
   inserted: function (el, binding, vnode) {
     const actionName = binding.arg
     const roles = store.getters.roles
-    if (roles.is_super) {
+    if (roles.name == "超级管理员") {
       return
     }
     const elVal = vnode.context.$route.meta.permission

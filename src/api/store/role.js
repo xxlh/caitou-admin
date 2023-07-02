@@ -4,10 +4,10 @@ import { axios } from '@/utils/request'
  * api接口列表
  */
 const api = {
-  list: '/store.role/list',
-  add: '/store.role/add',
-  edit: '/store.role/edit',
-  delete: '/store.role/delete'
+  list: '/roles',
+  add: '/roles',
+  edit: '/roles/{id}',
+  delete: '/roles/{id}'
 }
 
 /**

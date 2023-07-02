@@ -62,10 +62,9 @@ function filterAsyncRouter (routerMap, roles) {
  * @param {*} roles
  */
 function getAccessRouter (routerMap, roles) {
-  // is_super 代表超级管理员, 拥有所有权限
-  // roles.is_super = false
+  // "超级管理员" 代表超级管理员, 拥有所有权限
   // 根据角色过滤有访问权限的路由
-  const accessedRouters = roles.is_super ? routerMap : filterAsyncRouter(routerMap, roles)
+  const accessedRouters = roles.name == "超级管理员" ? routerMap : filterAsyncRouter(routerMap, roles)
   // 动态设置一级菜单的redirect
   return setPrimaryMenuRedirect(accessedRouters)
 }

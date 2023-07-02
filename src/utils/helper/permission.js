@@ -23,7 +23,7 @@ function plugin (Vue) {
           const [permission, action] = permissions.split('.')
           const roles = _this.$store.getters.roles
           // 如果是超管用户直接返回true
-          if (roles.is_super) {
+          if (roles.name == "超级管理员") {
             return true
           }
           // console.log('permissionList', roles.permissions)
