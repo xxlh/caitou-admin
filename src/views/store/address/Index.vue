@@ -4,7 +4,7 @@
     <div class="table-operator">
       <a-row>
         <a-col :span="5">
-          <a-button v-action:add type="primary" icon="plus" @click="handleAdd">新增</a-button>
+          <a-button v-action:create type="primary" icon="plus" @click="handleAdd">新增</a-button>
         </a-col>
         <a-col class="flex flex-x-end" :span="11" :offset="8">
           <SelectRegion
@@ -48,7 +48,7 @@
       </span> -->
       <!-- 操作 -->
       <span slot="action" slot-scope="text, item">
-        <a v-action:edit @click="handleEdit(item)" style="margin-right: 8px;">编辑</a>
+        <a v-action:update @click="handleEdit(item)" style="margin-right: 8px;">编辑</a>
         <a v-action:delete @click="handleDelete(item)" style="margin-right: 8px;">删除</a> 
         <a-popover v-if="item.type == 'self-support'" trigger="hover" @visibleChange="v => {
           if (!v) return;

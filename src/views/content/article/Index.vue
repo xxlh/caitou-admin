@@ -32,7 +32,7 @@
       </a-row>
       <!-- 操作板块 -->
       <div class="row-item-tab clearfix">
-        <a-button v-action:add type="primary" icon="plus" @click="handleAdd">新增</a-button>
+        <a-button v-action:create type="primary" icon="plus" @click="handleAdd">新增</a-button>
       </div>
     </div>
     <s-table
@@ -61,7 +61,7 @@
       </span>
       <!-- 操作项 -->
       <span slot="action" slot-scope="text, item">
-        <a v-action:edit style="margin-right: 8px;" @click="handleEdit(item)">编辑</a>
+        <a v-action:update style="margin-right: 8px;" @click="handleEdit(item)">编辑</a>
         <a v-action:delete @click="handleDelete(item)">删除</a>
       </span>
     </s-table>

@@ -4,7 +4,7 @@
     <div class="table-operator">
       <a-row>
         <a-col :span="6">
-          <a-button v-action:add type="primary" icon="plus" @click="handleAdd">新增</a-button>
+          <a-button v-action:create type="primary" icon="plus" @click="handleAdd">新增</a-button>
         </a-col>
         <a-col :span="8" :offset="10">
           <a-input-search
@@ -36,9 +36,9 @@
         </a-tag>
       </div>
       <div class="actions" slot="action" slot-scope="text, item">
-        <a v-action:edit @click="handleEdit(item)">编辑</a>
+        <a v-action:update @click="handleEdit(item)">编辑</a>
         <template v-if="!item.role || item.role.name != '超级管理员'">
-          <a v-action:edit @click="handleAssign(item)">分配角色</a>
+          <a v-action:update @click="handleAssign(item)">分配角色</a>
           <a v-action:delete @click="handleDelete(item)">删除</a>
         </template>
       </div>

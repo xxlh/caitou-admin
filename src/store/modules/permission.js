@@ -2,25 +2,34 @@ import { asyncRouterMap, constantRouterMap } from '@/config/router.config'
 
 /**
  * 过滤账户是否拥有某一个权限，并将菜单从加载列表移除
- * @param permission
- * @param route
+ * @param permissions
+ * @param routePermissions
  * @returns {boolean}
  */
-function hasPermission (permission, route) {
-  if (route.meta && route.meta.permission) {
-    let flag = false
-    for (let i = 0, len = permission.length; i < len; i++) {
-      // flag = route.meta.permission.includes(permission[i])
-      route.meta.permission.forEach(p => {
-        flag = p.indexOf(permission[i].page_path) != -1
-      })
-      if (flag) {
-        return true
-      }
-    }
-    return false
+export function hasPermission (rolePermissions, routePermissions) {
+  if (!routePermissions) return true
+  for (let i = 0, len = routePermissions.length; i < len; i++) {
+    const p = routePermissions[i]
+    let permisionInRole = false
+    rolePermissions?.forEach(permission => {
+      if (matchPermission(p, permission.name)) permisionInRole = true
+    })
+    if (!permisionInRole) return false
   }
   return true
+}
+function matchPermission (permission, toMatch) {
+  const parts = toMatch.split('.')
+  const perParts = permission.split('.')
+  let isMatched = true
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i] == '*') continue
+    if (!perParts[i]) continue
+    if (perParts[i] == '*') continue // 与后端不一致，后端被判断的权限name的*代表all而不是any
+    if (parts[i] == perParts[i]) continue
+    isMatched = false
+  }
+  return isMatched
 }
 
 /**
@@ -45,7 +54,7 @@ function hasRole (roles, route) {
  */
 function filterAsyncRouter (routerMap, roles) {
   const accessedRouters = routerMap.filter(route => {
-    if (hasPermission(roles.permissions, route)) {
+    if (!route.meta || hasPermission(roles.permissions, route.meta.permission)) {
       if (route.children && route.children.length) {
         route.children = filterAsyncRouter(route.children, roles)
       }

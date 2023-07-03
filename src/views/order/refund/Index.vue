@@ -132,7 +132,7 @@
                     <td>
                       <div class="actions">
                         <router-link
-                          v-if="$auth('/order/refund/detail')"
+                          v-if="$auth('orders.refund')"
                           :to="{ path: '/order/refund/detail', query: { orderRefundId: item.order_refund_id } }"
                         >详情</router-link>
                         <a

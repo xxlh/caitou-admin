@@ -4,7 +4,7 @@
     <div class="table-operator">
       <a-row>
         <a-col :span="5">
-          <a-button v-action:add type="primary" icon="plus" @click="handleAdd">新增</a-button>
+          <a-button v-action:create type="primary" icon="plus" @click="handleAdd">新增</a-button>
         </a-col>
         <a-col class="flex flex-x-end" :span="11" :offset="8">
           <SelectRegion

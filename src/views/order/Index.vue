@@ -187,7 +187,7 @@
                       <td :rowspan="item.items.length">
                         <div class="actions">
                           <router-link
-                            v-if="$auth('/order/detail')"
+                            v-if="$auth('orders.view')"
                             :to="{ path: '/order/detail', query: { orderId: item.id } }"
                           >详情</router-link>
                           <template v-if="item.delivery_deal">

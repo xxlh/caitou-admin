@@ -29,7 +29,7 @@
     </div>
     <s-table
       ref="table"
-      rowKey="user_id"
+      rowKey="id"
       :loading="isLoading"
       :columns="columns"
       :data="loadData"
@@ -43,8 +43,8 @@
         </div>
       </span>
       <span slot="main_info" slot-scope="item">
-        <p>{{ item.nick_name }}</p>
-        <p class="c-p">{{ item.mobile }}</p>
+        <p>{{ item.nickname }}</p>
+        <p class="c-p">{{ item.phone }}</p>
       </span>
       <!-- 会员等级 -->
       <span slot="grade" slot-scope="text">
@@ -131,7 +131,7 @@ export default {
       columns: [
         {
           title: '会员ID',
-          dataIndex: 'user_id'
+          dataIndex: 'id'
         },
         {
           title: '会员头像',
@@ -142,11 +142,11 @@ export default {
           title: '昵称/手机号',
           scopedSlots: { customRender: 'main_info' }
         },
-        {
-          title: '会员等级',
-          dataIndex: 'grade',
-          scopedSlots: { customRender: 'grade' }
-        },
+        // {
+        //   title: '会员等级',
+        //   dataIndex: 'grade',
+        //   scopedSlots: { customRender: 'grade' }
+        // },
         {
           title: '余额/积分',
           dataIndex: 'balance',
@@ -164,7 +164,7 @@ export default {
         },
         {
           title: '注册时间',
-          dataIndex: 'create_time'
+          dataIndex: 'created_at'
         },
         {
           title: '操作',
@@ -175,9 +175,9 @@ export default {
       ],
       // 加载数据方法 必须为 Promise 对象
       loadData: param => {
-        return Api.list({ ...param, ...this.queryParam })
+        return Api.list({ with_account: true, ...param, ...this.queryParam })
           .then(response => {
-            return response.data.list
+            return response
           })
       },
       // 会员等级列表
@@ -186,7 +186,7 @@ export default {
   },
   created () {
     // 获取会员等级列表
-    this.getGradeList()
+    // this.getGradeList()
   },
   methods: {
 
@@ -216,7 +216,7 @@ export default {
         title: '您确定要删除该记录吗?',
         content: '删除后不可恢复',
         onOk () {
-          return Api.deleted({ userId: item.user_id })
+          return Api.deleted({ userId: item.id })
             .then((result) => {
               app.$message.success(result.message, 1.5)
               app.handleRefresh()

@@ -19,14 +19,14 @@
           </div>
           <!-- 操作栏 -->
           <div class="actions mt-10">
-            <div v-if="$auth('/order/refund/index.audit')">
+            <div v-if="$auth('orders.refund')">
               <a-button
                 v-if="record.audit_status == AuditStatusEnum.WAIT.value"
                 type="primary"
                 @click="handleAudit"
               >商家审核</a-button>
             </div>
-            <div v-if="$auth('/order/refund/index.receipt')">
+            <div v-if="$auth('orders.refund')">
               <a-button
                 v-if="(
                   record.type == RefundTypeEnum.RETURN.value

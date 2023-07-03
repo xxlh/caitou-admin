@@ -4,7 +4,7 @@
     <div class="table-operator">
       <a-row>
         <a-col :span="6">
-          <a-button v-if="$auth('/page/create')" type="primary" icon="plus" @click="handleAdd">新增</a-button>
+          <a-button v-if="$auth('pages.create')" type="primary" icon="plus" @click="handleAdd">新增</a-button>
         </a-col>
         <a-col :span="8" :offset="10">
           <a-input-search
@@ -31,9 +31,9 @@
       </template>
       <!-- 操作 -->
       <span class="actions" slot="action" slot-scope="item">
-        <a v-if="$auth('/page/update')" @click="handleEdit(item)">编辑</a>
+        <a v-if="$auth('pages.update')" @click="handleEdit(item)">编辑</a>
         <a
-          v-action:setHome
+          v-action:setDefault
           v-if="item.type == PageTypeEnum.HOME.value && !item.is_default"
           @click="handleSetDefault(item)"
         >设为全局默认</a>

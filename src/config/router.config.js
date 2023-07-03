@@ -35,7 +35,7 @@ export const asyncRouterMap = [
         path: '/index',
         name: 'index',
         component: () => import(/* webpackChunkName: "index" */ '@/views/index/Index'),
-        meta: { title: '首页', keepAlive: true, icon: Icons.home, permission: ['/index'] }
+        meta: { title: '首页', keepAlive: true, icon: Icons.home, permission: [] }
       },
 
       // 管理员
@@ -44,17 +44,17 @@ export const asyncRouterMap = [
         name: 'manage',
         component: RouteView,
         redirect: '/manage/user/index',
-        meta: { title: '管理员', icon: Icons.manage, permission: ['/manage'] },
+        meta: { title: '管理员', icon: Icons.manage, permission: ['members'] },
         children: [
           {
             path: '/manage/user/index',
             component: () => import(/* webpackChunkName: "manage" */ '@/views/manage/user/Index'),
-            meta: { title: '管理员列表', keepAlive: false, permission: ['/manage/user/index'] }
+            meta: { title: '管理员列表', keepAlive: false, permission: ['members.view'] }
           },
           {
             path: '/manage/role/index',
             component: () => import(/* webpackChunkName: "manage" */ '@/views/manage/role/Index'),
-            meta: { title: '角色管理', keepAlive: false, permission: ['/manage/role/index'] }
+            meta: { title: '角色管理', keepAlive: false, permission: ['roles.view'] }
           }
         ]
       },
@@ -65,7 +65,7 @@ export const asyncRouterMap = [
         name: 'store',
         component: RouteView,
         redirect: '/store/address/index',
-        meta: { title: '仓储管理', icon: Icons.shop, permission: ['/store'] },
+        meta: { title: '仓储管理', icon: Icons.shop, permission: ['stores'] },
         children: [
           // {
           //   path: '/store/setting',
@@ -75,36 +75,36 @@ export const asyncRouterMap = [
           {
             path: '/store/address/index',
             component: () => import(/* webpackChunkName: "store" */ '@/views/store/address/Index'),
-            meta: { title: '仓储地址', keepAlive: false, permission: ['/store/address/index'] }
+            meta: { title: '仓储地址', keepAlive: false, permission: ['stores.view'] }
           },
           {
             path: '/area/index',
             component: () => import(/* webpackChunkName: "store" */ '@/views/area/Index'),
-            meta: { title: '区域管理', keepAlive: false, permission: ['/area/index'] }
+            meta: { title: '区域管理', keepAlive: false, permission: ['areas.view'] }
           },
           {
             path: '/page',
             component: RouteView,
             redirect: '/page/index',
-            meta: { title: '区域页面', keepAlive: false, permission: ['/page'] },
+            meta: { title: '区域页面', keepAlive: false, permission: ['pages'] },
             children: [
               {
                 path: '/page/index',
                 component: () => import(/* webpackChunkName: "page" */ '@/views/page/Index'),
-                meta: { title: '页面设计', keepAlive: false, permission: ['/page/index'] },
+                meta: { title: '页面设计', keepAlive: false, permission: ['pages.view'] },
                 // 访问其他页面时激活该菜单(router-link-active)
                 activePath: ['/page/create', '/page/update']
               },
               {
                 path: '/page/create',
                 component: () => import(/* webpackChunkName: "page" */ '@/views/page/Create'),
-                meta: { title: '新增页面', keepAlive: false, permission: ['/page/create'] },
+                meta: { title: '新增页面', keepAlive: false, permission: ['pages.create'] },
                 hidden: true
               },
               {
                 path: '/page/update',
                 component: () => import(/* webpackChunkName: "page" */ '@/views/page/Update'),
-                meta: { title: '编辑页面', keepAlive: false, permission: ['/page/update'] },
+                meta: { title: '编辑页面', keepAlive: false, permission: ['pages.update'] },
                 hidden: true
               },
               // {
@@ -123,31 +123,31 @@ export const asyncRouterMap = [
         name: 'goods',
         component: RouteView,
         redirect: '/goods/index',
-        meta: { title: '商品管理', icon: Icons.goods, permission: ['/goods'] },
+        meta: { title: '商品管理', icon: Icons.goods, permission: ['products'] },
         children: [
           {
             path: '/goods/index',
             component: () => import(/* webpackChunkName: "goods" */ '@/views/goods/Index'),
-            meta: { title: '商品列表', keepAlive: false, permission: ['/goods/index'] },
+            meta: { title: '商品列表', keepAlive: false, permission: ['products.*.view'] },
             // 访问其他页面时激活该菜单(router-link-active)
             activePath: ['/goods/create', '/goods/update']
           },
           {
             path: '/goods/create',
             component: () => import(/* webpackChunkName: "goods" */ '@/views/goods/Create'),
-            meta: { title: '创建商品', keepAlive: false, permission: ['/goods/create'] },
+            meta: { title: '创建商品', keepAlive: false, permission: ['products.*.create'] },
             hidden: true
           },
           {
             path: '/goods/update',
             component: () => import(/* webpackChunkName: "goods" */ '@/views/goods/Update'),
-            meta: { title: '编辑商品', keepAlive: false, permission: ['/goods/update'] },
+            meta: { title: '编辑商品', keepAlive: false, permission: ['products.*.update'] },
             hidden: true
           },
           {
             path: '/goods/category/index',
             component: () => import(/* webpackChunkName: "goods" */ '@/views/goods/category/Index'),
-            meta: { title: '商品分类', keepAlive: false, permission: ['/goods/category/index'] }
+            meta: { title: '商品分类', keepAlive: false, permission: ['categories.view'] }
           },
           // {
           //   path: '/goods/spec-template/index',
@@ -157,12 +157,12 @@ export const asyncRouterMap = [
           {
             path: '/goods/service/index',
             component: () => import(/* webpackChunkName: "goods" */ '@/views/goods/service/Index'),
-            meta: { title: '服务承诺', keepAlive: false, permission: ['/goods/service/index'] }
+            meta: { title: '服务承诺', keepAlive: false, permission: ['products.service.view'] }
           },
           {
             path: '/goods/comment/index',
             component: () => import(/* webpackChunkName: "goods" */ '@/views/goods/comment/Index'),
-            meta: { title: '商品评价', keepAlive: false, permission: ['/goods/comment/index'] }
+            meta: { title: '商品评价', keepAlive: false, permission: ['reviews.view'] }
           }
         ]
       },
@@ -178,65 +178,65 @@ export const asyncRouterMap = [
           {
             path: '/order/list/all',
             component: () => import(/* webpackChunkName: "order" */ '@/views/order/Index'),
-            meta: { title: '全部订单', keepAlive: false, permission: ['/order/list/all'] }
+            meta: { title: '全部订单', keepAlive: false, permission: ['orders.view'] }
           },
           {
             path: '/order/list/undelivered',
             component: () => import(/* webpackChunkName: "order" */ '@/views/order/Index'),
-            meta: { title: '待发货', keepAlive: false, permission: ['/order/list/all'] }
+            meta: { title: '待发货', keepAlive: false, permission: ['orders.view'] }
           },
           {
             path: '/order/list/unreceived',
             component: () => import(/* webpackChunkName: "order" */ '@/views/order/Index'),
-            meta: { title: '待收货', keepAlive: false, permission: ['/order/list/all'] }
+            meta: { title: '待收货', keepAlive: false, permission: ['orders.view'] }
           },
           {
             path: '/order/list/unpaid',
             component: () => import(/* webpackChunkName: "order" */ '@/views/order/Index'),
-            meta: { title: '待付款', keepAlive: false, permission: ['/order/list/all'] }
+            meta: { title: '待付款', keepAlive: false, permission: ['orders.view'] }
           },
           {
             path: '/order/list/completed',
             component: () => import(/* webpackChunkName: "order" */ '@/views/order/Index'),
-            meta: { title: '已完成', keepAlive: false, permission: ['/order/list/all'] }
+            meta: { title: '已完成', keepAlive: false, permission: ['orders.view'] }
           },
           {
             path: '/order/list/canceled',
             component: () => import(/* webpackChunkName: "order" */ '@/views/order/Index'),
-            meta: { title: '已取消', keepAlive: false, permission: ['/order/list/all'] }
+            meta: { title: '已取消', keepAlive: false, permission: ['orders.view'] }
           },
           {
             path: '/order/detail',
             component: () => import(/* webpackChunkName: "order" */ '@/views/order/Detail'),
-            meta: { title: '订单详情', keepAlive: false, permission: ['/order/detail'] },
+            meta: { title: '订单详情', keepAlive: false, permission: ['orders.view'] },
             hidden: true
           },
           {
             path: '/order/refund/index',
             component: () => import(/* webpackChunkName: "order" */ '@/views/order/refund/Index'),
-            meta: { title: '售后管理', keepAlive: false, permission: ['/order/refund/index'] },
+            meta: { title: '售后管理', keepAlive: false, permission: ['orders.refund'] },
             activePath: ['/order/refund/detail']
           },
           {
             path: '/order/refund/detail',
             component: () => import(/* webpackChunkName: "order" */ '@/views/order/refund/Detail'),
-            meta: { title: '售后单详情', keepAlive: false, permission: ['/order/refund/detail'] },
+            meta: { title: '售后单详情', keepAlive: false, permission: ['orders.refund'] },
             hidden: true
           },
           {
             path: '/order/deal/index',
             component: () => import(/* webpackChunkName: "order" */ '@/views/order/deal/Index'),
-            meta: { title: '配送订单', keepAlive: false, permission: ['/order/deal/index'] },
+            meta: { title: '配送订单', keepAlive: false, permission: ['deals.view'] },
           },
           {
             path: '/order/tools',
             component: RouteView,
-            meta: { title: '订单处理', keepAlive: false, permission: ['/order/tools'] },
+            meta: { title: '订单处理', keepAlive: false, permission: ['orders.export'] },
             children: [
               {
                 path: '/order/tools/export',
                 component: () => import(/* webpackChunkName: "order" */ '@/views/order/tools/Export'),
-                meta: { title: '订单导出', keepAlive: false, permission: ['/order/tools/export'] }
+                meta: { title: '订单导出', keepAlive: false, permission: ['orders.export'] }
               },
             ]
           },
@@ -248,33 +248,33 @@ export const asyncRouterMap = [
         path: '/user',
         name: 'user',
         component: RouteView,
-        meta: { title: '会员管理', icon: Icons.user, permission: ['/user'] },
+        meta: { title: '会员管理', icon: Icons.user, permission: ['users'] },
         children: [
           {
             path: '/user/index',
             component: () => import(/* webpackChunkName: "user" */ '@/views/user/Index'),
-            meta: { title: '会员列表', keepAlive: false, permission: ['/user/index'] }
+            meta: { title: '会员列表', keepAlive: false, permission: ['users'] }
           },
           {
             path: '/user/grade/index',
             component: () => import(/* webpackChunkName: "user" */ '@/views/user/grade/Index'),
-            meta: { title: '会员等级', keepAlive: false, permission: ['/user/grade/index'] }
+            meta: { title: '会员等级', keepAlive: false, permission: ['users.level'] }
           },
           {
             path: '/user/balance',
             component: RouteView,
             redirect: '/user/balance/index',
-            meta: { title: '余额记录', keepAlive: false, permission: ['/user/balance'] },
+            meta: { title: '余额记录', keepAlive: false, permission: ['users.account'] },
             children: [
               {
                 path: '/user/recharge/index',
                 component: () => import(/* webpackChunkName: "content" */ '@/views/user/recharge/Index'),
-                meta: { title: '充值记录', keepAlive: false, permission: ['/user/recharge/index'] }
+                meta: { title: '充值记录', keepAlive: false, permission: ['users.account'] }
               },
               {
                 path: '/user/balance/index',
                 component: () => import(/* webpackChunkName: "content" */ '@/views/user/balance/Index'),
-                meta: { title: '余额明细', keepAlive: false, permission: ['/user/balance/index'] }
+                meta: { title: '余额明细', keepAlive: false, permission: ['users.account'] }
               }
             ]
           }
@@ -337,7 +337,7 @@ export const asyncRouterMap = [
         path: '/market',
         name: 'market',
         component: RouteView,
-        meta: { title: '营销管理', icon: Icons.market, permission: ['/market'] },
+        meta: { title: '营销管理', icon: Icons.market, permission: ['vouchers'] },
         children: [
           
           {
@@ -359,31 +359,31 @@ export const asyncRouterMap = [
             path: '/market/coupon',
             component: RouteView,
             redirect: '/market/coupon/index',
-            meta: { title: '优惠券', keepAlive: false, permission: ['/market/coupon'] },
+            meta: { title: '优惠券', keepAlive: false, permission: ['vouchers.view'] },
             children: [
               {
                 path: '/market/coupon/index',
                 component: () => import(/* webpackChunkName: "market" */ '@/views/market/coupon/Index'),
-                meta: { title: '优惠券列表', keepAlive: false, permission: ['/market/coupon/index'] },
+                meta: { title: '优惠券列表', keepAlive: false, permission: ['vouchers.view'] },
                 // 访问其他页面时激活该菜单(router-link-active)
                 activePath: ['/market/coupon/create', '/market/coupon/update']
               },
               {
                 path: '/market/coupon/create',
                 component: () => import(/* webpackChunkName: "market" */ '@/views/market/coupon/Create'),
-                meta: { title: '创建优惠券', keepAlive: false, permission: ['/market/coupon/create'] },
+                meta: { title: '创建优惠券', keepAlive: false, permission: ['vouchers.create'] },
                 hidden: true
               },
               {
                 path: '/market/coupon/update',
                 component: () => import(/* webpackChunkName: "market" */ '@/views/market/coupon/Update'),
-                meta: { title: '编辑优惠券', keepAlive: false, permission: ['/market/coupon/update'] },
+                meta: { title: '编辑优惠券', keepAlive: false, permission: ['vouchers.update'] },
                 hidden: true
               },
               {
                 path: '/market/coupon/receive/index',
                 component: () => import(/* webpackChunkName: "market" */ '@/views/market/coupon/Receive'),
-                meta: { title: '领券记录', keepAlive: false, permission: ['/market/coupon/receive/index'] }
+                meta: { title: '领券记录', keepAlive: false, permission: ['vouchers.view'] }
               }
             ]
           },
@@ -391,17 +391,17 @@ export const asyncRouterMap = [
             path: '/market/recharge',
             component: RouteView,
             redirect: '/market/recharge/plan/index',
-            meta: { title: '会员充值', keepAlive: false, permission: ['/market/recharge'] },
+            meta: { title: '会员充值', keepAlive: false, permission: ['users.account'] },
             children: [
               {
                 path: '/market/recharge/plan/index',
                 component: () => import(/* webpackChunkName: "market" */ '@/views/market/recharge/plan/Index'),
-                meta: { title: '充值套餐', keepAlive: false, permission: ['/market/recharge/plan/index'] }
+                meta: { title: '充值套餐', keepAlive: false, permission: ['users.account.strategy'] }
               },
               {
                 path: '/market/recharge/setting',
                 component: () => import(/* webpackChunkName: "market" */ '@/views/market/recharge/Setting'),
-                meta: { title: '充值设置', keepAlive: false, permission: ['/market/recharge/setting'] }
+                meta: { title: '充值设置', keepAlive: false, permission: ['users.account.strategy'] }
               }
             ]
           },
@@ -409,17 +409,17 @@ export const asyncRouterMap = [
             path: '/market/points',
             component: RouteView,
             redirect: '/market/points/setting',
-            meta: { title: '积分管理', keepAlive: false, permission: ['/market/points'] },
+            meta: { title: '积分管理', keepAlive: false, permission: ['points'] },
             children: [
               {
                 path: '/market/points/setting',
                 component: () => import(/* webpackChunkName: "market" */ '@/views/market/points/Setting'),
-                meta: { title: '积分设置', keepAlive: false, permission: ['/market/points/setting'] }
+                meta: { title: '积分设置', keepAlive: false, permission: ['points.update'] }
               },
               {
                 path: '/market/points/log',
                 component: () => import(/* webpackChunkName: "market" */ '@/views/market/points/Log'),
-                meta: { title: '积分明细', keepAlive: false, permission: ['/market/points/log'] }
+                meta: { title: '积分明细', keepAlive: false, permission: ['points.view'] }
               }
             ]
           },
@@ -427,31 +427,31 @@ export const asyncRouterMap = [
             path: '/market/assistance',
             component: RouteView,
             redirect: '/market/assistance/index',
-            meta: { title: '助力券', keepAlive: false, permission: ['/market/assistance'] },
+            meta: { title: '助力券', keepAlive: false, permission: ['assists'] },
             children: [
               {
                 path: '/market/assistance/index',
                 component: () => import(/* webpackChunkName: "market" */ '@/views/market/assistance/Index'),
-                meta: { title: '助力券列表', keepAlive: false, permission: ['/market/assistance/index'] },
+                meta: { title: '助力券列表', keepAlive: false, permission: ['assists.view'] },
                 // 访问其他页面时激活该菜单(router-link-active)
                 activePath: ['/market/assistance/create', '/market/assistance/update']
               },
               {
                 path: '/market/assistance/create',
                 component: () => import(/* webpackChunkName: "market" */ '@/views/market/assistance/Create'),
-                meta: { title: '创建助力券', keepAlive: false, permission: ['/market/assistance/create'] },
+                meta: { title: '创建助力券', keepAlive: false, permission: ['assists.create'] },
                 hidden: true
               },
               {
                 path: '/market/assistance/update',
                 component: () => import(/* webpackChunkName: "market" */ '@/views/market/assistance/Update'),
-                meta: { title: '编辑助力券', keepAlive: false, permission: ['/market/assistance/update'] },
+                meta: { title: '编辑助力券', keepAlive: false, permission: ['assists.update'] },
                 hidden: true
               },
               {
                 path: '/market/assistance/log/index',
                 component: () => import(/* webpackChunkName: "market" */ '@/views/market/assistance/Log'),
-                meta: { title: '助力记录', keepAlive: false, permission: ['/market/assistance/log/index'] }
+                meta: { title: '助力记录', keepAlive: false, permission: ['assists.log'] }
               }
             ]
           },
@@ -459,7 +459,7 @@ export const asyncRouterMap = [
           {
             path: '/market/full-free',
             component: () => import(/* webpackChunkName: "market" */ '@/views/market/FullFree'),
-            meta: { title: '满额包邮', keepAlive: false, permission: ['/market/full-free'] }
+            meta: { title: '满额包邮', keepAlive: false, permission: ['freight.update'] }
           }
         ]
       },
@@ -469,7 +469,7 @@ export const asyncRouterMap = [
         path: '/statistics',
         name: 'statistics',
         component: () => import(/* webpackChunkName: "statistics" */ '@/views/statistics/Index'),
-        meta: { title: '数据统计', keepAlive: true, icon: Icons.statistics, permission: ['/statistics'] }
+        meta: { title: '数据统计', keepAlive: true, icon: Icons.statistics, permission: ['statistics'] }
       },
 
       // 客户端
@@ -525,57 +525,57 @@ export const asyncRouterMap = [
         name: 'setting',
         component: RouteView,
         redirect: '/setting/store/basic',
-        meta: { title: '设置', icon: Icons.setting, permission: ['/setting'] },
+        meta: { title: '设置', icon: Icons.setting, permission: ['settings'] },
         children: [
           {
             path: '/setting/trade',
             component: () => import(/* webpackChunkName: "setting" */ '@/views/setting/Trade'),
-            meta: { title: '交易设置', keepAlive: false, permission: ['/setting/trade'] }
+            meta: { title: '交易设置', keepAlive: false, permission: ['settings.trade'] }
           },
           {
             path: '/setting/storage',
             component: () => import(/* webpackChunkName: "setting" */ '@/views/setting/Storage'),
-            meta: { title: '上传设置', keepAlive: false, permission: ['/setting/storage'] }
+            meta: { title: '上传设置', keepAlive: false, permission: ['settings.storage'] }
           },
           {
             path: '/setting/sms',
             component: () => import(/* webpackChunkName: "setting" */ '@/views/setting/Sms'),
-            meta: { title: '短信通知', keepAlive: false, permission: ['/setting/sms'] }
+            meta: { title: '短信通知', keepAlive: false, permission: ['settings.sms'] }
           },
           {
             path: '/setting/delivery',
             component: RouteView,
             redirect: '/setting/delivery/setting',
-            meta: { title: '配送设置', keepAlive: false, permission: ['/setting/delivery'] },
+            meta: { title: '配送设置', keepAlive: false, permission: ['settings.delivery'] },
             children: [
               {
                 path: '/setting/delivery/setting',
                 component: () => import(/* webpackChunkName: "content" */ '@/views/setting/delivery/Setting'),
-                meta: { title: '配送方式', keepAlive: false, permission: ['/setting/delivery/setting'] }
+                meta: { title: '配送方式', keepAlive: false, permission: ['settings.delivery'] }
               },
               {
                 path: '/setting/delivery/template/index',
                 component: () => import(/* webpackChunkName: "content" */ '@/views/setting/delivery/template/Index'),
-                meta: { title: '运费模板', keepAlive: false, permission: ['/setting/delivery/template/index'] },
+                meta: { title: '运费模板', keepAlive: false, permission: ['settings.delivery'] },
                 // 访问其他页面时激活该菜单(router-link-active)
                 activePath: ['/setting/delivery/template/create', '/setting/delivery/template/update']
               },
               {
                 path: '/setting/delivery/template/create',
                 component: () => import(/* webpackChunkName: "content" */ '@/views/setting/delivery/template/Create'),
-                meta: { title: '新增运费模板', keepAlive: false, permission: ['/setting/delivery/template/create'] },
+                meta: { title: '新增运费模板', keepAlive: false, permission: ['settings.delivery.templates'] },
                 hidden: true
               },
               {
                 path: '/setting/delivery/template/update',
                 component: () => import(/* webpackChunkName: "content" */ '@/views/setting/delivery/template/Update'),
-                meta: { title: '编辑运费模板', keepAlive: false, permission: ['/setting/delivery/template/update'] },
+                meta: { title: '编辑运费模板', keepAlive: false, permission: ['settings.delivery.templates.update'] },
                 hidden: true
               },
               {
                 path: '/setting/delivery/express/index',
                 component: () => import(/* webpackChunkName: "content" */ '@/views/setting/delivery/express/Index'),
-                meta: { title: '物流公司', keepAlive: false, permission: ['/setting/delivery/express/index'] }
+                meta: { title: '物流公司', keepAlive: false, permission: ['settings.delivery.express'] }
               }
             ]
           },
@@ -583,12 +583,12 @@ export const asyncRouterMap = [
             path: '/setting/other',
             component: RouteView,
             redirect: '/setting/other/clear',
-            meta: { title: '其他设置', keepAlive: false, permission: ['/setting/other'] },
+            meta: { title: '其他设置', keepAlive: false, permission: ['settings.clear'] },
             children: [
               {
                 path: '/setting/other/clear',
                 component: () => import(/* webpackChunkName: "content" */ '@/views/setting/other/Clear'),
-                meta: { title: '清理缓存', keepAlive: false, permission: ['/setting/other/clear'] }
+                meta: { title: '清理缓存', keepAlive: false, permission: ['settings.clear'] }
               }
             ]
           }

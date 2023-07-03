@@ -6,7 +6,7 @@
       <a-row>
         <a-col :span="6">
           <a-button
-            v-if="$auth('/market/coupon/create')"
+            v-if="$auth('vouchers.create')"
             type="primary"
             icon="plus"
             @click="handleAdd"
@@ -61,7 +61,7 @@
       </template>
       <!-- 操作 -->
       <span class="actions" slot="action" slot-scope="item">
-        <a v-if="$auth('/market/coupon/update')" @click="handleEdit(item)">编辑</a>
+        <a v-if="$auth('vouchers.update')" @click="handleEdit(item)">编辑</a>
         <a v-action:delete @click="handleDelete(item)">删除</a>
       </span>
     </s-table>

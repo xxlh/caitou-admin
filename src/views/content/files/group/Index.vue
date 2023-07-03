@@ -2,7 +2,7 @@
   <a-card :bordered="false">
     <div class="card-title">{{ $route.meta.title }}</div>
     <div class="table-operator">
-      <a-button v-action:add type="primary" icon="plus" @click="handleAdd">新增</a-button>
+      <a-button v-action:create type="primary" icon="plus" @click="handleAdd">新增</a-button>
     </div>
     <a-table
       v-if="!isLoading"
@@ -15,7 +15,7 @@
       :loading="isLoading"
     >
       <span slot="action" slot-scope="text, item">
-        <a v-action:edit style="margin-right: 8px;" @click="handleEdit(item)">编辑</a>
+        <a v-action:update style="margin-right: 8px;" @click="handleEdit(item)">编辑</a>
         <a v-action:delete @click="handleDelete(item)">删除</a>
       </span>
     </a-table>

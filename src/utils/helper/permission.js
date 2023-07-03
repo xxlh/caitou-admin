@@ -1,3 +1,5 @@
+import { hasPermission } from '@/store/modules/permission'
+
 export const PERMISSION_ENUM = {
   'add': { key: 'add', label: '新增' },
   'delete': { key: 'delete', label: '删除' },
@@ -19,30 +21,11 @@ function plugin (Vue) {
     $auth: {
       get () {
         const _this = this
-        return (permissions) => {
-          const [permission, action] = permissions.split('.')
-          const roles = _this.$store.getters.roles
+        return (permission) => {
+          const role = _this.$store.getters.role
           // 如果是超管用户直接返回true
-          if (roles.name == "超级管理员") {
-            return true
-          }
-          // console.log('permissionList', roles.permissions)
-          // 查找指定的权限
-          const findPermission = roles.permissions.find((val) => {
-            return permission.indexOf(val.page_path) != -1
-          })
-          if (!findPermission) {
-            // console.error(`未找到权限: ${permission}`)
-            return false
-          }
-          // 未输入动作
-          if (action === undefined) {
-            return true
-          }
-          return findPermission.actions.findIndex((val) => {
-            return val === action
-          }) > -1
-
+          if (role.name == "超级管理员") return true
+          return hasPermission(role.permissions, [permission])
         }
       }
     }

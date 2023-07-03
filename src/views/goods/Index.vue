@@ -31,11 +31,11 @@
       <div class="row-item-tab clearfix">
         <div class="tab-list fl-l">
           <a-radio-group v-model="queryParam.type" @change="handleType">
-            <a-radio-button value="intra-city">同城商品</a-radio-button>
-            <a-radio-button value="physical">跨地商品</a-radio-button>
-            <a-radio-button value="travel">旅游线路</a-radio-button>
-            <a-radio-button value="verification">核销卡券</a-radio-button>
-            <a-radio-button value="virtual">线下交易</a-radio-button>
+            <a-radio-button value="intra-city" v-if="$store.getters.role.name != '旅游线路管理员' && $store.getters.role.name != '跨地商品管理员'">同城商品</a-radio-button>
+            <a-radio-button value="physical" v-if="$store.getters.role.name == '跨地商品管理员' || $store.getters.role.name == '超级管理员'">跨地商品</a-radio-button>
+            <a-radio-button value="travel" v-if="$store.getters.role.name == '旅游线路管理员' || $store.getters.role.name == '超级管理员'">旅游线路</a-radio-button>
+            <a-radio-button value="verification" v-if="$store.getters.role.name == '旅游线路管理员' || $store.getters.role.name == '超级管理员'">核销卡券</a-radio-button>
+            <a-radio-button value="virtual" v-if="$store.getters.role.name == '跨地商品管理员' || $store.getters.role.name == '超级管理员'">线下交易</a-radio-button>
           </a-radio-group>
         </div>
         <div class="tab-list fl-l">
@@ -47,7 +47,7 @@
           </a-radio-group>
         </div>
         <a-button
-          v-if="$auth('/goods/create') && queryParam.type == 'intra-city'"
+          v-if="$auth('products.intra-city.skus.create') && queryParam.type == 'intra-city'"
           class="fl-l"
           type="primary"
           icon="plus"
@@ -62,16 +62,14 @@
         <div v-if="selectedRowKeys.length" class="button-group">
           <a-button-group class="ml-10">
             <a-button
-              v-action:status
               icon="arrow-up"
               @click="handleUpdateStatus(selectedRowKeys, true)"
             >上架</a-button>
             <a-button
-              v-action:status
               icon="arrow-down"
               @click="handleUpdateStatus(selectedRowKeys, false)"
             >下架</a-button>
-            <a-button v-action:delete icon="delete" @click="handleDelete(selectedRowKeys)">删除</a-button>
+            <a-button v-action:products.*.delete icon="delete" @click="handleDelete(selectedRowKeys)">删除</a-button>
           </a-button-group>
         </div>
       </div>
@@ -105,8 +103,8 @@
       </span>
       <!-- 操作项 -->
       <div class="actions" slot="action" slot-scope="text, item">
-        <a v-if="$auth('/goods/update.edit')" @click="handleEdit(item)">编辑</a>
-        <a v-if="$auth('/goods/update.delete')" v-action:delete @click="handleDelete([item.id])">删除</a>
+        <a v-if="$auth('products.*.update')" @click="handleEdit(item)">编辑</a>
+        <a v-if="$auth('products.*.delete')" @click="handleDelete([item.id])">删除</a>
         <a-popover trigger="hover" @visibleChange="v => {
           if (!v) return;
           showQRCode(item)
@@ -389,7 +387,7 @@ export default {
 
     // 修改商品状态(上下架)
     handleUpdateStatus (goodsIds, state = true) {
-      if (!this.$auth('/goods/index.status')) {
+      if (!this.$auth('products.*.update')) {
         return false
       }
       this.isLoading = true

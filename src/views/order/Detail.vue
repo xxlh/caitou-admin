@@ -70,13 +70,13 @@
           </div>
           <!-- 操作栏 -->
           <div class="actions clearfix mt-10">
-            <div class="action-item" v-if="$auth('/order/detail.updatePrice')">
+            <div class="action-item" v-if="$auth('orders.updatePrice')">
               <a-button
                 v-if="!record.paid_at"
                 @click="handleUpdatePrice"
               >订单改价</a-button>
             </div>
-            <div class="action-item" v-if="$auth('/order/list/all.deliver')">
+            <div class="action-item" v-if="$auth('orders.deliver')">
               <template v-if="deal">
                 <a-button
                   v-if="(
@@ -102,7 +102,7 @@
                 >发货</a-button>
               </template>
             </div>
-            <div class="action-item" v-if="$auth('/order/list/all.cancel')">
+            <div class="action-item" v-if="$auth('orders.cancel')">
               <a-button
                 v-if="record.status == OrderStatusEnum.REFUNDING.value"
                 type="primary"

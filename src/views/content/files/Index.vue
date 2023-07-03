@@ -93,7 +93,7 @@
       </span>
       <!-- 操作 -->
       <span slot="action" slot-scope="text, item">
-        <a v-action:edit style="margin-right: 8px;" @click="handleEdit(item)">编辑</a>
+        <a v-action:update style="margin-right: 8px;" @click="handleEdit(item)">编辑</a>
         <a v-action:delete @click="handleDelete(item)">删除</a>
       </span>
     </s-table>

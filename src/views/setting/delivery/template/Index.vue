@@ -5,7 +5,7 @@
       <a-row>
         <a-col :span="6">
           <a-button
-            v-if="$auth('/setting/delivery/template/create')"
+            v-if="$auth('settings.delivery.templates.create')"
             type="primary"
             icon="plus"
             @click="handleAdd"
@@ -36,7 +36,7 @@
       <!-- 操作 -->
       <span slot="action" slot-scope="text, item">
         <a
-          v-if="$auth('/setting/delivery/template/update')"
+          v-if="$auth('settings.delivery.templates.update')"
           style="margin-right: 8px;"
           @click="handleEdit(item)"
         >编辑</a>

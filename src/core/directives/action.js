@@ -1,11 +1,12 @@
 import Vue from 'vue'
 import store from '@/store'
+import { hasPermission } from '@/store/modules/permission'
 
 /**
  * Action 权限指令
  * 指令用法：
  *  - 在需要控制 action 级别权限的组件上使用 v-action:[method] , 如下：
- *    <i-button v-action:add >添加用户</a-button>
+ *    <i-button v-action:create >添加用户</a-button>
  *    <a-button v-action:delete>删除用户</a-button>
  *    <a v-action:edit @click="edit(record)">修改</a>
  *
@@ -16,22 +17,21 @@ import store from '@/store'
  */
 const action = Vue.directive('action', {
   inserted: function (el, binding, vnode) {
-    const actionName = binding.arg
-    const roles = store.getters.roles
-    if (roles.name == "超级管理员") {
-      return
+    // const actionName = binding.arg
+    const actionName = binding.rawName.replace('v-action:', '')
+    const role = store.getters.role
+    if (role.name == "超级管理员") return
+    let permission = actionName
+    if (actionName.indexOf('.') == -1) {
+      const elVal = vnode.context.$route.meta.permission
+      const firstPermission = elVal.length && elVal[0] || elVal
+      const permissionHead = firstPermission.split('.')[0]
+      permission = `${permissionHead}.${actionName}`
     }
-    const elVal = vnode.context.$route.meta.permission
-    const permissionId = elVal instanceof String && [elVal] || elVal
-    roles.permissions.forEach(p => {
-      if (!permissionId.includes(p.permissionId)) {
-        return
-      }
-      // 无权限的话 抹除该元素
-      if (p.actions && !p.actions.includes(actionName)) {
-        el.parentNode && el.parentNode.removeChild(el) || (el.style.display = 'none')
-      }
-    })
+    let aa = hasPermission(role.permissions, [permission])
+    if (hasPermission(role.permissions, [permission])) return
+    // 无权限的话 抹除该元素
+    el.parentNode && el.parentNode.removeChild(el) || (el.style.display = 'none')
   }
 })
 
