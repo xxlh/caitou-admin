@@ -327,37 +327,80 @@ export default {
       // 指定图表的配置项和数据
       const option = {
         tooltip: {
-          trigger: 'axis'
-        },
-        legend: {
-          data: ['成交量', '成交额']
-        },
-        toolbox: {
-          show: true,
-          showTitle: false,
-          feature: {
-            mark: { show: true },
-            magicType: { show: true, type: ['line', 'bar'] }
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross',
+            crossStyle: {
+              color: '#999'
+            }
           }
         },
-        calculable: true,
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: _(this.ordersDaily).map('date').value()
+        toolbox: {
+          feature: {
+            dataView: { show: true, readOnly: false },
+            magicType: { show: true, type: ['line', 'bar'] },
+            restore: { show: true },
+            saveAsImage: { show: true }
+          }
         },
-        yAxis: {
-          type: 'value'
+        legend: {
+          data: ['成交额', '毛利', '成交量']
         },
+        xAxis: [
+          {
+            type: 'category',
+            data: _(this.ordersDaily).map('date').value(),
+            axisPointer: {
+              type: 'shadow'
+            }
+          }
+        ],
+        yAxis: [
+          {
+            type: 'value',
+            name: '金额',
+            axisLabel: {
+              formatter: '¥{value}'
+            }
+          },
+          {
+            type: 'value',
+            name: '单量',
+            axisLabel: {
+              formatter: '{value} 单'
+            }
+          },
+        ],
         series: [
           {
             name: '成交额',
-            type: 'line',
+            type: 'bar',
+            tooltip: {
+              valueFormatter: function (value) {
+                return value + ' 元';
+              }
+            },
             data: _(this.ordersDaily).map('turnover').value()
           },
           {
-            name: '成交量',
+            name: '毛利',
             type: 'bar',
+            tooltip: {
+              valueFormatter: function (value) {
+                return value + ' 元';
+              }
+            },
+            data: _(this.ordersDaily).map('gross_profit').value()
+          },
+          {
+            name: '成交量',
+            type: 'line',
+            yAxisIndex: 1,
+            tooltip: {
+              valueFormatter: function (value) {
+                return value + ' 单';
+              }
+            },
             data: _(this.ordersDaily).map('order_count').value()
           }
         ]

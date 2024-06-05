@@ -38,7 +38,10 @@ const vueConfig = {
     // webpack plugins
     plugins: [
       // Ignore all locale files of moment.js
-      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^\.\/locale$/,
+        contextRegExp: /moment$/
+      })
       // new webpack.DefinePlugin({
       //   APP_VERSION: `"${require('./package.json').version}"`,
       //   GIT_HASH: JSON.stringify(GitRevision.version()),
@@ -56,18 +59,11 @@ const vueConfig = {
     const svgRule = config.module.rule('svg')
     svgRule.uses.clear()
     svgRule
-      .oneOf('inline')
-      .resourceQuery(/inline/)
-      .use('vue-svg-icon-loader')
-      .loader('vue-svg-icon-loader')
+      .use('vue-loader')
+      .loader('vue-loader') // or `vue-loader-v16` if you are using a preview support of Vue 3 in Vue CLI
       .end()
-      .end()
-      .oneOf('external')
-      .use('file-loader')
-      .loader('file-loader')
-      .options({
-        name: 'assets/[name].[hash:8].[ext]'
-      })
+      .use('vue-svg-loader')
+      .loader('vue-svg-loader');
 
     // if prod is on
     // assets require on cdn
