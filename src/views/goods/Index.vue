@@ -444,7 +444,7 @@ export default {
      */
     handleRefresh (bool = false) {
       this.selectedRowKeys = []
-      this.$refs.table.refresh(bool)
+      this.$refs.table?.refresh(bool)
     },
 
     /**

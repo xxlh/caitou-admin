@@ -11,7 +11,7 @@
             <div class="item flex">
               <div class="col-left">
                 <div class="icon-body flex flex-x-center flex-y-center">
-                  <!-- <a-icon :component="Icons.overview.sale" /> -->
+                  <a-icon :component="Icons.overview.sale" />
                 </div>
               </div>
               <div class="col-right">
@@ -34,7 +34,7 @@
             <div class="item flex">
               <div class="col-left">
                 <div class="icon-body flex flex-x-center flex-y-center">
-                  <!-- <a-icon :component="Icons.overview.increase" /> -->
+                  <a-icon :component="Icons.overview.increase" />
                 </div>
               </div>
               <div class="col-right">
@@ -63,7 +63,7 @@
             <div class="flex flex-y-center">
               <div class="col-left">
                 <div class="icon-body flex flex-x-center flex-y-center">
-                  <!-- <a-icon class="icon" :component="Icons.statistics.goods" /> -->
+                  <a-icon class="icon" :component="Icons.statistics.goods" />
                 </div>
               </div>
               <div class="col-right">
@@ -78,7 +78,7 @@
             <div class="flex flex-y-center">
               <div class="col-left">
                 <div class="icon-body flex flex-x-center flex-y-center">
-                  <!-- <a-icon class="icon" :component="Icons.statistics.user" /> -->
+                  <a-icon class="icon" :component="Icons.statistics.user" />
                 </div>
               </div>
               <div class="col-right">
@@ -93,7 +93,7 @@
             <div class="flex flex-y-center">
               <div class="col-left">
                 <div class="icon-body flex flex-x-center flex-y-center">
-                  <!-- <a-icon class="icon" :component="Icons.statistics.order" /> -->
+                  <a-icon class="icon" :component="Icons.statistics.order" />
                 </div>
               </div>
               <div class="col-right">
@@ -108,7 +108,7 @@
             <div class="flex flex-y-center">
               <div class="col-left">
                 <div class="icon-body flex flex-x-center flex-y-center">
-                  <!-- <a-icon class="icon" :component="Icons.statistics.consume" /> -->
+                  <a-icon class="icon" :component="Icons.statistics.consume" />
                 </div>
               </div>
               <div class="col-right">
@@ -171,7 +171,7 @@
                   class="icon flex flex-x-center flex-y-center"
                   :style="{ backgroundColor: item.color }"
                 >
-                  <!-- <a-icon :component="item.icon" /> -->
+                  <a-icon :component="item.icon" />
                 </div>
                 <span class="name">{{ item.name }}</span>
               </div>
