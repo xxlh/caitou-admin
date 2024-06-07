@@ -53,12 +53,20 @@
           icon="plus"
           @click="handleAdd"
         >添加商品</a-button>
-        <a-tooltip v-else placement="right">
-          <template slot="title">
-            <span>非同城商品默认不会展示，需要在[页面设计]中配置对镜展示的商品类型</span>
-          </template>
-          <a-button type="dashed" shape="circle" icon="info" />
-        </a-tooltip>
+        <div v-else>
+          <a-button
+            class="fl-l"
+            type="primary"
+            icon="plus"
+            @click="handleCreate"
+          >{{ queryParam.type == 'travel' ? '新增线路' : '新增商品' }}</a-button>
+          <a-tooltip class="ml-10" placement="right">
+            <template slot="title">
+              <span>非同城商品默认不会展示，需要在[页面设计]中配置对应展示的商品类型</span>
+            </template>
+            <a-button type="dashed" shape="circle" icon="info" />
+          </a-tooltip>
+        </div>
         <div v-if="selectedRowKeys.length" class="button-group">
           <a-button-group class="ml-10">
             <a-button
@@ -409,8 +417,8 @@ export default {
         title: '您确定要删除该记录吗?',
         content: '删除后不可恢复',
         onOk () {
-          return GoodsApi.deleted({product_ids: goodsIds, store_id: app.$store.getters.storeId})
-            .then(result => {
+          const promiseGoodsApi = app.queryParam.type == 'intra-city' ? GoodsApi.deleteSkus({product_ids: goodsIds, store_id: app.$store.getters.storeId}) : GoodsApi.deleted({ids: goodsIds})
+          return promiseGoodsApi.then(result => {
               app.$message.success(result.message, 1.5)
               app.handleRefresh()
             })

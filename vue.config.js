@@ -16,6 +16,7 @@ const assetsCDN = {
   externals: {
     vue: 'Vue',
     'vue-router': 'VueRouter',
+    'viser-vue': 'ViserVue',
     vuex: 'Vuex',
     axios: 'axios'
   },
@@ -24,6 +25,7 @@ const assetsCDN = {
   js: [
     '//lib.baomitu.com/vue/2.6.10/vue.min.js',
     '//lib.baomitu.com/vue-router/3.1.3/vue-router.min.js',
+    '//unpkg.com/viser-vue/umd/viser-vue.min.js',
     '//lib.baomitu.com/vuex/3.1.1/vuex.min.js',
     '//lib.baomitu.com/axios/0.19.0/axios.min.js'
   ]
