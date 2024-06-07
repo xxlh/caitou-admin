@@ -65,7 +65,7 @@
               >
                 <div
                   class="img-cover"
-                  :style="{ backgroundImage: `url('${item.preview_url}')`, width: fileType === FileTypeEnum.VIDEO.value ? '55px' : '95px' }"
+                  :style="{ backgroundImage: `url('${item.preview_url||item.original_url}')`, width: fileType === FileTypeEnum.VIDEO.value ? '55px' : '95px' }"
                 ></div>
                 <p class="file-name oneline-hide">{{ item.file_name }}</p>
                 <div class="select-mask">

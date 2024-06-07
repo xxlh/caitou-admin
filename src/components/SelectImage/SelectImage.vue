@@ -17,8 +17,8 @@
           :style="{ width: `${width}px`, height: `${width}px` }"
         >
           <!-- 预览图 -->
-          <a :href="item.preview_url" target="_blank">
-            <div class="img-cover" :style="{ backgroundImage: `url('${item.preview_url}')` }"></div>
+          <a :href="item.original_url" target="_blank">
+            <div class="img-cover" :style="{ backgroundImage: `url('${item.preview_url||item.original_url}')` }"></div>
           </a>
           <!-- 删除文件 -->
           <a-icon

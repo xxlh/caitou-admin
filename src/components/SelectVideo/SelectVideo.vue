@@ -18,7 +18,7 @@
         >
           <!-- 预览图 -->
           <a :href="item.external_url" target="_blank">
-            <div class="img-cover" :style="{ backgroundImage: `url('${item.preview_url}')` }"></div>
+            <div class="img-cover" :style="{ backgroundImage: `url('${item.preview_url||item.original_url}')` }"></div>
           </a>
           <!-- 删除文件 -->
           <a-icon

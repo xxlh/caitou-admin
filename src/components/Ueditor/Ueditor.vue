@@ -164,7 +164,7 @@ export default {
       if (selectedItems.length > 0) {
         let content = ''
         if (app.filesModalType == FileTypeEnum.IMAGE.value) {
-          content = selectedItems.map(item => `<p><img src="${item.preview_url}" /></p>`)
+          content = selectedItems.map(item => `<p><img src="${item.original_url}" /></p>`)
         }
         if (app.filesModalType == FileTypeEnum.VIDEO.value) {
           content = selectedItems.map(item => `<p><video style="width: 100%; height: 240px;" src="${item.external_url}" controls>${item.file_id}</video></p>`)
