@@ -1350,17 +1350,17 @@ export default {
       if (!this.categoryIdToLoad) return this.loadCategory = false;
       const res = await CatApi.get(this.categoryIdToLoad)
       this.navItemToLoadCat.text = res.name
-      this.navItemToLoadCat.imgUrl = res.image && res.image.external_url
+      this.navItemToLoadCat.imgUrl = res.image_url || res.image && res.image.external_url
       const linkDefault = linkList.filter(l => l.key=='store')[0].data.filter(d => d.id=='995bf1c')[0]
       this.navItemToLoadCat.link = {
         ...linkDefault,
         param: {
           path: "pages/tabBar/category/category",
-          query: {id: this.categoryIdToLoad},
-          url: "pages/tabBar/category/category?id=" + this.categoryIdToLoad,
+          query: {category_id: this.categoryIdToLoad},
+          url: "pages/tabBar/category/category?category_id=" + this.categoryIdToLoad,
         }
       }
-      this.navItemToLoadCat.link.form.filter(f => f.key=='query.id')[0].value = this.categoryIdToLoad
+      this.navItemToLoadCat.link.form.filter(f => f.key=='query.category_id')[0].value = this.categoryIdToLoad
       this.loadCategory = false
     },
 

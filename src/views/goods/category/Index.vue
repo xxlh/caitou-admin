@@ -15,7 +15,7 @@
       :loading="isLoading"
     >
       <span slot="image" slot-scope="text">
-        <img v-if="text" :src="text.preview_url" width="30" height="30" />
+        <img v-if="text" :src="text.preview_url || text.original_url" width="30" height="30" />
       </span>
       <!-- 状态 -->
       <span slot="status" slot-scope="text">
