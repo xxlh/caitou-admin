@@ -1356,7 +1356,11 @@ export default {
         ...linkDefault,
         param: {
           path: "pages/tabBar/category/category",
-          query: {category_id: this.categoryIdToLoad},
+          query: {
+            category_id: this.categoryIdToLoad,
+            category_name: res.name,
+            category_imgUrl: this.navItemToLoadCat.imgUrl,
+          },
           url: "pages/tabBar/category/category?category_id=" + this.categoryIdToLoad,
         }
       }
