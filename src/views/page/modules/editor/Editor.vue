@@ -27,13 +27,6 @@
               </div>
             </div>
             <div class="block-item">
-              <span class="label">分享标题</span>
-              <div class="flex-box">
-                <a-input v-model="data.page.params.shareTitle" />
-                <div class="tips">用户端转发时显示的标题</div>
-              </div>
-            </div>
-            <div class="block-item">
               <span class="label">页面背景色</span>
               <div class="item-colorPicker">
                 <span
@@ -81,6 +74,44 @@
                   @click="data.page.style.titleBackgroundImage = ''"
                 >重置</span>
                 <SImage v-model="data.page.style.titleBackgroundImage" :channel="channel" :channel_id="pageId" collection="carousel_images" :width="60" :height="60" />
+              </div>
+            </div>
+            <div class="block-item">
+              <span class="label">首页形态</span>
+              <div class="flex-box">
+                <a-radio-group buttonStyle="solid" v-model="data.page.params.isIntraCity" :default-value="0">
+                  <a-radio-button :value="true">区域配送</a-radio-button>
+                  <a-radio-button :value="false">不限区域</a-radio-button>
+                </a-radio-group>
+                <div class="tips">用户不会根据定位切换到其他首页(包括转发查看的用户)</div>
+              </div>
+            </div>
+            <div class="block-item">
+              <span class="label">分享标题</span>
+              <div class="flex-box">
+                <a-input v-model="data.page.params.shareTitle" />
+                <div class="tips">用户端转发时显示的标题</div>
+              </div>
+            </div>
+            <div class="block-item">
+              <span class="label">分享描述</span>
+              <div class="flex-box">
+                <a-input v-model="data.page.params.shareDesc" />
+                <div class="tips">用户端转发时显示的一句话描述</div>
+              </div>
+            </div>
+            <div class="block-item">
+              <span class="label">分享预览图</span>
+              <div class="flex-box">
+                <SImage v-model="data.page.params.shareImage" :channel="channel" :channel_id="pageId" collection="icons" :width="60" :height="60" />
+                <div class="tips">用户端转发朋友时显示的图片</div>
+              </div>
+            </div>
+            <div class="block-item">
+              <span class="label">朋友圈预览图</span>
+              <div class="flex-box">
+                <SImage v-model="data.page.params.sharePyqImage" :channel="channel" :channel_id="pageId" collection="icons" :width="60" :height="60" />
+                <div class="tips">用户端转发朋友圈时显示的图片</div>
               </div>
             </div>
           </div>

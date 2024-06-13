@@ -78,16 +78,16 @@ export const asyncRouterMap = [
             meta: { title: '仓储地址', keepAlive: false, permission: ['stores.view'] }
           },
           {
-            path: '/area/index',
-            component: () => import(/* webpackChunkName: "store" */ '@/views/area/Index'),
-            meta: { title: '区域管理', keepAlive: false, permission: ['areas.view'] }
-          },
-          {
             path: '/page',
             component: RouteView,
             redirect: '/page/index',
-            meta: { title: '区域页面', keepAlive: false, permission: ['pages'] },
+            meta: { title: '区域管理', keepAlive: false, permission: ['pages'] },
             children: [
+              {
+                path: '/area/index',
+                component: () => import(/* webpackChunkName: "store" */ '@/views/area/Index'),
+                meta: { title: '区域配置', keepAlive: false, permission: ['areas.view'] }
+              },
               {
                 path: '/page/index',
                 component: () => import(/* webpackChunkName: "page" */ '@/views/page/Index'),

@@ -22,8 +22,8 @@
               @click="switchArea"
             >
               <a-menu-item v-for="area in areasById" :key="area.id">
-                <a-icon type="environment" /> {{area.id}}
-                <span>. {{area.name}}</span>
+                <a-icon type="environment" /> {{area.name}}
+                <span>- {{area.city}} {{area.district}}</span>
               </a-menu-item>
             </a-menu>
           </a-layout-sider>
