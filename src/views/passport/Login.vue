@@ -159,7 +159,7 @@ export default {
      */
     loginFailed (response) {
       this.isLoginError = true
-      this.loginErrorMsg = response.msg
+      this.loginErrorMsg = (response && response.msg) || '登录失败，请稍后重试'
     },
 
     /**
