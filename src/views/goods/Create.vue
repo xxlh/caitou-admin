@@ -476,7 +476,10 @@ export default {
     onFormSubmit (values) {
       this.isLoading = true
       this.isBtnLoading = true
-      values.store_id = this.$store.getters.storeId
+      // 只有同城商品才需要 store_id
+      if (values.type === 'intra-city') {
+        values.store_id = this.$store.getters.storeId
+      }
       // Promise.all([
         // Todo
         // GoodsApi.saveSku(this.goodsId, values.specData.skuList),

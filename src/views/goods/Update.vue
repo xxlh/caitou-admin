@@ -517,7 +517,10 @@ export default {
         // 整理商品分类ID集
         values.category_ids = values.categorys.map(item => item.value)
         delete values.categorys
-        values.store_id = this.$store.getters.storeId
+        // 只有同城商品才需要 store_id
+        if (values.type === 'intra-city') {
+          values.store_id = this.$store.getters.storeId
+        }
         values.image_ids = values.image_ids?.filter(img_id => img_id)
         // 配送时间限制
         if (values.delivery_taking != 'days') values.delivery_days_taking = null
