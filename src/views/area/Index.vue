@@ -154,7 +154,12 @@ export default {
         const currentAreaId = this.selectedKeys[0];
         let defaultSelectedArea = this.areasById[currentAreaId] || res.data[0];
         this.selectedKeys = [defaultSelectedArea.id]
-        this.loadPaths(defaultSelectedArea.paths);
+        // 传入区域信息，当区域没有路径时，地图会定位到该城市
+        this.loadPaths(defaultSelectedArea.paths, {
+          province: defaultSelectedArea.province,
+          city: defaultSelectedArea.city,
+          district: defaultSelectedArea.district
+        });
       } else {
         this.map.clearMap();
         this.polyEditor.close();
@@ -220,19 +225,33 @@ export default {
      * 区域切换
      */
     switchArea (menu) {
-      this.loadPaths(this.areasById[menu.key].paths, this.areasById[menu.key].district || this.areasById[menu.key].city || this.areasById[menu.key].province)
+      const area = this.areasById[menu.key]
+      this.loadPaths(area.paths, {
+        province: area.province,
+        city: area.city,
+        district: area.district
+      })
     },
 
     /**
      * 路径编辑
+     * @param {Array} paths 路径数据
+     * @param {Object} areaInfo 区域信息 { province, city, district }
      */
-    loadPaths (paths, city) {
+    loadPaths (paths, areaInfo) {
       if (!this.map) {this.$message.error('map还未完全加载，请刷新重试！'); return;}
       this.map.clearMap();
       this.polyEditor.close();
       if (!paths || !paths.length) {
-        this.$message.error('暂无路径数据！');
-        this.map.setCity(city);
+        this.$message.info('暂无路径数据，请绘制配送区域');
+        // setCity 只支持城市名，不支持区县名，所以优先使用 city，其次 province
+        // 注意：setCity 是异步方法，需要回调确认
+        const cityName = areaInfo?.city || areaInfo?.province
+        if (cityName) {
+          this.map.setCity(cityName, () => {
+            console.log('地图已定位到:', cityName)
+          });
+        }
         return;
       }
 

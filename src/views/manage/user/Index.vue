@@ -29,11 +29,17 @@
         <a-tag v-if="item.role && item.role.name == '超级管理员'" color="green">超级管理员</a-tag>
       </div>
       <div slot="roles" slot-scope="text, item">
-        <a-tag v-for="(role,index) in text" :key="index" :color="role.name == '超级管理员' ? 'green' : ''">
-          {{role.name}} 
-          <span v-if="role.name == '仓储管理员' && storeListById[role.store_id]"> ({{storeListById[role.store_id].name}})</span>
-          <span v-if="role.name == '区域管理员' && areaListById[role.store_id]"> ({{areaListById[role.store_id].name}})</span>
-        </a-tag>
+        <template v-for="(role,index) in text">
+          <a-tag :key="index" :color="role.name == '超级管理员' ? 'green' : ''">
+            {{role.name}}
+            <span v-if="role.name == '仓储管理员' && storeListById[role.store_id]"> ({{storeListById[role.store_id].name}})</span>
+            <span v-if="role.name == '区域管理员' && areaListById[role.area_id]"> ({{areaListById[role.area_id].name}})</span>
+          </a-tag>
+          <br :key="'br-' + index" v-if="role.name == '仓储管理员' && index < text.length - 1 && text[index+1].name == '仓储管理员'" />
+        </template>
+        <div v-if="item.managed_agents_count > 0" style="margin-top: 4px; font-size: 12px; color: #666">
+          管理 {{item.managed_agents_count}} 个分销员
+        </div>
       </div>
       <div class="actions" slot="action" slot-scope="text, item">
         <a v-action:update @click="handleEdit(item)">编辑</a>

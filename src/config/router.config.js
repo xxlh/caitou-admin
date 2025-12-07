@@ -281,6 +281,56 @@ export const asyncRouterMap = [
         ]
       },
 
+      // 分销管理
+      {
+        path: '/distribution',
+        name: 'distribution',
+        component: RouteView,
+        redirect: '/distribution/agents',
+        meta: {
+          title: '分销管理',
+          icon: Icons.team,
+          permission: [
+            'distribution.agents.view',
+            'distribution.rebates.view',
+            'distribution.withdrawals.view',
+            'distribution.orders.view'
+          ]
+        },
+        children: [
+          {
+            path: '/distribution/agents',
+            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/agents/Index'),
+            meta: { title: '分销员列表', keepAlive: false, permission: ['distribution.agents.view'] }
+          },
+          {
+            path: '/distribution/rebates',
+            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/rebates/Index'),
+            meta: { title: '佣金记录', keepAlive: false, permission: ['distribution.rebates.view'] }
+          },
+          {
+            path: '/distribution/withdrawals',
+            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/withdrawals/Index'),
+            meta: { title: '提现审核', keepAlive: false, permission: ['distribution.withdrawals.view'] }
+          },
+          {
+            path: '/distribution/withdrawals/setting',
+            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/withdrawals/Setting'),
+            meta: { title: '提现配置', keepAlive: false, permission: ['distribution.withdrawals.setting'] }
+          },
+          {
+            path: '/distribution/manager',
+            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/manager/Index'),
+            meta: { title: '分销管理员', keepAlive: false, permission: ['distribution.agents.manage'] }
+          },
+          {
+            path: '/distribution/stats',
+            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/stats/Index'),
+            meta: { title: '分销数据', keepAlive: false, permission: ['distribution.orders.view'] }
+          }
+        ]
+      },
+
       // 内容管理
       {
         path: '/content',

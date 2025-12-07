@@ -6,7 +6,18 @@
         <a-col :span="6">
           <a-button v-if="$auth('pages.create')" type="primary" icon="plus" @click="handleAdd">新增</a-button>
         </a-col>
-        <a-col :span="8" :offset="10">
+        <a-col :span="12" :offset="6" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
+          <a-select
+            v-model="queryParam.area_id"
+            placeholder="选择区域"
+            style="width: 200px;"
+            :loading="areasLoading"
+            @change="onAreaChange"
+          >
+            <a-select-option v-for="area in areaOptions" :key="area.value" :value="area.value">
+              {{ area.label }}
+            </a-select-option>
+          </a-select>
           <a-input-search
             class="input-search"
             v-model="queryParam.name"
@@ -49,6 +60,7 @@
 
 <script>
 import * as Api from '@/api/page'
+import * as AreaApi from '@/api/area'
 import { STable } from '@/components'
 import { PageTypeEnum } from '@/common/enum/page'
 import store from '@/store'
@@ -94,6 +106,9 @@ export default {
         name: '',
         area_id: store.getters.areaId,
       },
+      // 区域选项
+      areaOptions: [],
+      areasLoading: false,
       // 枚举类
       PageTypeEnum,
       // 正在加载
@@ -110,12 +125,43 @@ export default {
     }
   },
   created () {
+    // 加载有权限的区域列表
+    this.loadAreas()
   },
   methods: {
+    // 加载区域列表
+    async loadAreas () {
+      this.areasLoading = true
+      try {
+        const ownAreaIds = store.getters.ownAreaIds
+        const isSuperAdmin = store.getters.role?.name === '超级管理员'
+        // 获取所有区域列表
+        const res = await AreaApi.list({ per_page: 100 })
+        // 超级管理员可以看到所有区域，其他用户只能看到有权限的区域
+        this.areaOptions = res.data
+          .filter(area => isSuperAdmin || ownAreaIds.includes(area.id))
+          .map(area => ({
+            value: area.id,
+            label: area.name || `${area.city || area.province}_${area.id}`
+          }))
+        // 如果当前选中的区域不在列表中，则选择第一个
+        const validAreaIds = this.areaOptions.map(a => a.value)
+        if (!validAreaIds.includes(this.queryParam.area_id) && this.areaOptions.length) {
+          this.queryParam.area_id = this.areaOptions[0].value
+        }
+      } finally {
+        this.areasLoading = false
+      }
+    },
+
+    // 区域切换
+    onAreaChange () {
+      this.handleRefresh(true)
+    },
 
     // 新增页面
     handleAdd () {
-      this.$router.push('./create')
+      this.$router.push({ path: './create', query: { areaId: this.queryParam.area_id } })
     },
 
     // 编辑页面

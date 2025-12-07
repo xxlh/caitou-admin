@@ -37,6 +37,8 @@ const vueConfig = {
   publicPath: process.env.NODE_ENV === 'production' ? '/' : '/',
 
   configureWebpack: {
+    // 开发环境启用 source map - 使用 source-map 获得最佳调试体验
+    devtool: isProd ? false : 'source-map',
     // webpack plugins
     plugins: [
       // Ignore all locale files of moment.js
@@ -137,6 +139,7 @@ const vueConfig = {
     // }
   },
 
+  // 开发环境启用 source map,便于调试
   // disable source map in production
   productionSourceMap: false,
   lintOnSave: false,

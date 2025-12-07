@@ -18,6 +18,7 @@ import shop from '@/assets/icons/shop.svg?inline'
 import user from '@/assets/icons/user.svg?inline'
 import market from '@/assets/icons/market.svg?inline'
 import statistics from '@/assets/icons/statistics.svg?inline'
+import team from '@/assets/icons/team.svg?inline'
 // import mpweixin from '@/assets/icons/mpweixin.svg?inline'
 // import h5 from '@/assets/icons/h5.svg?inline'
 
@@ -27,6 +28,6 @@ import h5 from '@/assets/icons/h5.svg?inline'
 import app from '@/assets/icons/app.svg?inline'
 
 export {
-  home, manage, goods, order, content, setting, shop, user, market, statistics,
+  home, manage, goods, order, content, setting, shop, user, market, statistics, team,
   mpweixin, h5, app
 }

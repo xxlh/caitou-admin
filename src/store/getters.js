@@ -6,6 +6,12 @@ const getters = {
   token: state => state.user.token,
   storeId: state => state.user.currentStoreId,
   areaId: state => state.user.info.stores.filter(s => s.id == state.user.currentStoreId)?.[0]?.delivery_area_id,
+  // 获取用户有权限的所有区域ID列表（从仓储中提取唯一的 delivery_area_id）
+  ownAreaIds: state => {
+    const stores = state.user.info.stores || []
+    const areaIds = stores.map(s => s.delivery_area_id).filter(id => id != null)
+    return [...new Set(areaIds)]
+  },
   // avatar: state => state.user.avatar,
   nickname: state => state.user.name,
   welcome: state => state.user.welcome,

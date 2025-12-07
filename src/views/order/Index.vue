@@ -57,6 +57,26 @@
             <a-form-item label="下单时间">
               <a-range-picker format="YYYY-MM-DD" v-decorator="['created_between']" />
             </a-form-item>
+            <a-form-item label="分销员筛选">
+              <a-select
+                v-model="queryParam.referred_by"
+                placeholder="选择一级分销员"
+                allowClear
+                showSearch
+                :filterOption="false"
+                :loading="agentSearchLoading"
+                style="width: 200px"
+                @search="handleAgentSearch"
+              >
+                <a-select-option 
+                  v-for="agent in agentOptions" 
+                  :key="agent.user_id" 
+                  :value="agent.user_id"
+                >
+                  {{ agent.user_nickname }} (ID: {{ agent.user_id }})
+                </a-select-option>
+              </a-select>
+            </a-form-item>
             <a-form-item class="search-btn">
               <a-button type="primary" icon="search" html-type="submit">搜索</a-button>
             </a-form-item>
@@ -266,6 +286,7 @@ import {
 } from '@/common/enum/order'
 import { DeliveryForm, CancelForm, DeliveryManForm } from './modules'
 import store from '@/store'
+import { fetchAgents } from '@/api/distribution/index'
 
 // 表格字段
 const columns = [
@@ -341,6 +362,7 @@ export default {
       // 查询参数
       queryParam: {
         area_id: store.getters.areaId,
+        referred_by: undefined
       },
       searchParams: {},
       // 正在加载
@@ -350,7 +372,11 @@ export default {
       // 当前页码
       page: 1,
       // 列表数据
-      orderList: { data: [], total: 0, per_page: 10 }
+      orderList: { data: [], total: 0, per_page: 10 },
+      
+      // 分销员筛选相关
+      agentOptions: [],
+      agentSearchLoading: false
     }
   },
   beforeCreate () {
@@ -371,6 +397,8 @@ export default {
   created () {
     // 初始化页面
     this.init()
+    // 预加载分销员列表
+    this.handleAgentSearch('')
   },
   watch: {
     // 监听路由变化
@@ -489,6 +517,23 @@ export default {
     // 审核取消订单
     handleCancel (record) {
       this.$refs.CancelForm.show(record)
+    },
+
+    // 搜索分销员
+    async handleAgentSearch (keyword) {
+      this.agentSearchLoading = true
+      try {
+        const res = await fetchAgents({ 
+          keyword: keyword || undefined, 
+          per_page: 50 
+        })
+        this.agentOptions = res.data || []
+      } catch (error) {
+        this.$message.error('加载分销员列表失败')
+        console.error('Load agents error:', error)
+      } finally {
+        this.agentSearchLoading = false
+      }
     }
 
   }

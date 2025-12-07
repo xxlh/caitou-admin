@@ -62,11 +62,14 @@ export default {
       selectedIndex: 'page',
       // 当前选中的元素
       curItem: {},
-      area_id: store.getters.areaId,
+      // 优先使用路由参数中的 areaId，否则使用当前仓储关联的区域
+      area_id: null,
     }
   },
   // 初始化数据
   created () {
+    // 从路由参数或 store 获取区域ID
+    this.area_id = this.$route.query.areaId ? parseInt(this.$route.query.areaId) : store.getters.areaId
     // 获取初始化数据
     this.initData()
   },

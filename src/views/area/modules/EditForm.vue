@@ -68,6 +68,8 @@ export default {
       // 分类
       categories: [],
       categoryList: [],
+      // 分类数据加载状态
+      categoriesLoading: false,
     }
   },
   methods: {
@@ -80,12 +82,39 @@ export default {
       this.visible = true
       // 当前记录
       this.record = record
-      // 抓取分类筛选
-      this.categories = await Api.getCategories(record.id)
-      record.category_values = this.categories.map(c => { return { value: c.id } })
-      this.categoryList = await CategoryModel.getCategoryTreeSelect()
-      // 设置默认值
+      // 重置分类相关状态
+      this.categories = []
+      this.categoryList = []
+      this.categoriesLoading = true
+      // 先设置基础信息（区域名称、省市区等），用户可以立即看到
       this.setFieldsValue()
+      // 异步加载分类数据，加载完成后更新分类相关字段
+      this.loadCategoriesData(record)
+    },
+
+    /**
+     * 异步加载分类数据
+     */
+    async loadCategoriesData (record) {
+      try {
+        // 并行加载分类筛选和分类树
+        const [categories, categoryList] = await Promise.all([
+          Api.getCategories(record.id),
+          CategoryModel.getCategoryTreeSelect()
+        ])
+        this.categories = categories
+        this.categoryList = categoryList
+        // 更新分类相关字段
+        const categoryValues = categories.map(c => ({ value: c.id }))
+        this.$nextTick(() => {
+          this.form.setFieldsValue({
+            isFilter: categories.length ? 'filter' : 'all',
+            category_values: categoryValues
+          })
+        })
+      } finally {
+        this.categoriesLoading = false
+      }
     },
 
     /**
