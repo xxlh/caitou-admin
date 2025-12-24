@@ -96,6 +96,21 @@ const components = [
         name: '在线客服',
         type: 'service',
         icon: Icon.service
+      },
+      {
+        name: '一级分类导航',
+        type: 'categoryNav',
+        icon: Icon.navBar
+      },
+      {
+        name: '二级分类导航',
+        type: 'categorySubNav',
+        icon: Icon.navBar
+      },
+      {
+        name: '分类商品列表',
+        type: 'categoryProductList',
+        icon: Icon.goods
       }
     ]
   },

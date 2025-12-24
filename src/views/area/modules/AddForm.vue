@@ -19,6 +19,12 @@
             v-decorator="['cascader', {rules: [{required: true, message: '请选择省市区'}]}]"
           />
         </a-form-item>
+        <a-form-item label="支持同城配送" :labelCol="labelCol" :wrapperCol="wrapperCol" extra="开启后该区域可展示同城配送商品">
+          <a-radio-group v-decorator="['is_intracity', {initialValue: true, rules: [{required: true}]}]">
+            <a-radio :value="true">是</a-radio>
+            <a-radio :value="false">否</a-radio>
+          </a-radio-group>
+        </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>

@@ -38,16 +38,16 @@
       <!-- 页面类型 -->
       <template slot="type" slot-scope="text, item">
         <a-tag :color="text == PageTypeEnum.HOME.value ? 'green' : (text == PageTypeEnum.CATEGORY.value ? 'blue' : '')">{{ PageTypeEnum[text].name }}</a-tag>
-        <a-tag v-if="item.is_default" color="orange">全局默认</a-tag>
+        <a-tag v-if="item.is_default_area" color="orange">默认区域</a-tag>
       </template>
       <!-- 操作 -->
       <span class="actions" slot="action" slot-scope="item">
         <a v-if="$auth('pages.update')" @click="handleEdit(item)">编辑</a>
         <a
           v-action:setDefault
-          v-if="item.type == PageTypeEnum.HOME.value && !item.is_default"
+          v-if="item.type == PageTypeEnum.HOME.value && !item.is_default_area"
           @click="handleSetDefault(item)"
-        >设为全局默认</a>
+        >设为默认区域</a>
         <a
           v-action:delete
           v-if="item.type != PageTypeEnum.HOME.value"
@@ -169,11 +169,13 @@ export default {
       this.$router.push({ path: './update', query: { pageId: item.id } })
     },
 
-    // 设置为全局默认页
+    // 设置页面所属区域为默认区域
     handleSetDefault (item) {
       const app = this
+      const areaName = item.area?.name || `区域ID: ${item.delivery_area_id}`
       const modal = this.$confirm({
-        title: '您确定要设置为全局的默认页面吗？当用户定位不在配送区的时候展示。',
+        title: '确认设置为默认区域？',
+        content: `设置后，「${areaName}」将成为默认区域。未选择区域的用户（如新用户、缓存过期用户、偏远地区用户）将展示该区域的首页、商品和分类。`,
         onOk () {
           return Api.setDefault(item.id)
             .then((result) => {

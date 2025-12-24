@@ -135,6 +135,37 @@ export default {
      */
     onCheckAddItem (type) {
       const { data } = this
+      const itemsTypes = data.items.map(item => item.type)
+      
+      // 验证分类页组件的添加限制
+      if (type === 'categorySubNav') {
+        // 添加二级分类导航前，必须有一级分类导航
+        if (!inArray('categoryNav', itemsTypes)) {
+          this.$message.warning('请先添加「一级分类导航」组件')
+          return false
+        }
+        // 二级分类导航只能存在一个
+        if (inArray('categorySubNav', itemsTypes)) {
+          this.$message.warning('「二级分类导航」组件最多只能存在一个')
+          return false
+        }
+      }
+      
+      if (type === 'categoryProductList') {
+        // 添加商品列表前，建议有一级分类导航（但不强制）
+        // 如果没有一级分类导航，给出提示
+        if (!inArray('categoryNav', itemsTypes)) {
+          const confirmed = confirm('建议先添加「一级分类导航」组件，以便商品列表能够根据分类筛选。是否继续添加？')
+          if (!confirmed) {
+            return false
+          }
+        }
+        // 商品列表只能存在一个
+        if (inArray('categoryProductList', itemsTypes)) {
+          this.$message.warning('「分类商品列表」组件最多只能存在一个')
+          return false
+        }
+      }
       // 验证xx组件只能存在一个
       if (type === 'xxx') {
         const itemsTypes = data.items.map(item => item.type)

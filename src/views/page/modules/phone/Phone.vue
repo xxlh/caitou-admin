@@ -494,6 +494,93 @@
             v-html="item.params.content"
           ></div>
 
+          <!-- 一级分类导航 -->
+          <div
+            v-else-if="item.type == 'categoryNav'"
+            class="diy-category-nav"
+            :style="{ background: item.style.backgroundColor || '#fff', padding: `${item.style.paddingTop || 0}px 0 ${item.style.paddingBottom || 0}px` }"
+          >
+            <div class="category-nav-preview">
+              <div class="nav-scroll">
+                <div class="nav-item" v-for="i in 5" :key="i">
+                  <div class="nav-icon"></div>
+                  <div class="nav-text">分类{{ i }}</div>
+                </div>
+              </div>
+              <div v-if="item.params.showExpandButton !== false" class="nav-expand-btn">
+                <span>展</span>
+                <span>开</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 二级分类导航 -->
+          <div
+            v-else-if="item.type == 'categorySubNav'"
+            class="diy-category-subnav"
+            :style="{ 
+              background: item.style.backgroundColor || '#f5f5f5', 
+              width: (item.style.width || 160) + 'px',
+              padding: `${item.style.paddingTop || 0}px 0 ${item.style.paddingBottom || 0}px`,
+              minHeight: '200px'
+            }"
+          >
+            <div class="subnav-preview">
+              <div class="subnav-item" v-for="i in 6" :key="i" :class="{ active: i === 1 }">
+                <div class="subnav-dot"></div>
+                <div class="subnav-text">子分类{{ i }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 分类商品列表 -->
+          <div
+            v-else-if="item.type == 'categoryProductList'"
+            class="diy-category-product-list"
+            :style="{ 
+              background: item.style.backgroundColor || '#fff',
+              padding: `${item.style.paddingTop || 0}px ${item.style.paddingLeft || 0}px ${item.style.paddingBottom || 0}px ${item.style.paddingRight || 0}px`
+            }"
+          >
+            <!-- 筛选器和排序条 -->
+            <div v-if="item.params.showFilter || item.params.showSort" class="filter-bar-preview">
+              <div v-if="item.params.showFilter" class="filter-item-preview">
+                <span>全部</span>
+                <span class="arrow">▼</span>
+              </div>
+              <div v-if="item.params.showSort" class="sort-bar-preview">
+                <span class="sort-item" :class="{ active: true }">默认</span>
+                <span class="sort-item">价格</span>
+                <span class="sort-item">销量</span>
+              </div>
+            </div>
+            <!-- 广告位 -->
+            <div v-if="item.params.showAd && item.params.adImage" class="ad-preview">
+              <img :src="item.params.adImage" alt="广告" />
+            </div>
+            <!-- 商品列表 -->
+            <div class="goods-list-preview" :class="['display__' + (item.style.display || 'list'), 'column__' + (item.style.column || 2)]">
+              <div 
+                class="goods-item-preview" 
+                v-for="i in (item.style.column == 1 ? 3 : (item.style.column == 2 ? 4 : 6))" 
+                :key="i"
+              >
+                <div class="goods-image-preview">
+                  <div class="placeholder-img"></div>
+                </div>
+                <div class="goods-detail-preview">
+                  <div v-if="item.style.show && item.style.show.includes('title')" class="goods-title-preview">
+                    商品名称示例文字
+                  </div>
+                  <div class="goods-price-preview" :style="{ color: item.style.priceColor || '#289a2d' }">
+                    <span class="price-unit">¥</span>
+                    <span>99.00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- 删除操作 -->
           <div class="btn-edit-del">
             <div class="btn-del" @click="handleDeleleItem(index)">删除</div>

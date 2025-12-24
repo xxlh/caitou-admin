@@ -24,6 +24,8 @@
               <a-menu-item v-for="area in areasById" :key="area.id">
                 <a-icon type="environment" /> {{area.name}}
                 <span>- {{area.city}} {{area.district}}</span>
+                <a-tag v-if="area.is_intracity !== false" color="green" size="small" style="margin-left: 8px; font-size: 10px;">同城</a-tag>
+                <a-tag v-if="area.is_default" color="orange" size="small" style="margin-left: 4px; font-size: 10px;">默认</a-tag>
               </a-menu-item>
             </a-menu>
           </a-layout-sider>
@@ -32,6 +34,13 @@
             <a-card class="floating-controller" :bodyStyle="{display: 'flex', flexDirection: 'column'}">
               <a-button type='default' @click="handleEdit">区域信息</a-button>
               <a-button type='primary' @click="saveArea">保存路径</a-button>
+              <a-button 
+                :type="isCurrentAreaDefault ? 'default' : 'dashed'" 
+                :disabled="isCurrentAreaDefault"
+                @click="handleSetDefault"
+              >
+                {{ isCurrentAreaDefault ? '当前为默认区域' : '设为默认区域' }}
+              </a-button>
               <div class="plain-button" size="large">
                 <a-button type='default' icon="plus" @click="createPath"></a-button>
                 <a-button type='danger' ghost icon="delete" @click="removePath"></a-button>
@@ -59,6 +68,13 @@ export default {
     AddForm,
     EditForm,
     SelectRegion,
+  },
+  computed: {
+    isCurrentAreaDefault () {
+      const areaId = this.selectedKeys[0]
+      if (!areaId) return false
+      return this.areasById[areaId]?.is_default || false
+    }
   },
   data () {
     return {
@@ -279,6 +295,34 @@ export default {
       this.map.remove(polygon);
       this.polyEditor.close();
       this.polygons = this.polygons.filter(p => p != polygon);
+    },
+    /**
+     * 设置为默认区域
+     */
+    handleSetDefault () {
+      const areaId = this.selectedKeys[0]
+      if (!areaId) {
+        this.$message.error('当前未选中区域')
+        return
+      }
+      const app = this
+      this.$confirm({
+        title: '确认设置为默认区域?',
+        content: '设置后，未选择区域的用户将使用该区域的数据（包括首页、商品、分类等）',
+        onOk () {
+          return Api.setDefault(areaId).then(() => {
+            app.$message.success('设置成功', 1.5)
+            // 更新本地数据
+            Object.keys(app.areasById).forEach(id => {
+              app.areasById[id].is_default = (parseInt(id) === areaId)
+            })
+            // 强制更新视图
+            app.$forceUpdate()
+          }).catch(e => {
+            app.$message.error(e.msg || '设置失败', 3)
+          })
+        }
+      })
     },
   }
 }

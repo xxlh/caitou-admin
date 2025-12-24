@@ -9,6 +9,7 @@ const api = {
   edit: '/areas/{id}',
   getCategories: '/areas/{id}/categories',
   setCategories: '/areas/{id}/categorize',
+  setDefault: '/areas/{id}/set_default',
 }
 
 /**
@@ -59,6 +60,17 @@ export function getCategories (id) {
 export function setCategories (id) {
   return axios({
     url: api.setCategories.replace('{id}', id),
+    method: 'post',
+  })
+}
+
+/**
+ * 设置默认区域
+ * @param {*} id
+ */
+export function setDefault (id) {
+  return axios({
+    url: api.setDefault.replace('{id}', id),
     method: 'post',
   })
 }

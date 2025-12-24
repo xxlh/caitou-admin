@@ -1282,6 +1282,199 @@
           </a-tab-pane>
         </a-tabs>
       </div>
+
+      <!-- 一级分类导航 -->
+      <div v-if="curItem.type == 'categoryNav'" class="editor-content">
+        <a-tabs>
+          <a-tab-pane key="1" tab="内容设置">
+            <div class="block-box">
+              <div class="block-title">功能设置</div>
+              <div class="block-item">
+                <span class="label">显示展开按钮</span>
+                <a-switch v-model="curItem.params.showExpandButton" />
+                <div class="tips">是否显示展开按钮（当分类较多时）</div>
+              </div>
+              <div class="block-item">
+                <span class="label">默认选中分类ID</span>
+                <a-input-number v-model="curItem.params.defaultCategoryId" :min="0" />
+                <div class="tips">可选，设置默认选中的分类ID</div>
+              </div>
+            </div>
+          </a-tab-pane>
+          <a-tab-pane key="2" tab="样式设置">
+            <div class="block-box">
+              <div class="block-title">组件样式</div>
+              <div class="block-item">
+                <span class="label">背景颜色</span>
+                <div class="item-colorPicker">
+                  <span
+                    class="rest-color"
+                    @click="onEditorResetColor(curItem.style, 'backgroundColor', '#fff')"
+                  >重置</span>
+                  <colorPicker v-model="curItem.style.backgroundColor" defaultColor="#fff" />
+                </div>
+              </div>
+              <div class="block-item">
+                <span class="label">上下边距</span>
+                <div class="item-slider">
+                  <a-slider v-model="curItem.style.paddingTop" :min="0" :max="50" />
+                  <span class="unit-text">
+                    <span>{{ curItem.style.paddingTop }}</span>
+                    <span>像素</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </a-tab-pane>
+        </a-tabs>
+      </div>
+
+      <!-- 二级分类导航 -->
+      <div v-if="curItem.type == 'categorySubNav'" class="editor-content">
+        <a-tabs>
+          <a-tab-pane key="1" tab="样式设置">
+            <div class="block-box">
+              <div class="block-title">组件样式</div>
+              <div class="block-item">
+                <span class="label">背景颜色</span>
+                <div class="item-colorPicker">
+                  <span
+                    class="rest-color"
+                    @click="onEditorResetColor(curItem.style, 'backgroundColor', '#f5f5f5')"
+                  >重置</span>
+                  <colorPicker v-model="curItem.style.backgroundColor" defaultColor="#f5f5f5" />
+                </div>
+              </div>
+              <div class="block-item">
+                <span class="label">组件宽度</span>
+                <div class="item-slider">
+                  <a-slider v-model="curItem.style.width" :min="120" :max="200" />
+                  <span class="unit-text">
+                    <span>{{ curItem.style.width }}</span>
+                    <span>rpx</span>
+                  </span>
+                </div>
+              </div>
+              <div class="block-item">
+                <span class="label">上下边距</span>
+                <div class="item-slider">
+                  <a-slider v-model="curItem.style.paddingTop" :min="0" :max="50" />
+                  <span class="unit-text">
+                    <span>{{ curItem.style.paddingTop }}</span>
+                    <span>像素</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </a-tab-pane>
+        </a-tabs>
+      </div>
+
+      <!-- 分类商品列表 -->
+      <div v-if="curItem.type == 'categoryProductList'" class="editor-content">
+        <a-tabs>
+          <a-tab-pane key="1" tab="内容设置">
+            <div class="block-box">
+              <div class="block-title">功能设置</div>
+              <div class="block-item">
+                <span class="label">显示筛选器</span>
+                <a-switch v-model="curItem.params.showFilter" />
+                <div class="tips">是否显示筛选按钮</div>
+              </div>
+              <div class="block-item">
+                <span class="label">显示排序条</span>
+                <a-switch v-model="curItem.params.showSort" />
+                <div class="tips">是否显示排序选项（价格、销量等）</div>
+              </div>
+              <div class="block-item">
+                <span class="label">显示价格筛选</span>
+                <a-switch v-model="curItem.params.showPriceFilter" />
+                <div class="tips">是否在筛选器中显示价格区间筛选</div>
+              </div>
+              <div class="block-item">
+                <span class="label">显示分类广告</span>
+                <a-switch v-model="curItem.params.showAd" />
+                <div class="tips">是否在商品列表上方显示广告位</div>
+              </div>
+              <div v-if="curItem.params.showAd" class="block-item">
+                <span class="label">广告图片</span>
+                <SImage v-model="curItem.params.adImage" :channel="channel" :channel_id="pageId" collection="carousel_images" :width="60" :height="60" />
+              </div>
+              <div v-if="curItem.params.showAd && curItem.params.adImage" class="block-item">
+                <span class="label">广告链接</span>
+                <a-input v-model="curItem.params.adLink" placeholder="可选，点击广告跳转的链接" />
+                <div class="tips">可以是内部页面路径（如：/pages/goods/goods?id=123）或外部链接（http://...）</div>
+              </div>
+            </div>
+          </a-tab-pane>
+          <a-tab-pane key="2" tab="样式设置">
+            <div class="block-box">
+              <div class="block-title">商品列表样式</div>
+              <div class="block-item">
+                <span class="label">显示模式</span>
+                <a-radio-group buttonStyle="solid" v-model="curItem.style.display">
+                  <a-radio-button value="list">列表</a-radio-button>
+                  <a-radio-button value="slide">滑动</a-radio-button>
+                </a-radio-group>
+              </div>
+              <div class="block-item">
+                <span class="label">每行数量</span>
+                <a-radio-group buttonStyle="solid" v-model="curItem.style.column">
+                  <a-radio-button :value="1">1列</a-radio-button>
+                  <a-radio-button :value="2">2列</a-radio-button>
+                  <a-radio-button :value="3">3列</a-radio-button>
+                </a-radio-group>
+              </div>
+              <div class="block-item">
+                <span class="label">显示内容</span>
+                <a-checkbox-group v-model="curItem.style.show">
+                  <a-checkbox value="title">商品名称</a-checkbox>
+                  <a-checkbox value="price">价格</a-checkbox>
+                  <a-checkbox value="highlight">卖点</a-checkbox>
+                  <a-checkbox value="sold_total">销量</a-checkbox>
+                </a-checkbox-group>
+              </div>
+              <div class="block-item">
+                <span class="label">加购按钮样式</span>
+                <a-radio-group buttonStyle="solid" v-model="curItem.style.joinButton">
+                  <a-radio-button value="cart">购物车图标</a-radio-button>
+                  <a-radio-button value="add">加减按钮</a-radio-button>
+                </a-radio-group>
+              </div>
+              <div class="block-item">
+                <span class="label">价格颜色</span>
+                <div class="item-colorPicker">
+                  <span
+                    class="rest-color"
+                    @click="onEditorResetColor(curItem.style, 'priceColor', '#289a2d')"
+                  >重置</span>
+                  <colorPicker v-model="curItem.style.priceColor" defaultColor="#289a2d" />
+                </div>
+              </div>
+              <div class="block-item">
+                <span class="label">卡片背景色</span>
+                <div class="item-colorPicker">
+                  <span
+                    class="rest-color"
+                    @click="onEditorResetColor(curItem.style, 'background', '#fff')"
+                  >重置</span>
+                  <colorPicker v-model="curItem.style.background" defaultColor="#fff" />
+                </div>
+              </div>
+              <div class="block-item">
+                <span class="label">左右边距</span>
+                <div class="item-slider">
+                  <a-slider v-model="curItem.style.paddingLeft" :min="0" :max="50" />
+                  <span class="unit-text">
+                    <span>{{ curItem.style.paddingLeft }}</span>
+                    <span>像素</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </a-tab-pane>
+        </a-tabs>
+      </div>
     </template>
   </div>
 </template>
