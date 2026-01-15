@@ -115,6 +115,7 @@ import { debounce } from '@/utils/util'
 import * as FileApi from '@/api/files'
 import * as GroupApi from '@/api/files/group'
 import * as UploadApi from '@/api/upload'
+import rawAxios from 'axios'
 import FileTypeEnum from '@/common/enum/file/FileType'
 import ChannelEnum from '@/common/enum/file/Channel'
 import AddGroupForm from './AddGroupForm'
@@ -343,26 +344,43 @@ export default {
     },
 
     // 事件: 自定义上传
-    onUpload (info) {
+    async onUpload (info) {
       this.isLoading = true
       // 记录上传状态
       this.uploading.push(true)
-      // 构建上传参数
-      const formData = new FormData()
-      formData.append('file', info.file)
-      if (this.channel) formData.append('channel', this.channel || this.queryParam.channel)
-      if (this.channel_id) formData.append('channel_id', this.channel_id)
-      formData.append('collection', this.collection || this.queryParam.collection)
-      // 开始上传
-      this.uploadUrl(formData)
-        .finally(() => {
-          this.uploading.pop()
-          if (this.uploading.length === 0) {
-            this.isLoading = false
-            if (this.collection) this.queryParam.collection = this.collection
-            this.handleRefresh(true)
-          }
+      const file = info.file
+      const payload = {
+        file_name: file.name,
+        size: file.size,
+        mime_type: file.type,
+        collection: this.collection || this.queryParam.collection
+      }
+      if (this.channel) payload.channel = this.channel || this.queryParam.channel
+      if (this.channel_id) payload.channel_id = this.channel_id
+
+      let mediaId = null
+      try {
+        const presign = await UploadApi.presign(payload)
+        mediaId = presign.media_id
+        await rawAxios.put(presign.upload_url, file, {
+          headers: presign.upload_headers || { 'Content-Type': file.type }
         })
+        await UploadApi.complete(mediaId)
+        info.onSuccess && info.onSuccess({}, file)
+      } catch (err) {
+        if (mediaId) {
+          FileApi.deleted({ ids: [mediaId] }).catch(() => true)
+        }
+        info.onError && info.onError(err)
+        this.$message.error((err && err.message) || '上传失败')
+      } finally {
+        this.uploading.pop()
+        if (this.uploading.length === 0) {
+          this.isLoading = false
+          if (this.collection) this.queryParam.collection = this.collection
+          this.handleRefresh(true)
+        }
+      }
     },
 
     // 列表分页事件
