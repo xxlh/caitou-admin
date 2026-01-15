@@ -7,5 +7,6 @@ import Enum from '../enum'
 export default new Enum([
     { key: 'IMAGE', name: '图片', value: 'image' },
     { key: 'ANNEX', name: '附件', value: 'file' },
-    { key: 'VIDEO', name: '视频', value: 'video' }
+    { key: 'VIDEO', name: '视频', value: 'video' },
+    { key: 'AUDIO', name: '音频', value: 'audio' }
 ])

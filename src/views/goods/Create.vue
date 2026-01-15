@@ -19,14 +19,53 @@
               />
             </a-form-item>
             <a-form-item label="商品类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-radio-group v-decorator="['type', {initialValue: $store.getters.storeId ? 'intra-city' : 'physical', rules: [{required: true}]}]">
+              <a-radio-group v-decorator="['type', {initialValue: $store.getters.storeId ? 'intra-city' : 'physical', rules: [{required: true}]}]" @change="onProductTypeChange">
                 <a-radio value="intra-city">同城商品</a-radio>
                 <a-radio value="physical">跨地商品</a-radio>
                 <a-radio value="travel">旅游线路</a-radio>
                 <a-radio value="verification">核销卡券</a-radio>
                 <a-radio value="virtual">线下交易</a-radio>
+                <a-radio value="course">课程</a-radio>
               </a-radio-group>
             </a-form-item>
+            <template v-if="form.getFieldValue('type') === 'course'">
+              <a-form-item label="课程媒体类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                <a-radio-group v-decorator="['course_media_type', {initialValue: 'audio', rules: [{required: true, message: '请选择课程媒体类型'}]}]" @change="onCourseMediaTypeChange">
+                  <a-radio value="audio">音频</a-radio>
+                  <a-radio value="video">视频</a-radio>
+                </a-radio-group>
+              </a-form-item>
+              <a-form-item label="课程媒体" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                <SelectAudio
+                  v-if="courseMediaType === 'audio'"
+                  collection="course_media"
+                  :multiple="false"
+                  v-decorator="['course_media_id', {rules: [{required: true, message: '请上传课程音频'}]}]"
+                />
+                <SelectVideo
+                  v-else
+                  collection="course_media"
+                  :multiple="false"
+                  v-decorator="['course_media_id', {rules: [{required: true, message: '请上传课程视频'}]}]"
+                />
+              </a-form-item>
+              <a-form-item label="免费课程" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                <a-checkbox :checked="isCourseFree" @change="onCourseFreeChange">免费</a-checkbox>
+                <span class="ml-10 form-item-help">勾选后价格自动设为0</span>
+              </a-form-item>
+              <a-form-item v-if="!isCourseFree" label="课程价格" :labelCol="labelCol" :wrapperCol="wrapperCol" extra="商品的实际购买金额">
+                <a-input-number
+                  :min="0"
+                  :precision="2"
+                  v-decorator="['price', { initialValue: 1, rules: [{ required: true, message: '请输入课程价格' }] }]"
+                />
+                <span class="ml-10">元</span>
+              </a-form-item>
+              <a-form-item v-if="!isCourseFree" label="试听时长" :labelCol="labelCol" :wrapperCol="wrapperCol" extra="留空表示不允许试听">
+                <a-input-number :min="1" :precision="0" v-decorator="['course_trial_minutes']" />
+                <span class="ml-10">分钟</span>
+              </a-form-item>
+            </template>
             <a-form-item label="商品分类" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-tree-select
                 placeholder="请选择商品分类"
@@ -58,7 +97,7 @@
             <!-- <a-form-item label="商品编码" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-input placeholder="请输入商品编码" v-decorator="['goods_no']" />
             </a-form-item> -->
-            <a-form-item label="运费模板" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-form-item v-if="form.getFieldValue('type') !== 'course'" label="运费模板" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-select
                 style="width: 300px"
                 v-decorator="['delivery_id', {rules: [{required: false, message: '请选择运费模板'}]}]"
@@ -90,7 +129,7 @@
 
           <!-- 规格/库存 -->
           <div class="tab-pane" v-show="tabKey == 1">
-            <a-form-item label="规格类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-form-item v-if="form.getFieldValue('type') !== 'course'" label="规格类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-radio-group
                 v-decorator="['spec_type', { initialValue: 10, rules: [{ required: true }] }]"
                 @change="onForceUpdate()"
@@ -102,16 +141,17 @@
               </a-radio-group>
             </a-form-item>
             <!-- 多规格的表单内容 -->
-            <div v-show="form.getFieldValue('spec_type') == 20">
+            <div v-show="form.getFieldValue('spec_type') == 20 && form.getFieldValue('type') !== 'course'">
               <MultiSpec ref="MultiSpec" />
             </div>
             <!-- 单规格的表单内容 -->
             <div v-show="form.getFieldValue('spec_type') == 10">
               <a-form-item
+                v-if="form.getFieldValue('type') !== 'course'"
                 label="商品价格"
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
-                extra="商品的实际购买金额，最低0.01"
+                extra="商品的实际购买金额"
               >
                 <a-input-number
                   :min="0.01"
@@ -152,6 +192,7 @@
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
                 extra="商品的实际库存数量，为0时用户无法下单"
+                v-if="form.getFieldValue('type') !== 'course'"
               >
                 <a-input-number
                   :min="0"
@@ -165,6 +206,7 @@
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
                 extra="商品的实际重量，用于计算运费"
+                v-if="form.getFieldValue('type') !== 'course'"
               >
                 <a-input-number
                   :min="0"
@@ -173,7 +215,7 @@
                 <span class="ml-10">克 (g)</span>
               </a-form-item>
             </div>
-            <a-form-item label="库存计算方式" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-form-item v-if="form.getFieldValue('type') !== 'course'" label="库存计算方式" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-radio-group
                 v-decorator="['deduct_stock_type', {initialValue: 10, rules: [{ required: true }]}]"
               >
@@ -334,13 +376,14 @@
 
 <script>
 import * as GoodsApi from '@/api/goods'
-import { SelectImage, SelectVideo, Ueditor, InputNumberGroup } from '@/components'
+import { SelectAudio, SelectImage, SelectVideo, Ueditor, InputNumberGroup } from '@/components'
 import GoodsModel from '@/common/model/goods/Index'
 import MultiSpec from './modules/MultiSpec'
 import ChannelEnum from '@/common/enum/file/Channel'
 
 export default {
   components: {
+    SelectAudio,
     SelectImage,
     SelectVideo,
     Ueditor,
@@ -363,6 +406,9 @@ export default {
       // 表单数据
       formData: GoodsModel.formData,
       channel: ChannelEnum.PRODUCT.value,
+      isCourseFree: false,
+      // 课程媒体类型（用于控制显示音频/视频选择器）
+      courseMediaType: 'audio',
     }
   },
   // 初始化数据
@@ -414,6 +460,31 @@ export default {
         this.isLoading = false
       })
     },
+    onProductTypeChange (e) {
+      const type = e && e.target ? e.target.value : e
+      if (type === 'course') {
+        this.form.setFieldsValue({ spec_type: 10, stock: 999999, weight: 0 })
+        if (this.isCourseFree) this.form.setFieldsValue({ price: 0 })
+      } else {
+        this.isCourseFree = false
+        this.form.setFieldsValue({ course_trial_minutes: null })
+      }
+      this.onForceUpdate(true)
+    },
+    onCourseFreeChange (e) {
+      this.isCourseFree = e.target.checked
+      if (this.isCourseFree) {
+        this.form.setFieldsValue({ price: 0, course_trial_minutes: null })
+      }
+      this.onForceUpdate(true)
+    },
+    // 课程媒体类型切换
+    onCourseMediaTypeChange (e) {
+      this.courseMediaType = e.target.value
+      // 切换类型时清空已选择的媒体
+      this.form.setFieldsValue({ course_media_id: undefined })
+      this.onForceUpdate(true)
+    },
 
     /**
      * 确认按钮
@@ -440,6 +511,20 @@ export default {
           delete values.price
           delete values.stock
         }
+        if (values.type === 'course') {
+          values.spec_type = 10
+          values.stock = values.stock ?? 999999
+          values.weight = values.weight ?? 0
+          const isFreeCourse = this.isCourseFree || Number(values.price) <= 0
+          if (isFreeCourse) {
+            values.price = 0
+            values.course_trial_minutes = null
+          }
+        } else {
+          delete values.course_media_type
+          delete values.course_media_id
+          delete values.course_trial_minutes
+        }
         // 整理商品分类ID集
         values.category_ids = values.categorys.map(item => item.value)
         delete values.categorys
@@ -456,7 +541,7 @@ export default {
       // 表单字段与tabKey对应关系
       // 只需要必填字段就可
       const tabsFieldsMap = [
-        ['title', 'categorys', 'image_ids', 'delivery_id'],
+        ['title', 'categorys', 'image_ids', 'delivery_id', 'course_media_type', 'course_media_id', 'course_trial_minutes'],
         ['spec_type', 'price'],
         ['content'],
         ['alone_grade_equity', 'first_money', 'second_money', 'third_money']

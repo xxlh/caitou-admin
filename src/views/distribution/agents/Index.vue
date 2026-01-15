@@ -94,6 +94,10 @@
       </span>
       <span slot="actions" slot-scope="text, record">
         <a @click="openDetail(record)">查看数据</a>
+        <template v-if="$auth('distribution.agents.manage')">
+          <a-divider type="vertical" />
+          <a @click="openChangeLeaderModal(record)">修改上级</a>
+        </template>
       </span>
     </a-table>
   </a-card>
@@ -156,6 +160,61 @@
       </a-spin>
     </template>
   </a-drawer>
+
+  <!-- 修改上级分销员的模态框 -->
+  <a-modal
+    title="修改上级分销员"
+    :visible="changeLeaderVisible"
+    :confirmLoading="changeLeaderLoading"
+    :maskClosable="false"
+    @ok="handleChangeLeader"
+    @cancel="closeChangeLeaderModal"
+    width="600px"
+  >
+    <a-form layout="vertical">
+      <a-alert 
+        v-if="currentChangeAgent" 
+        type="info" 
+        showIcon
+        style="margin-bottom: 16px"
+      >
+        <template slot="message">
+          <div>
+            <strong>当前分销员：</strong>
+            {{ currentChangeAgent.user_nickname || '未设置昵称' }} (ID: {{ currentChangeAgent.user_id }})
+            <div style="margin-top: 4px; color: #666">
+              当前上级：{{ currentChangeAgent.first_leader ? ('ID: ' + currentChangeAgent.first_leader) : '无（顶级分销员）' }}
+            </div>
+          </div>
+        </template>
+      </a-alert>
+      
+      <a-form-item label="新上级分销员">
+        <a-select
+          v-model="changeLeaderForm.first_leader"
+          showSearch
+          allowClear
+          placeholder="搜索分销员昵称/ID，留空则设为顶级分销员"
+          :filterOption="false"
+          :loading="leaderSearchLoading"
+          @search="handleLeaderSearch"
+          style="width: 100%"
+        >
+          <a-select-option 
+            v-for="agent in leaderOptions" 
+            :key="agent.user_id" 
+            :value="agent.user_id"
+            :disabled="currentChangeAgent && agent.user_id === currentChangeAgent.user_id"
+          >
+            {{ agent.user_nickname || '未设置昵称' }} (ID: {{ agent.user_id }}) - LV{{ agent.level }}
+          </a-select-option>
+        </a-select>
+        <div style="margin-top: 8px; color: #999; font-size: 12px">
+          留空或清除选择，该分销员将成为顶级分销员（无上级）
+        </div>
+      </a-form-item>
+    </a-form>
+  </a-modal>
 
   <!-- 提升用户为分销员的模态框 -->
   <a-modal
@@ -289,7 +348,7 @@ export default {
           dataIndex: 'created_at',
           customRender: (text) => this.formatDate(text)
         },
-        { title: '操作', scopedSlots: { customRender: 'actions' }, width: 120 }
+        { title: '操作', scopedSlots: { customRender: 'actions' }, width: 160 }
       ],
       detailColumns: [
         { title: '日期', dataIndex: 'date' },
@@ -321,7 +380,17 @@ export default {
       userOptions: [],
       referrerOptions: [],
       userSearchLoading: false,
-      referrerSearchLoading: false
+      referrerSearchLoading: false,
+      
+      // 修改上级分销员相关
+      changeLeaderVisible: false,
+      changeLeaderLoading: false,
+      changeLeaderForm: {
+        first_leader: undefined
+      },
+      currentChangeAgent: null,
+      leaderOptions: [],
+      leaderSearchLoading: false
     }
   },
   computed: {
@@ -663,6 +732,116 @@ export default {
         this.$message.error(error?.msg || '提升失败，该用户可能已经是分销员')
       } finally {
         this.promoteLoading = false
+      }
+    },
+
+    // === 修改上级分销员相关方法 ===
+    
+    /**
+     * 打开修改上级模态框
+     */
+    openChangeLeaderModal (record) {
+      this.currentChangeAgent = record
+      this.changeLeaderForm = {
+        first_leader: record.first_leader || undefined
+      }
+      this.leaderOptions = []
+      this.changeLeaderVisible = true
+      
+      // 如果当前有上级，预加载上级信息
+      if (record.first_leader) {
+        this.preloadCurrentLeader(record.first_leader)
+      }
+    },
+    
+    /**
+     * 关闭修改上级模态框
+     */
+    closeChangeLeaderModal () {
+      this.changeLeaderVisible = false
+      this.currentChangeAgent = null
+      this.changeLeaderForm = { first_leader: undefined }
+      this.leaderOptions = []
+    },
+    
+    /**
+     * 预加载当前上级信息
+     */
+    async preloadCurrentLeader (leaderId) {
+      try {
+        const res = await fetchAgents({ 
+          keyword: String(leaderId), 
+          per_page: 10 
+        })
+        const agents = res.data || []
+        const currentLeader = agents.find(a => a.user_id === leaderId)
+        if (currentLeader && !this.leaderOptions.find(o => o.user_id === leaderId)) {
+          this.leaderOptions = [currentLeader, ...this.leaderOptions]
+        }
+      } catch (error) {
+        console.error('预加载上级信息失败:', error)
+      }
+    },
+    
+    /**
+     * 搜索上级分销员
+     */
+    async handleLeaderSearch (keyword) {
+      this.leaderSearchLoading = true
+      try {
+        const res = await fetchAgents({ 
+          keyword: keyword || undefined, 
+          per_page: 50 
+        })
+        this.leaderOptions = res.data || []
+      } catch (error) {
+        this.$message.error('搜索分销员失败')
+        this.leaderOptions = []
+      } finally {
+        this.leaderSearchLoading = false
+      }
+    },
+    
+    /**
+     * 提交修改上级
+     */
+    async handleChangeLeader () {
+      if (!this.currentChangeAgent) {
+        return
+      }
+      
+      const newLeader = this.changeLeaderForm.first_leader || null
+      const oldLeader = this.currentChangeAgent.first_leader || null
+      
+      // 如果没有变化，直接关闭
+      if (newLeader === oldLeader) {
+        this.$message.info('上级未发生变化')
+        this.closeChangeLeaderModal()
+        return
+      }
+      
+      // 不能设置自己为自己的上级
+      if (newLeader && newLeader === this.currentChangeAgent.user_id) {
+        this.$message.error('不能将自己设为自己的上级')
+        return
+      }
+      
+      this.changeLeaderLoading = true
+      try {
+        await updateAgent(this.currentChangeAgent.user_id, {
+          first_leader: newLeader
+        })
+        
+        const msg = newLeader 
+          ? '上级分销员已修改' 
+          : '已设置为顶级分销员（无上级）'
+        this.$message.success(msg)
+        this.closeChangeLeaderModal()
+        this.loadData() // 刷新列表
+      } catch (error) {
+        this.$message.error(error?.msg || '修改上级失败')
+      } finally {
+        this.changeLeaderLoading = false
       }
     }
   }

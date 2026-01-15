@@ -5,6 +5,7 @@ import { STable } from '@/components/Table'
 
 import SelectImage from '@/components/SelectImage'
 import SelectVideo from '@/components/SelectVideo'
+import SelectAudio from '@/components/SelectAudio'
 import SelectGoods from '@/components/SelectGoods'
 import SelectGoodsSku from '@/components/SelectGoodsSku'
 import SelectRegion from '@/components/SelectRegion'
@@ -20,6 +21,7 @@ export {
 
   SelectImage,
   SelectVideo,
+  SelectAudio,
   SelectGoods,
   SelectGoodsSku,
   SelectRegion,

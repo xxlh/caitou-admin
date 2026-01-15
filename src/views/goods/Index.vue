@@ -36,6 +36,7 @@
             <a-radio-button value="travel" v-if="$store.getters.role.name == '旅游线路管理员' || $store.getters.role.name == '超级管理员'">旅游线路</a-radio-button>
             <a-radio-button value="verification" v-if="$store.getters.role.name == '旅游线路管理员' || $store.getters.role.name == '超级管理员'">核销卡券</a-radio-button>
             <a-radio-button value="virtual" v-if="$store.getters.role.name == '跨地商品管理员' || $store.getters.role.name == '超级管理员'">线下交易</a-radio-button>
+            <a-radio-button value="course" v-if="$store.getters.role.name == '超级管理员'">课程</a-radio-button>
           </a-radio-group>
         </div>
         <div class="tab-list fl-l">

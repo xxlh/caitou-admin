@@ -40,7 +40,7 @@
             <div class="file-upload fl-r">
               <span
                 class="upload-desc"
-              >{{ fileType === FileTypeEnum.VIDEO.value ? '视频' : '图片' }}大小不能超过{{ uploadSizeLimit }}M</span>
+              >{{ fileTypeLabel }}大小不能超过{{ uploadSizeLimit }}M</span>
               <a-upload
                 name="iFile"
                 :accept="accept"
@@ -65,7 +65,7 @@
               >
                 <div
                   class="img-cover"
-                  :style="{ backgroundImage: `url('${item.preview_url||item.original_url}')`, width: fileType === FileTypeEnum.VIDEO.value ? '55px' : '95px' }"
+                  :style="{ backgroundImage: `url('${item.preview_url||item.original_url}')`, width: (fileType === FileTypeEnum.VIDEO.value || fileType === FileTypeEnum.AUDIO.value) ? '55px' : '95px' }"
                 ></div>
                 <p class="file-name oneline-hide">{{ item.file_name }}</p>
                 <div class="select-mask">
@@ -186,6 +186,13 @@ export default {
   created () {
     // if (this.collection) this.queryParam.collection = this.collection
   },
+  computed: {
+    fileTypeLabel () {
+      if (this.fileType === this.FileTypeEnum.VIDEO.value) return '视频'
+      if (this.fileType === this.FileTypeEnum.AUDIO.value) return '音频'
+      return '图片'
+    }
+  },
   methods: {
 
     // 显示对话框
@@ -194,6 +201,10 @@ export default {
       this.visible = true
       // 初始化文件类型
       this.initFileType()
+      // 初始化 collection 参数（筛选指定分组的文件）
+      if (this.collection) {
+        this.queryParam.collection = this.collection
+      }
       // 获取分组列表
       this.getGroupList()
       // 获取文件列表
@@ -202,18 +213,24 @@ export default {
 
     // 初始化文件类型
     initFileType () {
-      const publicConfig = store.getters.publicConfig
+      const publicConfig = store.getters.publicConfig || {}
       if (this.fileType === FileTypeEnum.IMAGE.value) {
         this.title = '图片库'
         this.accept = 'image/jpeg,image/png,image/gif,image/webp'
         this.uploadUrl = UploadApi.image
-        this.uploadSizeLimit = publicConfig.uploadImageSize || 2
+        this.uploadSizeLimit = publicConfig.uploadImageSize || 10
       }
       if (this.fileType === FileTypeEnum.VIDEO.value) {
         this.title = '视频库'
         this.accept = '.mp4'
         this.uploadUrl = UploadApi.video
-        this.uploadSizeLimit = publicConfig.uploadVideoSize || 10
+        this.uploadSizeLimit = publicConfig.uploadVideoSize || 500
+      }
+      if (this.fileType === FileTypeEnum.AUDIO.value) {
+        this.title = '音频库'
+        this.accept = 'audio/mpeg,audio/mp4,audio/x-m4a,audio/aac,audio/wav'
+        this.uploadUrl = UploadApi.video
+        this.uploadSizeLimit = publicConfig.uploadAudioSize || 200
       }
       this.queryParam.type = this.fileType
     },

@@ -83,6 +83,7 @@ export default {
     const goodsFormData = _.pick(goodsInfo, [
       'title', 'type', 'delivery_id', 'delivery_hours_taking', 'delivery_days_taking', 'delivery_latest', 'on_sale',
       'description', 'highlight', 'serviceIds', 'sold_inital', 'is_points_gift',
+      'course_media_type', 'course_trial_minutes',
       'is_points_discount', 'is_enable_grade', 'is_alone_grade'
     ])
     // 格式化categoryIds
