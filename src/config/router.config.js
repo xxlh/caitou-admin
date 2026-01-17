@@ -277,6 +277,24 @@ export const asyncRouterMap = [
                 meta: { title: '余额明细', keepAlive: false, permission: ['users.account'] }
               }
             ]
+          },
+          {
+            path: '/user/withdrawals',
+            component: RouteView,
+            redirect: '/user/withdrawals/index',
+            meta: { title: '提现管理', keepAlive: false, permission: ['distribution.withdrawals.view'] },
+            children: [
+              {
+                path: '/user/withdrawals/index',
+                component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/withdrawals/Index'),
+                meta: { title: '提现审核', keepAlive: false, permission: ['distribution.withdrawals.view'] }
+              },
+              {
+                path: '/user/withdrawals/setting',
+                component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/withdrawals/Setting'),
+                meta: { title: '提现配置', keepAlive: false, permission: ['distribution.withdrawals.setting'] }
+              }
+            ]
           }
         ]
       },
@@ -286,18 +304,59 @@ export const asyncRouterMap = [
         path: '/distribution',
         name: 'distribution',
         component: RouteView,
-        redirect: '/distribution/agents',
+        // redirect 会根据权限动态设置为第一个有权限的子菜单
         meta: {
           title: '分销管理',
           icon: Icons.team,
           permission: [
+            // 管理员权限
             'distribution.agents.view',
             'distribution.rebates.view',
-            'distribution.withdrawals.view',
-            'distribution.orders.view'
+            'distribution.orders.view',
+            'distribution.settings.view',
+            'distribution.manager.view',
+            // 分销管理员团队权限
+            'distribution.team.data.view',
+            'distribution.team.agents.view',
+            'distribution.team.products.view',
+            'distribution.team.orders.view',
+            'distribution.team.commission.view'
           ]
         },
         children: [
+          // ========== 分销管理员可查看的菜单（按顺序：团队数据、团队成员、分销商品、分销订单、团队佣金）==========
+          // 注意：这些菜单放在前面，这样分销管理员登录后会自动跳转到第一个有权限的菜单
+          {
+            path: '/distribution/team-data',
+            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/teams/data/Index'),
+            meta: { title: '团队数据', keepAlive: false, permission: ['distribution.team.data.view'] }
+          },
+          {
+            path: '/distribution/team-members',
+            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/teams/members/Index'),
+            meta: { title: '团队成员', keepAlive: false, permission: ['distribution.team.agents.view'] }
+          },
+          {
+            path: '/distribution/team-products',
+            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/teams/products/Index'),
+            meta: { title: '分销商品', keepAlive: false, permission: ['distribution.team.products.view'] }
+          },
+          {
+            path: '/distribution/team-orders',
+            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/teams/orders/Index'),
+            meta: { title: '分销订单', keepAlive: false, permission: ['distribution.team.orders.view'] }
+          },
+          {
+            path: '/distribution/team-commission',
+            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/teams/commission/Index'),
+            meta: { title: '团队佣金', keepAlive: false, permission: ['distribution.team.commission.view'] }
+          },
+          // ========== 管理员专用菜单 ==========
+          {
+            path: '/distribution/stats',
+            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/stats/Index'),
+            meta: { title: '分销数据', keepAlive: false, permission: ['distribution.orders.view'] }
+          },
           {
             path: '/distribution/agents',
             component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/agents/Index'),
@@ -309,24 +368,14 @@ export const asyncRouterMap = [
             meta: { title: '佣金记录', keepAlive: false, permission: ['distribution.rebates.view'] }
           },
           {
-            path: '/distribution/withdrawals',
-            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/withdrawals/Index'),
-            meta: { title: '提现审核', keepAlive: false, permission: ['distribution.withdrawals.view'] }
-          },
-          {
-            path: '/distribution/withdrawals/setting',
-            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/withdrawals/Setting'),
-            meta: { title: '提现配置', keepAlive: false, permission: ['distribution.withdrawals.setting'] }
+            path: '/distribution/settings',
+            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/settings/Index'),
+            meta: { title: '分销配置', keepAlive: false, permission: ['distribution.settings.manage'] }
           },
           {
             path: '/distribution/manager',
             component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/manager/Index'),
-            meta: { title: '分销管理员', keepAlive: false, permission: ['distribution.agents.manage'] }
-          },
-          {
-            path: '/distribution/stats',
-            component: () => import(/* webpackChunkName: "distribution" */ '@/views/distribution/stats/Index'),
-            meta: { title: '分销数据', keepAlive: false, permission: ['distribution.orders.view'] }
+            meta: { title: '分销管理员', keepAlive: false, permission: ['distribution.manager.manage'] }
           }
         ]
       },

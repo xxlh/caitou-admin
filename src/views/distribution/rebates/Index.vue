@@ -22,6 +22,7 @@
       :dataSource="list"
       :loading="loading"
       :pagination="pagination"
+      :scroll="{ x: 1100 }"
       rowKey="id"
       @change="handleTableChange"
     >
@@ -187,5 +188,12 @@ export default {
 <style lang="less" scoped>
 .table-search {
   margin-bottom: 16px;
+}
+
+// 操作区按钮间距
+::v-deep .ant-table-tbody td {
+  .ant-btn + .ant-btn {
+    margin-left: 8px;
+  }
 }
 </style>

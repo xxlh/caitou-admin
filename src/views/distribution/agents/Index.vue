@@ -62,6 +62,7 @@
       :dataSource="list"
       :loading="loading"
       :pagination="pagination"
+      :scroll="{ x: 1200 }"
       rowKey="user_id"
       @change="handleTableChange"
     >
@@ -852,6 +853,13 @@ export default {
 <style lang="less" scoped>
 .table-search {
   margin-bottom: 16px;
+}
+
+// 操作区链接间距
+::v-deep .ant-table-tbody td {
+  a + .ant-divider-vertical {
+    margin: 0 8px;
+  }
 }
 
 .detail-toolbar {

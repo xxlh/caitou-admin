@@ -25,7 +25,16 @@ const api = {
   statsRanking: '/agents/stats/ranking',
   statsOverall: '/agents/stats/overall',
   statsTeam: '/agents/stats/team',
-  statsDetail: '/agents/stats/detail'
+  statsDetail: '/agents/stats/detail',
+  distributionSettings: '/distribution/settings',
+  teamSummary: '/distribution/teams/summary',
+  teamCommission: '/distribution/teams/commission',
+  teamProducts: '/distribution/teams/products',
+  teamProductCommission: '/distribution/teams/products/{id}/commission',
+  teamMembers: '/distribution/teams/members',
+  teamMemberProducts: '/distribution/teams/members/{id}/products',
+  teamMemberProduct: '/distribution/teams/members/{id}/products/{productId}',
+  teamOrders: '/distribution/teams/orders'
 }
 
 export function fetchAgents (params) {
@@ -178,6 +187,101 @@ export function fetchAgentTeamStats (params) {
 export function fetchAgentDetailStats (params) {
   return axios({
     url: api.statsDetail,
+    method: 'get',
+    params
+  })
+}
+
+export function fetchDistributionSettings () {
+  return axios({
+    url: api.distributionSettings,
+    method: 'get'
+  })
+}
+
+export function updateDistributionSettings (data) {
+  return axios({
+    url: api.distributionSettings,
+    method: 'put',
+    data
+  })
+}
+
+export function fetchTeamSummary (params) {
+  return axios({
+    url: api.teamSummary,
+    method: 'get',
+    params
+  })
+}
+
+export function fetchTeamCommission (params) {
+  return axios({
+    url: api.teamCommission,
+    method: 'get',
+    params
+  })
+}
+
+export function updateTeamCommission (data) {
+  return axios({
+    url: api.teamCommission,
+    method: 'put',
+    data
+  })
+}
+
+export function fetchTeamProducts (params) {
+  return axios({
+    url: api.teamProducts,
+    method: 'get',
+    params
+  })
+}
+
+export function updateTeamProductCommission (productId, data) {
+  return axios({
+    url: api.teamProductCommission.replace('{id}', productId),
+    method: 'put',
+    data
+  })
+}
+
+export function fetchTeamMembers (params) {
+  return axios({
+    url: api.teamMembers,
+    method: 'get',
+    params
+  })
+}
+
+export function fetchTeamMemberProducts (agentId, params) {
+  return axios({
+    url: api.teamMemberProducts.replace('{id}', agentId),
+    method: 'get',
+    params
+  })
+}
+
+export function upsertTeamMemberProduct (agentId, data) {
+  return axios({
+    url: api.teamMemberProducts.replace('{id}', agentId),
+    method: 'post',
+    data
+  })
+}
+
+export function deleteTeamMemberProduct (agentId, productId, params) {
+  return axios({
+    url: api.teamMemberProduct.replace('{id}', agentId).replace('{productId}', productId),
+    method: 'delete',
+    params
+  })
+}
+
+export function fetchTeamOrders (params) {
+  return axios({
+    url: api.teamOrders,
     method: 'get',
     params
   })

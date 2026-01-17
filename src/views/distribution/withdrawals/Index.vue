@@ -89,6 +89,7 @@
       :dataSource="list"
       :loading="loading"
       :pagination="pagination"
+      :scroll="{ x: 1200 }"
       :rowSelection="rowSelection"
       rowKey="id"
       @change="handleTableChange"

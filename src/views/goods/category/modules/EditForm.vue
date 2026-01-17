@@ -43,6 +43,47 @@
             v-decorator="['slug', {rules: [{required: true, min: 2, message: '请输入至少2个字符'}]}]"
           />
         </a-form-item>
+        <a-divider>分销配置</a-divider>
+        <a-form-item label="开启分销" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-switch v-decorator="['is_distributable', { valuePropName: 'checked', initialValue: true }]" />
+        </a-form-item>
+        <a-form-item v-if="showDistributionFields" label="佣金类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-select v-decorator="['commission_type']" placeholder="系统默认">
+            <a-select-option value="">系统默认</a-select-option>
+            <a-select-option value="percent">按比例</a-select-option>
+            <a-select-option value="fixed">固定金额</a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item v-if="showDistributionFields" label="一级佣金" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input-number
+            v-decorator="['rank_1_commission']"
+            :min="0"
+            :max="commissionPercentMax"
+            :precision="4"
+            style="width: 200px"
+          />
+          <span class="ant-form-text">{{ commissionUnit }}</span>
+        </a-form-item>
+        <a-form-item v-if="showDistributionFields" label="二级佣金" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input-number
+            v-decorator="['rank_2_commission']"
+            :min="0"
+            :max="commissionPercentMax"
+            :precision="4"
+            style="width: 200px"
+          />
+          <span class="ant-form-text">{{ commissionUnit }}</span>
+        </a-form-item>
+        <a-form-item v-if="showDistributionFields" label="三级佣金" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input-number
+            v-decorator="['rank_3_commission']"
+            :min="0"
+            :max="commissionPercentMax"
+            :precision="4"
+            style="width: 200px"
+          />
+          <span class="ant-form-text">{{ commissionUnit }}</span>
+        </a-form-item>
         <!-- [已废弃] is_limit_area 字段已被区域的 is_intracity 属性替代，此配置项不再使用
         <a-form-item label="同城配送商品分类" :labelCol="labelCol" :wrapperCol="wrapperCol" extra="仅展示当前配送区域商品">
           <a-radio-group v-decorator="['is_limit_area', { initialValue: $store.getters.storeId ? true : false, rules: [{ required: true }] }]">
@@ -103,6 +144,17 @@ export default {
       channel: ChannelEnum.CATEGORY.value,
     }
   },
+  computed: {
+    showDistributionFields () {
+      return this.form.getFieldValue('is_distributable') !== false
+    },
+    commissionUnit () {
+      return this.form.getFieldValue('commission_type') === 'percent' ? '比例(0-1)' : '元'
+    },
+    commissionPercentMax () {
+      return this.form.getFieldValue('commission_type') === 'percent' ? 1 : undefined
+    }
+  },
   methods: {
 
     /**
@@ -126,7 +178,22 @@ export default {
       const { record, form: { setFieldsValue } } = this
       // 设置表单内容 (is_limit_area 已废弃，不再设置)
       this.$nextTick(() => {
-        setFieldsValue(_.pick(record, ['name', 'parent_id', 'image_id', 'status', 'description', 'slug']))
+        const data = _.pick(record, [
+          'name',
+          'parent_id',
+          'image_id',
+          'status',
+          'description',
+          'slug',
+          'is_distributable',
+          'commission_type',
+          'rank_1_commission',
+          'rank_2_commission',
+          'rank_3_commission'
+        ])
+        if (data.is_distributable === undefined || data.is_distributable === null) data.is_distributable = true
+        if (!data.commission_type) data.commission_type = ''
+        setFieldsValue(data)
       })
     },
 
@@ -174,6 +241,17 @@ export default {
     onFormSubmit (values) {
       if (!values.parent_id) delete values.parent_id;
       this.confirmLoading = true
+      if (values.commission_type === '') values.commission_type = null
+      if (values.commission_type === 'percent') {
+        const sum = Number(values.rank_1_commission || 0) +
+          Number(values.rank_2_commission || 0) +
+          Number(values.rank_3_commission || 0)
+        if (sum > 1) {
+          this.$message.error('佣金比例总和不能超过100%')
+          this.confirmLoading = false
+          return
+        }
+      }
       Api.edit(this.record['id'], values)
         .then((result) => {
           // 显示成功
@@ -190,3 +268,10 @@ export default {
   }
 }
 </script>
+
+<style lang="less" scoped>
+.ant-form-text {
+  margin-left: 8px;
+  color: rgba(0, 0, 0, 0.45);
+}
+</style>

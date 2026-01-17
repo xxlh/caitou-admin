@@ -2,21 +2,23 @@ import { asyncRouterMap, constantRouterMap } from '@/config/router.config'
 
 /**
  * 过滤账户是否拥有某一个权限，并将菜单从加载列表移除
+ * 使用 OR 逻辑：只要有一个权限匹配即可访问
  * @param permissions
  * @param routePermissions
  * @returns {boolean}
  */
 export function hasPermission (rolePermissions, routePermissions) {
-  if (!routePermissions) return true
+  if (!routePermissions || routePermissions.length === 0) return true
+  // OR 逻辑：只要有一个权限匹配即可
   for (let i = 0, len = routePermissions.length; i < len; i++) {
     const p = routePermissions[i]
     let permisionInRole = false
     rolePermissions?.forEach(permission => {
       if (matchPermission(p, permission.name)) permisionInRole = true
     })
-    if (!permisionInRole) return false
+    if (permisionInRole) return true // 只要有一个匹配就返回 true
   }
-  return true
+  return false // 没有任何权限匹配
 }
 function matchPermission (permission, toMatch) {
   const parts = toMatch.split('.')
